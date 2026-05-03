@@ -45,7 +45,7 @@ class PayMongoCheckout:
             # IMPORTANT: Use your actual server URL
             # For local testing with ngrok, use your ngrok URL
             # For production, use your domain
-            base_url = "http://127.0.0.1:5000"
+            base_url = os.environ.get('BASE_URL', 'http://127.0.0.1:5000')
             
             success_url = f"{base_url}/api/payments/paymongo-success?booking_id={booking_id}"
             failed_url = f"{base_url}/api/payments/paymongo-failed?booking_id={booking_id}"
