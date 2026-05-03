@@ -6,20 +6,23 @@ from datetime import datetime
 import os
 
 class EmailService:
-    class EmailService:
-     def __init__(self):
+    # Set default
+    enabled = True
+    
+    def __init__(self):
+        # Configure your email settings here
         self.smtp_server = "smtp.gmail.com"
         self.smtp_port = 587
         self.sender_email = os.environ.get('EMAIL_SENDER', "badiablemarcraphael@gmail.com")
         self.sender_password = os.environ.get('EMAIL_PASSWORD', "")
-    
-    # Auto-disable if no password or on Render
+        
+        # Override enabled based on password
         if not self.sender_password:
             self.enabled = False
             print("⚠️ Email service disabled - no EMAIL_PASSWORD set")
         else:
             self.enabled = True
-        print("✅ Email service enabled")
+            print("✅ Email service enabled")
     
     def _get_payment_status_html(self, payment_method, payment_status='pending'):
         """Get payment status badge HTML"""
