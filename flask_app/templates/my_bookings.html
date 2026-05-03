@@ -2,8 +2,8 @@
 
 {% block content %}
 
-<div class="welcome-banner fade-in">
-    <h2 class="fw-bold mb-2"><i class="fas fa-bookmark text-warning me-2"></i> My Bookings</h2>
+<div class="welcome-banner fade-in p-4 mb-4 rounded-4 shadow-sm" style="background: linear-gradient(135deg, #1a2744, #243356); color: white;">
+    <h2 class="fw-bold mb-2"><i class="fas fa-bookmark me-2" style="color: #c9a84c;"></i> My Bookings</h2>
     <p class="mb-0 opacity-75 fs-5">View and manage all your reservations in one place.</p>
 </div>
 
@@ -26,7 +26,7 @@
         </div>
         <div class="col-md-4">
             <label class="fw-bold d-block mb-1">&nbsp;</label>
-            <button class="btn btn-secondary w-100 shadow-sm" onclick="resetFilters()">
+            <button class="btn btn-secondary w-100 shadow-sm fw-bold" onclick="resetFilters()">
                 <i class="fas fa-undo me-1"></i> Reset Filters
             </button>
         </div>
@@ -41,14 +41,11 @@
 </div>
 
 <script>
-// Wait for jQuery to load
 (function() {
     function waitForjQuery() {
         if (typeof jQuery !== 'undefined') {
-            console.log("✅ jQuery loaded, initializing my bookings...");
             initMyBookingsPage();
         } else {
-            console.log("⏳ Waiting for jQuery...");
             setTimeout(waitForjQuery, 100);
         }
     }
@@ -56,8 +53,6 @@
     function initMyBookingsPage() {
         jQuery(document).ready(function($) {
             loadMyBookings();
-            
-            // Add event listeners
             $('#statusFilter').on('change', filterBookings);
             $('#searchInput').on('keyup', filterBookings);
         });
@@ -69,8 +64,6 @@
 var allBookings = [];
 
 function loadMyBookings() {
-    console.log("📋 Loading my bookings...");
-    
     var currentEmail = '{{ session.get("email", "") }}';
     var currentUsername = '{{ session.get("username", "") }}';
     
@@ -78,19 +71,17 @@ function loadMyBookings() {
         url: '/api/bookings/list',
         method: 'GET',
         success: function(bookings) {
-            // Filter bookings for current user
             allBookings = bookings.filter(function(b) {
                 if (currentEmail && b.guest_email === currentEmail) return true;
                 if (currentUsername && b.guest_name === currentUsername) return true;
                 return false;
             });
-            
             displayBookings(allBookings);
         },
         error: function() {
             document.getElementById('bookingsList').innerHTML = `
                 <div class="col-12">
-                    <div class="empty-state">
+                    <div class="text-center py-5">
                         <i class="fas fa-exclamation-circle fa-3x text-danger mb-3"></i>
                         <h4 class="fw-bold">Error Loading Bookings</h4>
                         <p class="text-muted">Could not load your bookings. Please try again later.</p>
@@ -107,11 +98,11 @@ function displayBookings(bookings) {
     if (bookings.length === 0) {
         html = `
             <div class="col-12">
-                <div class="empty-state fade-in">
+                <div class="text-center py-5 fade-in">
                     <i class="fas fa-calendar-times fa-3x text-muted opacity-50 mb-3"></i>
                     <h4 class="fw-bold text-muted">No Bookings Found</h4>
-                    <p class="text-muted">You haven't made any bookings yet or none match your filters.</p>
-                    <a href="/dashboard" class="btn btn-primary mt-3 shadow-sm">
+                    <p class="text-muted">You haven't made any bookings yet.</p>
+                    <a href="/dashboard" class="btn btn-primary mt-3 shadow-sm rounded-pill">
                         <i class="fas fa-bed me-2"></i> Book a Room
                     </a>
                 </div>
@@ -134,16 +125,11 @@ function displayBookings(bookings) {
             var paymentClass = booking.payment_status === 'paid' ? 'status-paid' : 'status-pending';
             var paymentText = booking.payment_status === 'paid' ? 'Paid' : 'Pending Payment';
             
-            var nights = 1;
-            if (booking.check_in_date && booking.check_out_date) {
-                var checkIn = new Date(booking.check_in_date);
-                var checkOut = new Date(booking.check_out_date);
-                nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
-            }
+            var nights = window.calculateNights(booking.check_in_date, booking.check_out_date);
             
             html += `
                 <div class="col-md-6 col-lg-4 fade-in">
-                    <div class="my-booking-card shadow-sm">
+                    <div class="my-booking-card shadow-sm" style="border-radius: 20px; overflow: hidden; background: white; transition: all 0.3s ease;">
                         <div class="card-body d-flex flex-column p-4">
                             <div class="d-flex justify-content-between align-items-start mb-3">
                                 <div>
@@ -155,9 +141,9 @@ function displayBookings(bookings) {
                                 </div>
                             </div>
                             
-                            <div class="p-3 rounded mb-3 bg-light-custom" style="background: #f8fafc;">
-                                <div class="row text-center mb-2 pb-2 border-bottom" style="border-color: #cbd5e1 !important;">
-                                    <div class="col-6 border-end" style="border-color: #cbd5e1 !important;">
+                            <div class="p-3 rounded-3 mb-3" style="background: #f8fafc;">
+                                <div class="row text-center mb-2 pb-2 border-bottom">
+                                    <div class="col-6 border-end">
                                         <small class="text-muted fw-bold d-block">Check-in</small>
                                         <strong class="text-dark">${booking.check_in_date}</strong>
                                     </div>
@@ -175,11 +161,11 @@ function displayBookings(bookings) {
                             <div class="border-top pt-3 mt-auto mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <span class="text-muted fw-bold">Total Amount:</span>
-                                    <span class="fs-5 fw-bold text-success">$${parseFloat(booking.total_amount).toFixed(2)}</span>
+                                    <span class="fs-5 fw-bold text-success">${window.formatPHP(booking.total_amount)}</span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="text-muted fw-bold">Payment:</span>
-                                    <span class="${paymentClass} shadow-sm">${paymentText}</span>
+                                    <span class="badge ${paymentClass === 'status-paid' ? 'bg-success' : 'bg-warning text-dark'} shadow-sm px-3 py-1 rounded-pill">${paymentText}</span>
                                 </div>
                             </div>
                             
@@ -261,24 +247,21 @@ function cancelBooking(bookingId) {
 }
 
 function showNotification(message, type) {
-    var alertClass = '';
-    var icon = '';
-    
-    if (type === 'error') { alertClass = 'danger'; icon = '<i class="fas fa-exclamation-circle me-2"></i> '; } 
-    else if (type === 'success') { alertClass = 'success'; icon = '<i class="fas fa-check-circle me-2"></i> '; } 
-    else if (type === 'warning') { alertClass = 'warning'; icon = '<i class="fas fa-exclamation-triangle me-2"></i> '; } 
-    else { alertClass = 'info'; icon = '<i class="fas fa-info-circle me-2"></i> '; }
-    
-    var alertHtml = '<div class="alert alert-' + alertClass + ' alert-dismissible fade show border-0 shadow-sm" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">' +
-        icon + '<strong>' + message + '</strong>' +
-        '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
-        '</div>';
-    
-    jQuery('body').append(alertHtml);
-    
-    setTimeout(function() {
-        jQuery('.alert').fadeOut(500, function() { jQuery(this).remove(); });
-    }, 4000);
+    if (typeof window.showNotification === 'function') {
+        window.showNotification(message, type);
+    } else {
+        alert(message);
+    }
 }
 </script>
+
+<style>
+.my-booking-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.12) !important;
+}
+.dark-mode .my-booking-card {
+    background: #1c2135;
+}
+</style>
 {% endblock %}

@@ -2,45 +2,50 @@
 
 {% block content %}
 
-<div class="d-flex align-items-center mb-4">
-    <h2 class="mb-0"><i class="fas fa-chart-pie text-primary me-2"></i> Hotel Dashboard</h2>
+<div class="d-flex align-items-center mb-4 fade-in">
+    <h2 class="fw-bold mb-0"><i class="fas fa-chart-pie text-primary me-2"></i> Executive Dashboard</h2>
+    <span class="ms-3 text-muted fw-bold border-start ps-3">Real-time hotel analytics</span>
 </div>
 
-<div class="row mt-2 g-4 fade-in">
-    <div class="col-md-3">
-        <div class="stat-card stat-bookings shadow-sm">
-            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-bed me-2"></i> Occupancy Rate</h5>
-            <h2 id="occupancy-rate" class="display-5 fw-bold mb-0">0%</h2>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="stat-card stat-revenue shadow-sm text-dark">
-            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-hand-holding-dollar me-2"></i> Today's Revenue</h5>
-            <h2 id="today-revenue" class="display-5 fw-bold mb-0">$0</h2>
-        </div>
-    </div>
+<div class="row g-4 mb-4 fade-in" style="animation-delay: 0.1s;">
     <div class="col-md-3">
         <div class="stat-card stat-rooms shadow-sm">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-bed me-2"></i> Occupancy Rate</h5>
+            <h2 id="occupancy-rate" class="display-5 fw-bold mb-0">0%</h2>
+            <small class="opacity-75">Current occupancy</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-revenue shadow-sm">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-hand-holding-dollar me-2"></i> Today's Revenue</h5>
+            <h2 id="today-revenue" class="display-5 fw-bold mb-0">₱0</h2>
+            <small class="opacity-75">Daily earnings</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-bookings shadow-sm">
             <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-calendar-check me-2"></i> Active Bookings</h5>
             <h2 id="active-bookings" class="display-5 fw-bold mb-0">0</h2>
+            <small class="opacity-75">Confirmed & checked-in</small>
         </div>
     </div>
     <div class="col-md-3">
         <div class="stat-card stat-guests shadow-sm">
             <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-door-open me-2"></i> Available Rooms</h5>
             <h2 id="available-rooms" class="display-5 fw-bold mb-0">0</h2>
+            <small class="opacity-75">Ready for guests</small>
         </div>
     </div>
 </div>
 
-<div class="row mt-4 g-4 fade-in" style="animation-delay: 0.1s;">
+<div class="row g-4 mb-4 fade-in" style="animation-delay: 0.2s;">
     <div class="col-md-6">
         <div class="dashboard-card">
             <div class="dashboard-card-header">
                 <h5 class="mb-0 fw-bold"><i class="fas fa-chart-area text-primary me-2"></i> Occupancy Trends</h5>
             </div>
             <div class="dashboard-card-body">
-                <canvas id="occupancyChart" style="min-height: 300px;"></canvas>
+                <canvas id="occupancyChart" style="min-height: 320px;"></canvas>
             </div>
         </div>
     </div>
@@ -50,13 +55,13 @@
                 <h5 class="mb-0 fw-bold"><i class="fas fa-chart-bar text-primary me-2"></i> Revenue per Room</h5>
             </div>
             <div class="dashboard-card-body">
-                <canvas id="revenueChart" style="min-height: 300px;"></canvas>
+                <canvas id="revenueChart" style="min-height: 320px;"></canvas>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row mt-4 g-4 mb-5 fade-in" style="animation-delay: 0.2s;">
+<div class="row g-4 mb-4 fade-in" style="animation-delay: 0.3s;">
     
     <div class="col-md-4">
         <div class="dashboard-card">
@@ -73,7 +78,7 @@
                     </div>
                     <div class="col-6">
                         <div class="p-3 rounded-3" style="background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.1);">
-                            <h3 id="totalRevenue" class="fw-bold text-success mb-1">$0</h3>
+                            <h3 id="totalRevenue" class="fw-bold text-success mb-1">₱0</h3>
                             <div class="quick-stat-label">Total Revenue</div>
                         </div>
                     </div>
@@ -96,7 +101,7 @@
 
     <div class="col-md-8">
         <div class="dashboard-card">
-            <div class="dashboard-card-header" style="background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); color: black; border-radius: 14px 14px 0 0;">
+            <div class="dashboard-card-header" style="background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); color: var(--primary-dark); border-radius: 14px 14px 0 0;">
                 <h5 class="mb-0 fw-bold"><i class="fas fa-star me-2"></i> Guest Reviews Overview</h5>
             </div>
             <div class="dashboard-card-body">
@@ -111,36 +116,36 @@
                     <div class="col-md-5 border-start border-end px-4">
                         <div class="d-flex align-items-center mb-2">
                             <span class="me-2 fw-bold text-muted" style="width: 30px;">5 ★</span>
-                            <div class="review-progress-bg flex-grow-1" style="height: 8px;">
-                                <div id="fiveStarsBar" class="review-progress-bar bg-warning" style="width: 0%; height: 100%;"></div>
+                            <div class="review-progress-bg flex-grow-1" style="height: 8px; background: #e8e0d5; border-radius: 4px; overflow: hidden;">
+                                <div id="fiveStarsBar" class="review-progress-bar bg-warning" style="width: 0%; height: 100%; border-radius: 4px; transition: width 0.6s ease;"></div>
                             </div>
                             <span id="fiveStarsCount" class="ms-2 fw-bold text-muted" style="width: 20px; text-align: right;">0</span>
                         </div>
                         <div class="d-flex align-items-center mb-2">
                             <span class="me-2 fw-bold text-muted" style="width: 30px;">4 ★</span>
-                            <div class="review-progress-bg flex-grow-1" style="height: 8px;">
-                                <div id="fourStarsBar" class="review-progress-bar bg-warning" style="width: 0%; height: 100%;"></div>
+                            <div class="review-progress-bg flex-grow-1" style="height: 8px; background: #e8e0d5; border-radius: 4px; overflow: hidden;">
+                                <div id="fourStarsBar" class="review-progress-bar bg-warning" style="width: 0%; height: 100%; border-radius: 4px; transition: width 0.6s ease;"></div>
                             </div>
                             <span id="fourStarsCount" class="ms-2 fw-bold text-muted" style="width: 20px; text-align: right;">0</span>
                         </div>
                         <div class="d-flex align-items-center mb-2">
                             <span class="me-2 fw-bold text-muted" style="width: 30px;">3 ★</span>
-                            <div class="review-progress-bg flex-grow-1" style="height: 8px;">
-                                <div id="threeStarsBar" class="review-progress-bar bg-warning" style="width: 0%; height: 100%;"></div>
+                            <div class="review-progress-bg flex-grow-1" style="height: 8px; background: #e8e0d5; border-radius: 4px; overflow: hidden;">
+                                <div id="threeStarsBar" class="review-progress-bar bg-warning" style="width: 0%; height: 100%; border-radius: 4px; transition: width 0.6s ease;"></div>
                             </div>
                             <span id="threeStarsCount" class="ms-2 fw-bold text-muted" style="width: 20px; text-align: right;">0</span>
                         </div>
                         <div class="d-flex align-items-center mb-2">
                             <span class="me-2 fw-bold text-muted" style="width: 30px;">2 ★</span>
-                            <div class="review-progress-bg flex-grow-1" style="height: 8px;">
-                                <div id="twoStarsBar" class="review-progress-bar bg-warning" style="width: 0%; height: 100%;"></div>
+                            <div class="review-progress-bg flex-grow-1" style="height: 8px; background: #e8e0d5; border-radius: 4px; overflow: hidden;">
+                                <div id="twoStarsBar" class="review-progress-bar bg-warning" style="width: 0%; height: 100%; border-radius: 4px; transition: width 0.6s ease;"></div>
                             </div>
                             <span id="twoStarsCount" class="ms-2 fw-bold text-muted" style="width: 20px; text-align: right;">0</span>
                         </div>
-                        <div class="d-flex align-items-center mb-0">
+                        <div class="d-flex align-items-center">
                             <span class="me-2 fw-bold text-muted" style="width: 30px;">1 ★</span>
-                            <div class="review-progress-bg flex-grow-1" style="height: 8px;">
-                                <div id="oneStarBar" class="review-progress-bar bg-warning" style="width: 0%; height: 100%;"></div>
+                            <div class="review-progress-bg flex-grow-1" style="height: 8px; background: #e8e0d5; border-radius: 4px; overflow: hidden;">
+                                <div id="oneStarBar" class="review-progress-bar bg-warning" style="width: 0%; height: 100%; border-radius: 4px; transition: width 0.6s ease;"></div>
                             </div>
                             <span id="oneStarCount" class="ms-2 fw-bold text-muted" style="width: 20px; text-align: right;">0</span>
                         </div>
@@ -150,7 +155,7 @@
                         <i class="fas fa-camera fa-2x text-primary opacity-50 mb-2"></i>
                         <h4 id="withPhotosDisplay" class="fw-bold mb-0">0</h4>
                         <p class="text-muted fw-bold mb-3">reviews with photos</p>
-                        <a href="/reviews" class="btn btn-outline-primary rounded-pill px-4 shadow-sm">
+                        <a href="/reviews" class="btn btn-outline-gold rounded-pill px-4 shadow-sm">
                             View All <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
@@ -172,9 +177,9 @@
 <script>
 let charts = {};
 
-// Configure Chart.js globally for modern aesthetics (works in both dark/light mode)
-Chart.defaults.color = '#64748b'; // Soft slate gray text
-Chart.defaults.scale.grid.color = 'rgba(100, 116, 139, 0.1)'; // Very subtle grid lines
+// Configure Chart.js globally for modern aesthetics
+Chart.defaults.color = '#64748b';
+Chart.defaults.scale.grid.color = 'rgba(100, 116, 139, 0.1)';
 Chart.defaults.font.family = "'Segoe UI', sans-serif";
 
 // Wait for jQuery to load
@@ -233,7 +238,7 @@ function loadMetrics() {
     
     // Load today's revenue
     jQuery.ajax({
-    url: '/api/analytics/revenue-per-room',
+        url: '/api/analytics/revenue-per-room',
         method: 'GET',
         success: function(data) {
             let todayRevenue = 0;
@@ -244,10 +249,10 @@ function loadMetrics() {
                     todayRevenue = todayData[0].total_revenue || 0;
                 }
             }
-            document.getElementById('today-revenue').textContent = '$' + todayRevenue.toFixed(2);
+            document.getElementById('today-revenue').textContent = window.formatPHP(todayRevenue);
         },
         error: function() {
-            document.getElementById('today-revenue').textContent = '$0';
+            document.getElementById('today-revenue').textContent = '₱0';
         }
     });
     
@@ -306,14 +311,15 @@ function loadOccupancyData() {
                     datasets: [{
                         label: 'Total Bookings',
                         data: data.map(d => d.total_bookings),
-                        borderColor: '#6366f1', // Luxury Primary
+                        borderColor: '#6366f1',
                         backgroundColor: 'rgba(99, 102, 241, 0.1)',
                         borderWidth: 3,
                         pointBackgroundColor: '#fff',
                         pointBorderColor: '#6366f1',
                         pointBorderWidth: 2,
-                        pointRadius: 4,
-                        tension: 0.4, // Smooth curves
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        tension: 0.4,
                         fill: true
                     }]
                 },
@@ -326,12 +332,20 @@ function loadOccupancyData() {
                             backgroundColor: 'rgba(15, 23, 42, 0.9)',
                             padding: 12,
                             titleFont: { size: 14 },
-                            bodyFont: { size: 14 }
+                            bodyFont: { size: 14 },
+                            cornerRadius: 8
                         }
                     },
                     scales: {
-                        y: { beginAtZero: true, border: { display: false } },
-                        x: { border: { display: false }, grid: { display: false } }
+                        y: { 
+                            beginAtZero: true, 
+                            border: { display: false },
+                            grid: { color: 'rgba(100, 116, 139, 0.08)' }
+                        },
+                        x: { 
+                            border: { display: false }, 
+                            grid: { display: false } 
+                        }
                     }
                 }
             });
@@ -359,10 +373,10 @@ function loadRevenueData() {
                 data: {
                     labels: topRooms.map(d => `Room ${d.room_number}`),
                     datasets: [{
-                        label: 'Revenue ($)',
+                        label: 'Revenue (₱)',
                         data: topRooms.map(d => d.total_revenue || 0),
-                        backgroundColor: 'rgba(16, 185, 129, 0.85)', // Luxury Success
-                        borderRadius: 6, // Rounded bars
+                        backgroundColor: 'rgba(16, 185, 129, 0.85)',
+                        borderRadius: 8,
                         borderWidth: 0
                     }]
                 },
@@ -374,21 +388,29 @@ function loadRevenueData() {
                         tooltip: {
                             backgroundColor: 'rgba(15, 23, 42, 0.9)',
                             padding: 12,
+                            cornerRadius: 8,
                             callbacks: {
                                 label: function(context) {
-                                    let label = context.dataset.label || '';
-                                    if (label) label += ': ';
-                                    if (context.parsed.y !== null) {
-                                        label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
-                                    }
-                                    return label;
+                                    return 'Revenue: ' + window.formatPHP(context.parsed.y);
                                 }
                             }
                         }
                     },
                     scales: {
-                        y: { beginAtZero: true, border: { display: false } },
-                        x: { border: { display: false }, grid: { display: false } }
+                        y: { 
+                            beginAtZero: true, 
+                            border: { display: false },
+                            grid: { color: 'rgba(100, 116, 139, 0.08)' },
+                            ticks: {
+                                callback: function(value) {
+                                    return '₱' + value.toLocaleString('en-PH');
+                                }
+                            }
+                        },
+                        x: { 
+                            border: { display: false }, 
+                            grid: { display: false } 
+                        }
                     }
                 }
             });
@@ -400,7 +422,6 @@ function loadRevenueData() {
 }
 
 function loadQuickStats() {
-    // Get total bookings and revenue
     jQuery.ajax({
         url: '/api/bookings/list',
         method: 'GET',
@@ -409,24 +430,23 @@ function loadQuickStats() {
                 document.getElementById('totalBookings').textContent = bookings.length;
                 
                 const totalRevenue = bookings.reduce((sum, b) => sum + parseFloat(b.total_amount || 0), 0);
-                document.getElementById('totalRevenue').textContent = '$' + totalRevenue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                document.getElementById('totalRevenue').textContent = window.formatPHP(totalRevenue);
                 
                 const activeGuests = bookings.filter(b => b.status === 'checked_in').length;
                 document.getElementById('activeGuests').textContent = activeGuests;
             } else {
                 document.getElementById('totalBookings').textContent = '0';
-                document.getElementById('totalRevenue').textContent = '$0.00';
+                document.getElementById('totalRevenue').textContent = '₱0.00';
                 document.getElementById('activeGuests').textContent = '0';
             }
         },
         error: function() {
             document.getElementById('totalBookings').textContent = '0';
-            document.getElementById('totalRevenue').textContent = '$0.00';
+            document.getElementById('totalRevenue').textContent = '₱0.00';
             document.getElementById('activeGuests').textContent = '0';
         }
     });
     
-    // Get available rooms
     jQuery.ajax({
         url: '/api/rooms/list',
         method: 'GET',
@@ -457,24 +477,10 @@ function loadReviewStats() {
             if (data && data.total_reviews > 0) {
                 $('#avgRatingDisplay').text(data.avg_rating);
                 
-                // Generate star HTML
                 let avgRating = data.avg_rating;
-                let fullStars = Math.floor(avgRating);
-                let hasHalfStar = (avgRating - fullStars) >= 0.5;
-                let starsHtml = '';
-                
-                for (let i = 1; i <= 5; i++) {
-                    if (i <= fullStars) {
-                        starsHtml += '<i class="fas fa-star text-warning me-1"></i>';
-                    } else if (i === fullStars + 1 && hasHalfStar) {
-                        starsHtml += '<i class="fas fa-star-half-alt text-warning me-1"></i>';
-                    } else {
-                        starsHtml += '<i class="far fa-star text-warning me-1"></i>';
-                    }
-                }
+                let starsHtml = window.generateStars(avgRating);
                 $('#avgStarsDisplay').html(starsHtml);
                 
-                // Update counts
                 $('#totalReviewsDisplay').text(data.total_reviews);
                 $('#fiveStarsCount').text(data.five_stars);
                 $('#fourStarsCount').text(data.four_stars);
@@ -483,7 +489,6 @@ function loadReviewStats() {
                 $('#oneStarCount').text(data.one_star);
                 $('#withPhotosDisplay').text(data.with_photos);
                 
-                // Update progress bars
                 const total = data.total_reviews;
                 $('#fiveStarsBar').css('width', (data.five_stars / total * 100) + '%');
                 $('#fourStarsBar').css('width', (data.four_stars / total * 100) + '%');
@@ -491,25 +496,17 @@ function loadReviewStats() {
                 $('#twoStarsBar').css('width', (data.two_stars / total * 100) + '%');
                 $('#oneStarBar').css('width', (data.one_star / total * 100) + '%');
                 
-                // Display recent reviews
                 let recentHtml = '';
                 if (data.recent_reviews && data.recent_reviews.length > 0) {
                     data.recent_reviews.forEach(function(review) {
-                        let reviewStars = '';
-                        for (let i = 1; i <= 5; i++) {
-                            if (i <= review.rating) {
-                                reviewStars += '<i class="fas fa-star text-warning" style="font-size: 0.75rem;"></i>';
-                            } else {
-                                reviewStars += '<i class="far fa-star text-warning" style="font-size: 0.75rem;"></i>';
-                            }
-                        }
+                        let reviewStars = window.generateStars(review.rating);
                         
                         recentHtml += `
-                            <div class="review-list-item p-3">
+                            <div class="review-list-item p-3 rounded-3" style="background: rgba(0,0,0,0.02); border: 1px solid rgba(0,0,0,0.05);">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
                                         <strong class="text-dark d-block">${escapeHtml(review.guest_name || 'Guest')}</strong>
-                                        <div class="mb-1">${reviewStars}</div>
+                                        <div class="mb-1" style="font-size: 0.8rem;">${reviewStars}</div>
                                         <p class="mb-0 text-muted" style="font-size: 0.85rem;">${escapeHtml(review.comment ? review.comment.substring(0, 100) : '')}${review.comment && review.comment.length > 100 ? '...' : ''}</p>
                                     </div>
                                     <small class="text-muted fw-bold" style="font-size: 0.7rem;">${formatDate(review.created_at)}</small>
@@ -535,7 +532,7 @@ function loadReviewStats() {
 function formatDate(dateString) {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString('en-PH', {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
@@ -549,4 +546,33 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 </script>
+
+<style>
+.quick-stat-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.review-progress-bg {
+    background: #e8e0d5;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.review-list-item {
+    transition: all 0.2s ease;
+}
+.review-list-item:hover {
+    background: rgba(201, 168, 76, 0.04) !important;
+    border-color: rgba(201, 168, 76, 0.15) !important;
+}
+.dark-mode .review-list-item {
+    background: rgba(255, 255, 255, 0.02) !important;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+}
+.dark-mode .review-list-item:hover {
+    background: rgba(201, 168, 76, 0.08) !important;
+}
+</style>
 {% endblock %}

@@ -15,9 +15,9 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="stat-card stat-revenue text-dark shadow-sm">
+        <div class="stat-card stat-revenue shadow-sm">
             <h2 id="myAvgRating" class="display-4 fw-bold mb-0">0</h2>
-            <p class="mb-1 fw-bold opacity-75 text-dark">My Avg Rating</p>
+            <p class="mb-1 fw-bold opacity-75">My Avg Rating</p>
             <div id="myAvgStars" class="fs-5"></div>
         </div>
     </div>
@@ -36,8 +36,7 @@
     </div>
 </div>
 
-<!-- Tabs for My Reviews vs Community Reviews -->
-<ul class="nav luxury-tabs fade-in" style="animation-delay: 0.15s;">
+<ul class="nav luxury-tabs fade-in mb-4" style="animation-delay: 0.15s;">
     <li class="nav-item">
         <a class="nav-link active" data-bs-toggle="tab" href="#myReviewsTab">
             <i class="fas fa-user me-2"></i>My Reviews
@@ -54,13 +53,13 @@
     
     <!-- MY REVIEWS TAB -->
     <div class="tab-pane active" id="myReviewsTab">
-        <div class="mb-4 fade-in" style="animation-delay: 0.2s;">
-            <div class="collapsible-header" onclick="togglePendingSection()">
+        <div class="mb-4 fade-in">
+            <div class="collapsible-header rounded-4" onclick="togglePendingSection()">
                 <div class="d-flex align-items-center">
-                    <h5 class="mb-0 fw-bold"><i class="fas fa-clock me-2"></i> Ready for Review</h5>
+                    <h5 class="mb-0 fw-bold text-white"><i class="fas fa-clock me-2"></i> Ready for Review</h5>
                     <span class="pending-count shadow-sm" id="pendingCount">0</span>
                 </div>
-                <i class="fas fa-chevron-down fs-5" id="toggleIcon"></i>
+                <i class="fas fa-chevron-down fs-5 text-white" id="toggleIcon"></i>
             </div>
             <div class="collapsible-content shadow-sm" id="pendingContent">
                 <div id="pendingReviews">
@@ -72,7 +71,7 @@
             </div>
         </div>
 
-        <div class="card dashboard-card fade-in" style="animation-delay: 0.3s;">
+        <div class="card dashboard-card fade-in" style="animation-delay: 0.3s; border-radius: 20px;">
             <div class="card-header border-0 pb-0 bg-transparent mt-3 ms-2 me-2 d-flex justify-content-between align-items-center">
                 <h4 class="mb-0 fw-bold"><i class="fas fa-history text-primary me-2"></i> Your Review History</h4>
                 <select id="sortSelect" class="form-select shadow-sm w-auto fw-bold text-muted" onchange="sortReviews()">
@@ -89,33 +88,32 @@
                         <p class="text-muted fw-bold">Loading your reviews...</p>
                     </div>
                 </div>
-                
                 <div id="myPagination" class="pagination-container justify-content-center border-0 shadow-none bg-transparent"></div>
             </div>
         </div>
     </div>
 
-    <!-- COMMUNITY REVIEWS TAB - FIXED VERSION -->
+    <!-- COMMUNITY REVIEWS TAB -->
     <div class="tab-pane fade" id="communityTab">
-        <div class="filter-bar mb-4">
+        <div class="filter-bar mb-4 rounded-3">
             <div class="row align-items-end g-3">
                 <div class="col-md-4">
                     <label for="communitySearchInput" class="fw-bold text-muted mb-1"><i class="fas fa-search me-1"></i> Search Reviews</label>
                     <input type="text" id="communitySearchInput" class="form-control shadow-sm" placeholder="Search by guest name...">
                 </div>
                 <div class="col-md-3">
-                    <label for="communityRatingFilter" class="fw-bold text-muted mb-1"><i class="fas fa-star me-1"></i> Filter by Rating</label>
+                    <label for="communityRatingFilter" class="fw-bold text-muted mb-1"><i class="fas fa-star me-1"></i> Rating</label>
                     <select id="communityRatingFilter" class="form-select shadow-sm">
                         <option value="all">All Ratings</option>
-                        <option value="5">5 Stars ★★★★★</option>
-                        <option value="4">4 Stars ★★★★☆</option>
-                        <option value="3">3 Stars ★★★☆☆</option>
-                        <option value="2">2 Stars ★★☆☆☆</option>
-                        <option value="1">1 Star ★☆☆☆☆</option>
+                        <option value="5">5 Stars</option>
+                        <option value="4">4 Stars</option>
+                        <option value="3">3 Stars</option>
+                        <option value="2">2 Stars</option>
+                        <option value="1">1 Star</option>
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label for="communityPhotoFilter" class="fw-bold text-muted mb-1"><i class="fas fa-image me-1"></i> Photo Filter</label>
+                    <label for="communityPhotoFilter" class="fw-bold text-muted mb-1"><i class="fas fa-image me-1"></i> Photos</label>
                     <select id="communityPhotoFilter" class="form-select shadow-sm">
                         <option value="all">All Reviews</option>
                         <option value="with">With Photos Only</option>
@@ -142,10 +140,8 @@
 </div>
 
 <script>
-// Get session data from Jinja
 var currentUserEmail = '{{ session.get("email", "")|safe }}';
 var currentUserName = '{{ session.get("username", "")|safe }}';
-var currentUserId = '{{ session.get("user_id", "null")|safe }}';
 
 let allReviews = [];
 let allCommunityReviews = [];
@@ -153,7 +149,6 @@ let currentPage = 1;
 let communityCurrentPage = 1;
 let itemsPerPage = 5;
 let communityItemsPerPage = 6;
-let currentBookingId = null;
 let currentSort = 'newest';
 let selectedImageFile = null;
 let isPendingOpen = false;
@@ -175,40 +170,9 @@ function togglePendingSection() {
     isPendingOpen = !isPendingOpen;
 }
 
-function previewImage(input) {
-    if (input.files && input.files[0]) {
-        selectedImageFile = input.files[0];
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('imagePreview').src = e.target.result;
-            document.getElementById('imagePreviewContainer').style.display = 'block';
-            jQuery('.image-upload-btn').hide();
-        };
-        reader.readAsDataURL(selectedImageFile);
-    }
-}
-
-function removeImage() {
-    var reviewImageInput = document.getElementById('reviewImageInput');
-    var imagePreviewContainer = document.getElementById('imagePreviewContainer');
-    var imagePreview = document.getElementById('imagePreview');
-    
-    selectedImageFile = null;
-    
-    if (reviewImageInput) reviewImageInput.value = '';
-    if (imagePreviewContainer) imagePreviewContainer.style.display = 'none';
-    if (imagePreview) imagePreview.src = '';
-    
-    if (typeof jQuery !== 'undefined' && jQuery('.image-upload-btn').length) {
-        jQuery('.image-upload-btn').show();
-    }
-}
-
-// Wait for jQuery
 (function() {
     function waitForjQuery() {
         if (typeof jQuery !== 'undefined') {
-            console.log("jQuery loaded, initializing my reviews...");
             initPage();
         } else {
             setTimeout(waitForjQuery, 100);
@@ -219,19 +183,6 @@ function removeImage() {
 
 function initPage() {
     loadAllData();
-    
-    // Setup star rating
-    jQuery('.star-rating i').on('click', function() {
-        var rating = jQuery(this).data('rating');
-        jQuery('#selectedRating').val(rating);
-        jQuery('#ratingError').hide();
-        jQuery('.star-rating i').removeClass('fas').addClass('far');
-        for(var i = 1; i <= rating; i++) {
-            jQuery('.star-rating i[data-rating="' + i + '"]').removeClass('far').addClass('fas');
-        }
-    });
-    
-    // Community filters
     $('#communitySearchInput').on('keyup', function() { filterCommunityReviews(); });
     $('#communityRatingFilter').on('change', function() { filterCommunityReviews(); });
     $('#communityPhotoFilter').on('change', function() { filterCommunityReviews(); });
@@ -262,16 +213,13 @@ function loadCommunityReviews() {
         url: '/api/comments/list',
         method: 'GET',
         success: function(reviews) {
-            // Filter only approved reviews and exclude current user's reviews
             allCommunityReviews = reviews.filter(function(r) {
                 return r.status === 'approved';
             });
-            console.log("Community reviews loaded:", allCommunityReviews.length);
             updateCommunityStats();
-            filterCommunityReviews(); // This will display them
+            filterCommunityReviews();
         },
         error: function() {
-            console.error("Error loading community reviews");
             jQuery('#communityReviewsList').html('<div class="col-12 text-center py-5"><i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i><h5 class="fw-bold">Error loading community reviews</h5></div>');
         }
     });
@@ -283,46 +231,16 @@ function updateCommunityStats() {
     
     jQuery('#totalCommunityReviews').text(total);
     jQuery('#communityAvgRating').text(avg.toFixed(1));
-    
-    var starsHtml = '';
-    var fullStars = Math.floor(avg);
-    var hasHalfStar = (avg - fullStars) >= 0.5;
-    
-    for (var i = 1; i <= 5; i++) {
-        if (i <= fullStars) {
-            starsHtml += '<i class="fas fa-star text-warning"></i>';
-        } else if (i === fullStars + 1 && hasHalfStar) {
-            starsHtml += '<i class="fas fa-star-half-alt text-warning"></i>';
-        } else {
-            starsHtml += '<i class="far fa-star text-warning opacity-50"></i>';
-        }
-    }
-    jQuery('#communityAvgStars').html(starsHtml);
+    jQuery('#communityAvgStars').html(window.generateStars(avg));
 }
 
 function updateStats() {
     var total = allReviews.length;
     var avg = total > 0 ? allReviews.reduce(function(sum, r) { return sum + r.rating; }, 0) / total : 0;
-    var photosCount = allReviews.filter(function(r) { return r.image_path && r.image_path !== ''; }).length;
     
     jQuery('#myTotalReviews').text(total);
     jQuery('#myAvgRating').text(avg.toFixed(1));
-    jQuery('#myPhotosCount').text(photosCount);
-    
-    var starsHtml = '';
-    var fullStars = Math.floor(avg);
-    var hasHalfStar = (avg - fullStars) >= 0.5;
-    
-    for (var i = 1; i <= 5; i++) {
-        if (i <= fullStars) {
-            starsHtml += '<i class="fas fa-star text-warning"></i>';
-        } else if (i === fullStars + 1 && hasHalfStar) {
-            starsHtml += '<i class="fas fa-star-half-alt text-warning"></i>';
-        } else {
-            starsHtml += '<i class="far fa-star text-warning opacity-50"></i>';
-        }
-    }
-    jQuery('#myAvgStars').html(starsHtml);
+    jQuery('#myAvgStars').html(window.generateStars(avg));
 }
 
 function sortReviews() {
@@ -355,8 +273,12 @@ function displayReviewsWithPagination(reviews) {
 }
 
 function displayPagination(totalPages) {
-    var html = '<div class="pagination-buttons d-flex gap-2">';
+    if (totalPages <= 1) {
+        jQuery('#myPagination').html('');
+        return;
+    }
     
+    var html = '<div class="pagination-buttons d-flex gap-2">';
     html += '<button class="page-btn fw-bold" onclick="changePage(' + (currentPage - 1) + ')"' + (currentPage === 1 ? ' disabled' : '') + '><i class="fas fa-chevron-left me-1"></i> Prev</button>';
     
     var startPage = Math.max(1, currentPage - 2);
@@ -398,19 +320,12 @@ function displayReviews(reviews) {
     } else {
         for (var idx = 0; idx < reviews.length; idx++) {
             var review = reviews[idx];
-            var starsHtml = '';
-            for (var i = 1; i <= 5; i++) {
-                if (i <= review.rating) {
-                    starsHtml += '<i class="fas fa-star text-warning"></i>';
-                } else {
-                    starsHtml += '<i class="far fa-star text-warning opacity-50"></i>';
-                }
-            }
+            var starsHtml = window.generateStars(review.rating);
             
             var statusBadge = '';
             var statusColor = '';
             if (review.status === 'pending') {
-                statusBadge = '<span class="badge bg-warning text-dark ms-2"><i class="fas fa-hourglass-half me-1"></i> Pending Approval</span>';
+                statusBadge = '<span class="badge bg-warning text-dark ms-2"><i class="fas fa-hourglass-half me-1"></i> Pending</span>';
                 statusColor = 'border-warning';
             } else if (review.status === 'approved') {
                 statusBadge = '<span class="badge bg-success ms-2"><i class="fas fa-check-circle me-1"></i> Published</span>';
@@ -422,11 +337,11 @@ function displayReviews(reviews) {
             
             var imageHtml = '';
             if (review.image_path) {
-                imageHtml = '<img src="' + review.image_path + '" class="review-image-preview shadow-sm mt-0" style="cursor: pointer; max-height: 120px;" onclick="window.open(\'' + review.image_path + '\', \'_blank\')">';
+                imageHtml = '<img src="' + review.image_path + '" class="review-image-preview shadow-sm mt-0" style="cursor: pointer; max-height: 120px; border-radius: 12px;" onclick="window.open(\'' + review.image_path + '\', \'_blank\')">';
             }
             
             html += `
-                <div class="review-card-custom fade-in border-start-4 ${statusColor}" style="border-left: 4px solid;">
+                <div class="review-card-custom fade-in border-start-4 ${statusColor} p-4 mb-3 rounded-3" style="border-left: 4px solid; background: white;">
                     <div class="row">
                         <div class="col-md-8">
                             <div class="d-flex align-items-center mb-2 flex-wrap">
@@ -449,8 +364,6 @@ function displayReviews(reviews) {
     jQuery('#myReviewsList').html(html);
 }
 
-// ============ COMMUNITY REVIEWS FUNCTIONS ============
-
 let filteredCommunityReviews = [];
 
 function filterCommunityReviews() {
@@ -460,7 +373,6 @@ function filterCommunityReviews() {
     
     filteredCommunityReviews = [...allCommunityReviews];
     
-    // Sort newest first
     filteredCommunityReviews.sort(function(a, b) {
         return new Date(b.created_at) - new Date(a.created_at);
     });
@@ -502,25 +414,17 @@ function renderCommunityCards(reviews) {
     var html = '';
     
     if (reviews.length === 0) {
-        html = '<div class="col-12 text-center py-5"><i class="fas fa-comment-slash fa-3x text-muted opacity-50 mb-3"></i><h4 class="text-muted fw-bold">No reviews found</h4><p class="text-muted">Try adjusting your filters or check back later.</p></div>';
+        html = '<div class="col-12 text-center py-5"><i class="fas fa-comment-slash fa-3x text-muted opacity-50 mb-3"></i><h4 class="text-muted fw-bold">No reviews found</h4></div>';
     } else {
         for (var idx = 0; idx < reviews.length; idx++) {
             var review = reviews[idx];
-            var starsHtml = '';
-            for (var i = 1; i <= 5; i++) {
-                if (i <= review.rating) {
-                    starsHtml += '<i class="fas fa-star text-warning"></i>';
-                } else {
-                    starsHtml += '<i class="far fa-star text-warning opacity-50"></i>';
-                }
-            }
-            
+            var starsHtml = window.generateStars(review.rating);
             var hasImage = review.image_path && review.image_path !== '' && review.image_path !== null;
             var imageUrl = hasImage ? review.image_path : '';
             
             html += `
                 <div class="col-md-6 col-lg-4 fade-in">
-                    <div class="review-card-custom h-100 shadow-sm">
+                    <div class="review-card-custom h-100 shadow-sm p-4" style="border-radius: 16px; background: white;">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div>
                                 <h5 class="fw-bold text-primary mb-1">${escapeHtml(review.guest_name || 'Anonymous Guest')}</h5>
@@ -532,7 +436,7 @@ function renderCommunityCards(reviews) {
                         <p class="text-dark mb-3" style="font-size: 0.95rem; line-height: 1.6;">"${escapeHtml(review.comment || '')}"</p>
                         
                         ${hasImage ? `
-                            <img src="${imageUrl}" class="public-review-image" onclick="showFullImage('${imageUrl}')" onerror="this.style.display='none'" alt="Review photo">
+                            <img src="${imageUrl}" class="public-review-image" onclick="showFullImage('${imageUrl}')" onerror="this.style.display='none'" alt="Review photo" style="width: 100%; height: 180px; object-fit: cover; border-radius: 12px; cursor: pointer; transition: transform 0.3s ease;">
                         ` : ''}
                         
                         <div class="mt-3 pt-3 border-top">
@@ -556,7 +460,6 @@ function renderCommunityPagination(totalPages) {
     }
     
     var html = '<div class="pagination-buttons d-flex gap-2 flex-wrap justify-content-center">';
-    
     html += `<button class="page-btn fw-bold" onclick="changeCommunityPage(${communityCurrentPage - 1})" ${communityCurrentPage === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left me-1"></i> Prev</button>`;
     
     var startPage = Math.max(1, communityCurrentPage - 2);
@@ -604,23 +507,15 @@ function loadPendingReviews() {
         method: 'GET',
         success: function(bookings) {
             var userBookings = bookings.filter(function(b) {
-                return b.guest_email === currentUserEmail || 
-                       b.guest_name === currentUserName;
+                return b.guest_email === currentUserEmail || b.guest_name === currentUserName;
             });
             
             var completedBookings = userBookings.filter(function(b) {
-                var isCompleted = (b.status === 'checked_out');
-                var hasReview = allReviews.some(function(r) { 
-                    return r.booking_id === b.booking_id; 
-                });
-                return isCompleted && !hasReview;
+                return (b.status === 'checked_out') && !allReviews.some(function(r) { return r.booking_id === b.booking_id; });
             });
             
             document.getElementById('pendingCount').innerText = completedBookings.length;
             displayPendingReviews(completedBookings);
-        },
-        error: function() {
-            jQuery('#pendingReviews').html('<div class="text-center py-4 text-danger fw-bold"><i class="fas fa-exclamation-triangle me-2"></i>Error loading pending reviews</div>');
         }
     });
 }
@@ -633,13 +528,9 @@ function displayPendingReviews(bookings) {
     } else {
         for (var idx = 0; idx < bookings.length; idx++) {
             var booking = bookings[idx];
-            var starsHtml = '';
-            for (var i = 1; i <= 5; i++) {
-                starsHtml += '<i class="far fa-star text-muted opacity-50 me-1"></i>';
-            }
             
             html += `
-                <div class="pending-review-item fade-in shadow-sm">
+                <div class="pending-review-item fade-in shadow-sm p-3 mb-2 rounded-3" style="background: white;">
                     <div class="row align-items-center">
                         <div class="col-md-3 mb-2 mb-md-0">
                             <h5 class="mb-0 fw-bold text-primary">Room ${booking.room_number}</h5>
@@ -650,7 +541,7 @@ function displayPendingReviews(bookings) {
                             <div class="small text-muted fw-bold"><i class="fas fa-sign-out-alt me-1"></i> Out: ${booking.check_out_date}</div>
                         </div>
                         <div class="col-md-2 mb-3 mb-md-0 text-center text-md-start">
-                            <div class="d-flex align-items-center">${starsHtml}</div>
+                            <div class="d-flex align-items-center">${window.generateStars(0)}</div>
                         </div>
                         <div class="col-md-3 text-md-end">
                             <button class="btn btn-warning shadow-sm w-100 fw-bold" onclick="openReviewModal(${booking.booking_id})">
@@ -666,66 +557,20 @@ function displayPendingReviews(bookings) {
     jQuery('#pendingReviews').html(html);
 }
 
-// ==========================================
-// DYNAMIC MODAL
-// ==========================================
-
 function openReviewModal(bookingId) {
-    currentBookingId = bookingId;
-    selectedImageFile = null;
-    
-    var reviewImageInput = document.getElementById('reviewImageInput');
-    var imagePreviewContainer = document.getElementById('imagePreviewContainer');
-    var imagePreview = document.getElementById('imagePreview');
-    var selectedRating = document.getElementById('selectedRating');
-    var reviewComment = document.getElementById('reviewComment');
-    
-    if (reviewImageInput) reviewImageInput.value = '';
-    if (imagePreviewContainer) imagePreviewContainer.style.display = 'none';
-    if (imagePreview) imagePreview.src = '';
-    if (selectedRating) selectedRating.value = 0;
-    if (reviewComment) reviewComment.value = '';
-    
-    if (typeof jQuery !== 'undefined') {
-        jQuery('.star-rating i').removeClass('fas').addClass('far');
-    }
-    
-    var ratingError = document.getElementById('ratingError');
-    var commentError = document.getElementById('commentError');
-    if (ratingError) ratingError.style.display = 'none';
-    if (commentError) commentError.style.display = 'none';
-    
-    createReviewModal(bookingId);
-}
-
-function createReviewModal(bookingId) {
-    var existingModal = document.getElementById('reviewModal');
-    if (existingModal) {
-        jQuery('#reviewModal').remove();
-    }
-    
-    var modalBackdrops = document.querySelectorAll('.modal-backdrop');
-    modalBackdrops.forEach(function(backdrop) {
-        backdrop.remove();
-    });
-    
-    jQuery('body').removeClass('modal-open');
-    jQuery('body').css('overflow', '');
-    jQuery('body').css('padding-right', '');
-    
+    // Uses the same modal pattern as other pages - creates dynamic Bootstrap modal
     var modalHtml = `
-        <div class="modal fade" id="reviewModal" tabindex="-1" data-bs-backdrop="true" data-bs-keyboard="true">
+        <div class="modal fade" id="reviewModal" tabindex="-1" data-bs-backdrop="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content" style="max-height: 85vh; display: flex; flex-direction: column;">
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            <i class="fas fa-star me-2" style="color: var(--gold-400);"></i>
-                            Write a Review
+                <div class="modal-content" style="border-radius: 20px;">
+                    <div class="modal-header" style="background: linear-gradient(135deg, #1a2744, #243356); border-radius: 20px 20px 0 0;">
+                        <h5 class="modal-title text-white">
+                            <i class="fas fa-star me-2" style="color: #c9a84c;"></i> Write a Review
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body" style="overflow-y: auto; flex: 1;">
-                        <div id="modalBookingInfo" class="p-3 rounded-3 mb-4 shadow-sm" style="background: rgba(14, 165, 233, 0.1); border: 1px solid rgba(14, 165, 233, 0.2);">
+                    <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                        <div class="p-3 rounded-3 mb-4 shadow-sm" style="background: rgba(14, 165, 233, 0.1);">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-bed text-primary me-2"></i> Booking #${bookingId}</h5>
                                 <span class="badge bg-success shadow-sm px-3 py-2">Ready for Review</span>
@@ -736,65 +581,46 @@ function createReviewModal(bookingId) {
                             <div class="col-md-5">
                                 <label class="fw-bold text-muted mb-2 text-uppercase" style="letter-spacing: 1px; font-size: 0.8rem;">Your Rating *</label>
                                 <div class="star-rating d-flex gap-2" id="starRating">
-                                    <i class="far fa-star" data-rating="1"></i>
-                                    <i class="far fa-star" data-rating="2"></i>
-                                    <i class="far fa-star" data-rating="3"></i>
-                                    <i class="far fa-star" data-rating="4"></i>
-                                    <i class="far fa-star" data-rating="5"></i>
+                                    <i class="far fa-star rating-star" data-rating="1"></i>
+                                    <i class="far fa-star rating-star" data-rating="2"></i>
+                                    <i class="far fa-star rating-star" data-rating="3"></i>
+                                    <i class="far fa-star rating-star" data-rating="4"></i>
+                                    <i class="far fa-star rating-star" data-rating="5"></i>
                                 </div>
                                 <input type="hidden" id="selectedRating" value="0">
-                                <div id="ratingError" class="text-danger fw-bold small mt-2" style="display: none;"><i class="fas fa-exclamation-circle me-1"></i>Please select a rating</div>
-                                
-                                <div class="mt-4 pt-4 border-top">
-                                    <label class="fw-bold text-muted mb-2 text-uppercase" style="letter-spacing: 1px; font-size: 0.8rem;"><i class="fas fa-image me-1"></i> Upload Photo (Optional)</label>
-                                    <div class="image-upload-btn" onclick="window.uploadPhotoClick()">
-                                        <i class="fas fa-cloud-upload-alt text-primary mb-2"></i>
-                                        <p class="mb-0 fw-bold text-dark">Click to upload</p>
-                                        <small class="text-muted fw-bold">JPG, PNG up to 5MB</small>
-                                    </div>
-                                    <input type="file" id="reviewImageInput" accept="image/*" style="display: none;" onchange="window.handleImagePreview(this)">
-                                    
-                                    <div id="imagePreviewContainer" class="text-center" style="display: none;">
-                                        <img id="imagePreview" class="review-image-preview shadow-sm">
-                                        <button type="button" class="btn btn-sm btn-outline-danger w-100 mt-2 fw-bold" onclick="window.removeSelectedImage()"><i class="fas fa-trash me-1"></i> Remove Photo</button>
-                                    </div>
-                                </div>
+                                <div id="ratingError" class="text-danger fw-bold small mt-2" style="display: none;">Please select a rating</div>
                             </div>
                             
                             <div class="col-md-7">
                                 <label for="reviewComment" class="fw-bold text-muted mb-2 text-uppercase" style="letter-spacing: 1px; font-size: 0.8rem;">Your Review *</label>
-                                <textarea id="reviewComment" class="form-control shadow-sm" rows="8" placeholder="Tell us what you loved about your stay..." maxlength="500" style="resize: none; border-radius: 12px; padding: 15px;"></textarea>
-                                <div id="commentError" class="text-danger fw-bold small mt-2" style="display: none;"><i class="fas fa-exclamation-circle me-1"></i>Please write a review</div>
+                                <textarea id="reviewComment" class="form-control shadow-sm" rows="8" placeholder="Tell us what you loved about your stay..." maxlength="500" style="resize: none; border-radius: 12px;"></textarea>
+                                <div id="commentError" class="text-danger fw-bold small mt-2" style="display: none;">Please write a review</div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" onclick="window.submitModalReview()">Submit Review <i class="fas fa-paper-plane ms-1"></i></button>
+                        <button type="button" class="btn btn-primary" onclick="submitModalReview(${bookingId})">Submit Review <i class="fas fa-paper-plane ms-1"></i></button>
                     </div>
                 </div>
             </div>
         </div>
     `;
     
+    jQuery('#reviewModal').remove();
+    jQuery('.modal-backdrop').remove();
+    jQuery('body').removeClass('modal-open');
+    
     jQuery('body').append(modalHtml);
     
-    jQuery('#starRating i').on('click', function() {
+    jQuery('#starRating .rating-star').on('click', function() {
         var rating = jQuery(this).data('rating');
         jQuery('#selectedRating').val(rating);
         jQuery('#ratingError').hide();
-        jQuery('#starRating i').removeClass('fas').addClass('far');
+        jQuery('#starRating .rating-star').removeClass('fas').addClass('far');
         for(var i = 1; i <= rating; i++) {
-            jQuery('#starRating i[data-rating="' + i + '"]').removeClass('far').addClass('fas');
+            jQuery('#starRating .rating-star[data-rating="' + i + '"]').removeClass('far').addClass('fas');
         }
-    });
-    
-    jQuery('#reviewModal').removeAttr('aria-hidden');
-    
-    jQuery('#reviewModal').on('show.bs.modal', function() {
-        jQuery('body').css('overflow', 'auto');
-        jQuery('body').css('padding-right', '0');
-        jQuery('#reviewModal').removeAttr('aria-hidden');
     });
     
     jQuery('#reviewModal').modal('show');
@@ -804,74 +630,26 @@ function createReviewModal(bookingId) {
         jQuery('.modal-backdrop').remove();
         jQuery('body').removeClass('modal-open');
         jQuery('body').css('overflow', '');
-        jQuery('body').css('padding-right', '');
     });
 }
 
-// Global functions for modal buttons
-window.uploadPhotoClick = function() {
-    var fileInput = document.getElementById('reviewImageInput');
-    if (fileInput) fileInput.click();
-};
-
-window.handleImagePreview = function(input) {
-    if (input.files && input.files[0]) {
-        selectedImageFile = input.files[0];
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            var imagePreview = document.getElementById('imagePreview');
-            var imagePreviewContainer = document.getElementById('imagePreviewContainer');
-            if (imagePreview) imagePreview.src = e.target.result;
-            if (imagePreviewContainer) imagePreviewContainer.style.display = 'block';
-            var uploadBtn = document.querySelector('.image-upload-btn');
-            if (uploadBtn) uploadBtn.style.display = 'none';
-        };
-        reader.readAsDataURL(selectedImageFile);
-    }
-};
-
-window.removeSelectedImage = function() {
-    selectedImageFile = null;
-    var reviewImageInput = document.getElementById('reviewImageInput');
-    var imagePreviewContainer = document.getElementById('imagePreviewContainer');
-    var imagePreview = document.getElementById('imagePreview');
-    
-    if (reviewImageInput) reviewImageInput.value = '';
-    if (imagePreviewContainer) imagePreviewContainer.style.display = 'none';
-    if (imagePreview) imagePreview.src = '';
-    
-    var uploadBtn = document.querySelector('.image-upload-btn');
-    if (uploadBtn) uploadBtn.style.display = 'block';
-};
-
-window.submitModalReview = function() {
+window.submitModalReview = function(bookingId) {
     var rating = jQuery('#selectedRating').val();
     var comment = jQuery('#reviewComment').val();
     var isValid = true;
     
-    if (!rating || rating == 0) {
-        jQuery('#ratingError').show();
-        isValid = false;
-    }
-    if (!comment || !comment.trim()) {
-        jQuery('#commentError').show();
-        isValid = false;
-    }
-    
+    if (!rating || rating == 0) { jQuery('#ratingError').show(); isValid = false; }
+    if (!comment || !comment.trim()) { jQuery('#commentError').show(); isValid = false; }
     if (!isValid) return;
     
     var formData = new FormData();
-    formData.append('booking_id', currentBookingId);
+    formData.append('booking_id', bookingId);
     formData.append('rating', rating);
     formData.append('comment', comment);
-    if (selectedImageFile) {
-        formData.append('image', selectedImageFile);
-    }
     
     var $btn = jQuery('#reviewModal .btn-primary');
     var originalText = $btn.html();
-    $btn.html('<span class="spinner-border spinner-border-sm me-2"></span> Submitting...');
-    $btn.prop('disabled', true);
+    $btn.html('<span class="spinner-border spinner-border-sm me-2"></span> Submitting...').prop('disabled', true);
     
     jQuery.ajax({
         url: '/api/comments/add',
@@ -881,20 +659,18 @@ window.submitModalReview = function() {
         contentType: false,
         success: function(response) {
             if (response.success) {
-                showNotification(response.message || 'Thank you for your review!', 'success');
+                showNotification('Thank you for your review!', 'success');
                 jQuery('#reviewModal').modal('hide');
                 loadAllData();
                 if (isPendingOpen) loadPendingReviews();
             } else {
                 showNotification(response.message || 'Error submitting review', 'error');
             }
-            $btn.html(originalText);
-            $btn.prop('disabled', false);
+            $btn.html(originalText).prop('disabled', false);
         },
         error: function() {
             showNotification('Error submitting review', 'error');
-            $btn.html(originalText);
-            $btn.prop('disabled', false);
+            $btn.html(originalText).prop('disabled', false);
         }
     });
 };
@@ -903,10 +679,10 @@ function showFullImage(imagePath) {
     var modalHtml = `
         <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg">
-                <div class="modal-content image-modal-content">
+                <div class="modal-content" style="background: #1c2135; border-radius: 16px;">
                     <div class="modal-body text-center p-0 position-relative">
                         <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" style="z-index: 10;"></button>
-                        <img id="modalFullImage" class="modal-image-full" src="${imagePath}" alt="Review photo" style="max-width: 100%; max-height: 85vh;">
+                        <img src="${imagePath}" style="max-width: 100%; max-height: 85vh; border-radius: 16px;" alt="Review photo">
                     </div>
                 </div>
             </div>
@@ -924,73 +700,45 @@ function showFullImage(imagePath) {
 
 function formatDate(dateString) {
     if (!dateString) return 'N/A';
-    var date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
+    return new Date(dateString).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 function formatShortDate(dateString) {
     if (!dateString) return 'N/A';
-    var date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-    });
+    return new Date(dateString).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 function escapeHtml(text) {
     if (!text) return '';
-    var div = document.createElement('div');
+    const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
 }
 
 function showNotification(message, type) {
-    var alertClass = '';
-    var icon = '';
-    
-    if (type === 'error') { alertClass = 'danger'; icon = '<i class="fas fa-exclamation-circle me-2"></i> '; } 
-    else if (type === 'success') { alertClass = 'success'; icon = '<i class="fas fa-check-circle me-2"></i> '; } 
-    else if (type === 'warning') { alertClass = 'warning'; icon = '<i class="fas fa-exclamation-triangle me-2"></i> '; } 
-    else { alertClass = 'info'; icon = '<i class="fas fa-info-circle me-2"></i> '; }
-    
-    var alertHtml = '<div class="alert alert-' + alertClass + ' alert-dismissible fade show border-0 shadow-sm" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">' +
-        icon + '<strong>' + message + '</strong>' +
-        '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
-        '</div>';
-    
-    jQuery('body').append(alertHtml);
-    
-    setTimeout(function() {
-        jQuery('.alert').fadeOut(500, function() { jQuery(this).remove(); });
-    }, 4000);
+    if (typeof window.showNotification === 'function') {
+        window.showNotification(message, type);
+    }
 }
 </script>
 
 <style>
 .collapsible-header {
-    background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
-    border-radius: 14px;
+    background: linear-gradient(135deg, #1a2744 0%, #2c3e6b 100%);
     padding: 18px 25px;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: white;
-    box-shadow: var(--shadow-soft);
 }
 .collapsible-header:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-hover);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 .pending-count {
-    background: var(--warning);
-    color: black;
+    background: #e9c46a;
+    color: #1a2744;
     padding: 2px 12px;
     border-radius: 20px;
     font-size: 0.85rem;
@@ -1013,115 +761,26 @@ function showNotification(message, type) {
     border-top: none;
 }
 .pending-review-item {
-    background: white;
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 12px;
     border: 1px solid #e2e8f0;
     transition: all 0.2s ease;
 }
 .pending-review-item:hover {
     transform: translateX(4px);
-    border-left: 4px solid var(--warning);
-    box-shadow: var(--shadow-soft);
+    border-left: 4px solid #e9c46a;
 }
 .review-card-custom {
-    background: white;
-    border-radius: 14px;
-    padding: 20px;
-    margin-bottom: 20px;
-    border: 1px solid #e2e8f0;
-    box-shadow: var(--shadow-soft);
     transition: all 0.3s ease;
 }
 .review-card-custom:hover {
     transform: translateY(-3px);
-    box-shadow: var(--shadow-hover);
-}
-.image-upload-btn {
-    background: #f8fafc;
-    border: 2px dashed #cbd5e1;
-    border-radius: 12px;
-    padding: 25px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-.image-upload-btn:hover {
-    border-color: var(--primary);
-    background: rgba(99, 102, 241, 0.05);
-}
-.review-image-preview {
-    max-width: 100%;
-    max-height: 200px;
-    border-radius: 12px;
-    margin-top: 15px;
-    box-shadow: var(--shadow-soft);
-}
-.public-review-image {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 10px;
-    cursor: pointer;
-    margin-top: 15px;
-    transition: all 0.3s ease;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1) !important;
 }
 .public-review-image:hover {
-    transform: scale(1.02);
+    transform: scale(1.03) !important;
 }
-.star-rating i {
-    font-size: 2rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    color: #cbd5e1;
-}
-.star-rating i:hover, .star-rating i.fas {
-    color: var(--warning);
-    transform: scale(1.1);
-}
-
-/* =============================================
-   MODAL SCROLLING FIX
-   ============================================= */
-body.modal-open {
-    overflow: auto !important;
-    padding-right: 0 !important;
-}
-body {
-    padding-right: 0px !important;
-}
-.modal.fade {
-    transition: none;
-}
-.modal.show {
-    background: rgba(0, 0, 0, 0.5);
-}
-.modal-backdrop {
-    display: none !important;
-}
-.modal-content {
-    max-height: 85vh;
-    display: flex;
-    flex-direction: column;
-}
-.modal-body {
-    overflow-y: auto;
-    flex: 1;
-}
-
-/* Dark mode adjustments */
-.dark-mode .collapsible-content { background: #0f172a; border-color: rgba(255,255,255,0.05); }
-.dark-mode .pending-review-item { background: #0f172a; border-color: rgba(255,255,255,0.05); }
-.dark-mode .pending-review-item:hover { border-left-color: var(--warning); background: #1e293b; }
-.dark-mode .review-card-custom { background: #0f172a; border-color: rgba(255,255,255,0.05); color: var(--dark-text); }
-.dark-mode .review-card-custom:hover { border-color: var(--warning); }
-.dark-mode .image-upload-btn { background: #0f172a; border-color: #1e293b; }
-.dark-mode .image-upload-btn:hover { border-color: var(--primary); }
-.dark-mode .star-rating i { color: #334155; }
-.dark-mode .modal-content { background: #0f172a; color: var(--dark-text); }
-.dark-mode .modal-header, .dark-mode .modal-footer { border-color: #1e293b; }
-.dark-mode .btn-close { filter: invert(1); }
-.dark-mode .public-review-image { border: 1px solid var(--dark-border); }
+.dark-mode .collapsible-content { background: #141929; border-color: rgba(255,255,255,0.05); }
+.dark-mode .pending-review-item { background: #141929; border-color: rgba(255,255,255,0.05); }
+.dark-mode .pending-review-item:hover { background: #1c2135; }
+.dark-mode .review-card-custom { background: #141929; color: #d4cec4; }
 </style>
 {% endblock %}

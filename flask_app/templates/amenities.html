@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="d-flex justify-content-between align-items-center mb-4 fade-in">
-    <h2 class="fw-bold"><i class="fas fa-concierge-bell text-primary me-2"></i> Amenities Management</h2>
+    <h2 class="fw-bold mb-0"><i class="fas fa-concierge-bell text-primary me-2"></i> Amenities Management</h2>
     <div>
         <button class="btn btn-outline-primary shadow-sm fw-bold me-2" onclick="toggleSortOrder()" id="sortBtn">
             <i class="fas fa-sort-amount-down me-1"></i> Price: <span id="sortLabel">Low to High</span>
@@ -24,10 +24,10 @@
             <label for="priceFilter" class="fw-bold text-muted mb-1"><i class="fas fa-filter me-1"></i> Filter by Price</label>
             <select id="priceFilter" class="form-select shadow-sm">
                 <option value="all">All Prices</option>
-                <option value="free">Free ($0)</option>
-                <option value="under10">Under $10</option>
-                <option value="10to25">$10 - $25</option>
-                <option value="over25">Over $25</option>
+                <option value="free">Free (₱0)</option>
+                <option value="under10">Under ₱10</option>
+                <option value="10to25">₱10 - ₱25</option>
+                <option value="over25">Over ₱25</option>
             </select>
         </div>
         <div class="col-md-2">
@@ -50,7 +50,7 @@
     </div>
 </div>
 
-<div class="table-responsive shadow-sm fade-in" style="border-radius: 12px; animation-delay: 0.2s;">
+<div class="table-responsive shadow-sm fade-in" style="border-radius: 16px; animation-delay: 0.2s;">
     <table class="table table-bordered table-hover mb-0">
         <thead style="background: linear-gradient(135deg, #1a2744 0%, #243356 100%);">
             <tr>
@@ -132,7 +132,6 @@ function loadAmenities() {
 }
 
 function deduplicateAmenities() {
-    // Remove duplicates - keep only one per amenity name (the first one found)
     const seen = new Set();
     uniqueAmenities = allAmenities.filter(function(amenity) {
         const name = amenity.amenity_name.toLowerCase().trim();
@@ -164,7 +163,6 @@ function filterAmenities() {
         return true;
     });
     
-    // Sort by price
     filtered.sort(function(a, b) {
         var priceA = parseFloat(a.price_per_day) || 0;
         var priceB = parseFloat(b.price_per_day) || 0;
@@ -200,7 +198,7 @@ function displayAmenities(amenities) {
             var price = parseFloat(amenity.price_per_day) || 0;
             var priceDisplay = price === 0 
                 ? '<span class="badge bg-success px-3 py-2"><i class="fas fa-gift me-1"></i>Complimentary</span>' 
-                : '<strong class="text-success">$' + price.toFixed(2) + '</strong>';
+                : '<strong class="text-success">' + window.formatPHP(price) + '</strong>';
             
             html += `
                 <tr class="fade-in">
@@ -283,4 +281,9 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 </script>
+
+<style>
+.search-highlight { background: #fef3cd; padding: 0.1em 0.3em; border-radius: 3px; font-weight: 700; }
+.dark-mode .search-highlight { background: rgba(201, 168, 76, 0.2); color: #dfc278; }
+</style>
 {% endblock %}

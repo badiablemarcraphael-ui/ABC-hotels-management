@@ -2,62 +2,72 @@
 
 {% block content %}
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-center mb-4 fade-in">
     <div>
-        <h2 class="mb-0"><i class="fas fa-calendar-alt text-primary me-2"></i> Booking Calendar</h2>
-        <small class="text-muted fw-bold">Shows check-in, check-out, and currently staying only</small>
+        <h2 class="mb-0 fw-bold"><i class="fas fa-calendar-alt text-primary me-2"></i> Booking Calendar</h2>
+        <small class="text-muted fw-bold">Shows check-in, check-out, and currently staying guests only</small>
     </div>
-    <button class="nav-btn" onclick="location.reload()">
+    <button class="btn btn-gold shadow-sm fw-bold" onclick="location.reload()">
         <i class="fas fa-sync-alt me-1"></i> Refresh
     </button>
 </div>
 
-<div class="stats-container">
-    <div class="stat-card stat-bookings calendar-stat" onclick="goToToday()">
-        <h3 id="totalBookingsCard">0</h3>
-        <p class="fw-bold mb-1">Total Active Bookings</p>
-        <small>Excluding cancelled</small>
+<div class="row g-4 mb-4 fade-in" style="animation-delay: 0.1s;">
+    <div class="col-md-3">
+        <div class="stat-card stat-bookings shadow-sm" style="cursor: pointer;" onclick="goToToday()">
+            <h3 id="totalBookingsCard" class="mb-1">0</h3>
+            <p class="fw-bold mb-0 opacity-75">Total Active Bookings</p>
+            <small class="opacity-75">Excluding cancelled</small>
+        </div>
     </div>
-    <div class="stat-card stat-rooms calendar-stat" onclick="setStatusFilter('checkin')">
-        <h3 id="checkedInCard">0</h3>
-        <p class="fw-bold mb-1"> Currently Staying</p>
-        <small>Checked in today</small>
+    <div class="col-md-3">
+        <div class="stat-card stat-rooms shadow-sm" style="cursor: pointer;" onclick="setStatusFilter('checkin')">
+            <h3 id="checkedInCard" class="mb-1">0</h3>
+            <p class="fw-bold mb-0 opacity-75">Currently Staying</p>
+            <small class="opacity-75">Checked in today</small>
+        </div>
     </div>
-    <div class="stat-card stat-revenue calendar-stat" onclick="setStatusFilter('checkin')">
-        <h3 id="todayCheckinsCard" class="text-dark">0</h3>
-        <p class="fw-bold mb-1 text-dark"> Today's Check-ins</p>
-        <small class="text-dark">Arrivals</small>
+    <div class="col-md-3">
+        <div class="stat-card stat-revenue shadow-sm" style="cursor: pointer;" onclick="setStatusFilter('checkin')">
+            <h3 id="todayCheckinsCard" class="mb-1">0</h3>
+            <p class="fw-bold mb-0">Today's Check-ins</p>
+            <small>Arrivals</small>
+        </div>
     </div>
-    <div class="stat-card stat-guests calendar-stat" onclick="setStatusFilter('checkout')">
-        <h3 id="todayCheckoutsCard">0</h3>
-        <p class="fw-bold mb-1"> Today's Check-outs</p>
-        <small>Departures</small>
+    <div class="col-md-3">
+        <div class="stat-card stat-guests shadow-sm" style="cursor: pointer;" onclick="setStatusFilter('checkout')">
+            <h3 id="todayCheckoutsCard" class="mb-1">0</h3>
+            <p class="fw-bold mb-0 opacity-75">Today's Check-outs</p>
+            <small class="opacity-75">Departures</small>
+        </div>
     </div>
 </div>
 
-<div class="filter-bar">
-    <span class="fw-bold"><i class="fas fa-filter text-muted me-1"></i> Filter:</span>
-    <button class="filter-btn active" onclick="setStatusFilter('all')">All</button>
-    
-    <button class="filter-btn" onclick="setStatusFilter('checkin')">📥 Check-ins</button>
-    
-    <button class="filter-btn" onclick="setStatusFilter('checkout')">📤 Check-outs</button>
-
-    <span id="filterStatus" class="ms-auto text-muted fw-bold">Showing: All</span>
+<div class="filter-bar fade-in" style="animation-delay: 0.15s;">
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+        <span class="fw-bold text-muted"><i class="fas fa-filter me-1"></i> Filter:</span>
+        <button class="btn btn-sm fw-bold filter-btn-custom active" onclick="setStatusFilter('all')">
+            <i class="fas fa-globe me-1"></i> All
+        </button>
+        <button class="btn btn-sm fw-bold filter-btn-custom" onclick="setStatusFilter('checkin')">
+            <i class="fas fa-sign-in-alt me-1"></i> Check-ins
+        </button>
+        <button class="btn btn-sm fw-bold filter-btn-custom" onclick="setStatusFilter('checkout')">
+            <i class="fas fa-sign-out-alt me-1"></i> Check-outs
+        </button>
+        <span id="filterStatus" class="ms-auto text-muted fw-bold">Showing: All Bookings</span>
+    </div>
 </div>
 
-<div class="calendar-wrapper">
+<div class="calendar-wrapper shadow-sm fade-in" style="animation-delay: 0.2s;">
     <div class="calendar-nav-bar">
-        
-        <h3 class="month-year" id="monthYearDisplay">Loading...</h3>
-        <div class="d-flex gap-2">
-            <button class="nav-btn" onclick="changeMonth(-1)">
+        <button class="btn btn-sm btn-outline-light fw-bold" onclick="changeMonth(-1)">
             <i class="fas fa-chevron-left me-1"></i> Previous
         </button>
-            <button class="nav-btn" onclick="changeMonth(1)">
-                  Next   <i class="fas fa-chevron-right ms-1"></i>
-            </button>
-        </div>
+        <h3 class="month-year mb-0 text-white fw-bold" id="monthYearDisplay">Loading...</h3>
+        <button class="btn btn-sm btn-outline-light fw-bold" onclick="changeMonth(1)">
+            Next <i class="fas fa-chevron-right ms-1"></i>
+        </button>
     </div>
 
     <div class="weekdays-row">
@@ -77,11 +87,10 @@
         </div>
     </div>
 
-    <div class="legend-container shadow-sm">
-        <div></div>
-        <div class="legend-item"><span class="legend-dot checkin"></span> Check-in Day</div>
-        <div class="legend-item"><span class="legend-dot checkout"></span> Check-out Day</div>
-        <div></div>
+    <div class="legend-container p-3 d-flex justify-content-center gap-4 flex-wrap">
+        <div class="legend-item"><span class="legend-dot" style="background: #2d6a4f;"></span> Check-in Day</div>
+        <div class="legend-item"><span class="legend-dot" style="background: #8b3a3a;"></span> Check-out Day</div>
+        <div class="legend-item"><span class="legend-dot" style="background: #c9a84c;"></span> Currently Staying</div>
     </div>
 </div>
 
@@ -89,14 +98,13 @@
     <div class="modal-content-custom" onclick="event.stopPropagation()">
         <div class="modal-header-custom d-flex justify-content-between align-items-center">
             <h4 class="mb-0 fw-bold"><i class="fas fa-receipt me-2"></i> Booking Details</h4>
-            <button class="btn-close" style="filter: invert(1);" onclick="closeModal()"></button>
+            <button class="btn-close btn-close-white" onclick="closeModal()"></button>
         </div>
         <div class="modal-body p-4" id="modalBody">Loading...</div>
     </div>
 </div>
 
 <script>
-// Global variables
 let currentDate = new Date();
 let allBookings = [];
 let allRooms = [];
@@ -109,17 +117,14 @@ let currentStatusFilter = 'all';
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
                     'July', 'August', 'September', 'October', 'November', 'December'];
 
-// Statuses to EXCLUDE from calendar
 const EXCLUDED_STATUSES = ['cancelled', 'checked_out'];
 
-// Initialize
 (function() {
     function waitForjQuery() {
         if (typeof jQuery !== 'undefined') {
             console.log("✅ jQuery loaded, initializing calendar...");
             initCalendar();
         } else {
-            console.log("⏳ Waiting for jQuery...");
             setTimeout(waitForjQuery, 100);
         }
     }
@@ -135,8 +140,8 @@ const EXCLUDED_STATUSES = ['cancelled', 'checked_out'];
 
 function setStatusFilter(status) {
     currentStatusFilter = status;
-    $('.filter-btn').removeClass('active');
-    $(event.target).addClass('active');
+    $('.filter-btn-custom').removeClass('active');
+    $(event.target).closest('.filter-btn-custom').addClass('active');
     
     let filterText = '';
     switch(status) {
@@ -151,7 +156,7 @@ function setStatusFilter(status) {
 }
 
 function loadAllData() {
-    console.log("📊 Loading calendar data from database...");
+    console.log("📊 Loading calendar data...");
     
     const year = currentYear;
     const month = String(currentMonth + 1).padStart(2, '0');
@@ -228,7 +233,7 @@ function updateStats() {
 function showError(message) {
     document.getElementById('calendarGrid').innerHTML = `
         <div class="text-center py-5" style="grid-column: span 7;">
-            <i class="fas fa-exclamation-triangle fa-3x mb-3" style="color: var(--danger);"></i>
+            <i class="fas fa-exclamation-triangle fa-3x mb-3" style="color: #8b3a3a;"></i>
             <h4 class="fw-bold">Error Loading Data</h4>
             <p class="text-muted">${message}</p>
             <button class="btn btn-primary mt-2" onclick="location.reload()">
@@ -347,6 +352,10 @@ function renderCalendar() {
             `;
         });
         
+        if (bookingsForDate.length > 4) {
+            html += `<div class="more-bookings text-center small text-muted fw-bold">+${bookingsForDate.length - 4} more</div>`;
+        }
+        
         html += `</div>`;
     }
     
@@ -355,8 +364,9 @@ function renderCalendar() {
     if (allBookings.length === 0) {
         document.getElementById('calendarGrid').innerHTML = `
             <div class="text-center py-5" style="grid-column: span 7;">
-                <i class="fas fa-calendar-plus fa-3x mb-3 text-muted"></i>
+                <i class="fas fa-calendar-plus fa-3x mb-3 text-muted opacity-50"></i>
                 <h4 class="fw-bold text-muted">No Active Bookings</h4>
+                <p class="text-muted">Create a new booking to see it on the calendar</p>
                 <button class="btn btn-primary mt-2 shadow-sm" onclick="window.location.href='/bookings'">
                     <i class="fas fa-plus me-1"></i> Create Booking
                 </button>
@@ -383,13 +393,13 @@ function showBooking(bookingId) {
     let statusBadge = '';
     let statusColor = '';
     if (isCurrentlyStaying) {
-        statusColor = 'var(--success)';
+        statusColor = '#2d6a4f';
         statusBadge = '🟢 CURRENTLY STAYING';
     } else if (booking.status === 'checked_in') {
-        statusColor = 'var(--success)';
+        statusColor = '#2d6a4f';
         statusBadge = '✅ Checked In';
     } else if (booking.status === 'confirmed') {
-        statusColor = 'var(--warning)';
+        statusColor = '#b8860b';
         statusBadge = '📅 Confirmed';
     } else {
         statusColor = '#64748b';
@@ -433,11 +443,11 @@ function showBooking(bookingId) {
         
         <div class="p-3 rounded-3 shadow-sm" style="background: rgba(100,116,139,0.05);">
             <strong class="d-block mb-2"><i class="fas fa-money-bill-wave text-success"></i> Payment Summary</strong>
-            <div class="d-flex justify-content-between mb-1"><span class="text-muted">Room Charge:</span> <span class="fw-bold">$${totalAmount.toFixed(2)}</span></div>
-            <div class="d-flex justify-content-between mb-1"><span class="text-muted">VAT (7%):</span> <span class="fw-bold">$${vat.toFixed(2)}</span></div>
-            <div class="d-flex justify-content-between mb-2"><span class="text-muted">Service (5%):</span> <span class="fw-bold">$${service.toFixed(2)}</span></div>
+            <div class="d-flex justify-content-between mb-1"><span class="text-muted">Room Charge:</span> <span class="fw-bold">${window.formatPHP(totalAmount)}</span></div>
+            <div class="d-flex justify-content-between mb-1"><span class="text-muted">VAT (7%):</span> <span class="fw-bold">${window.formatPHP(vat)}</span></div>
+            <div class="d-flex justify-content-between mb-2"><span class="text-muted">Service (5%):</span> <span class="fw-bold">${window.formatPHP(service)}</span></div>
             <hr class="my-2 opacity-25">
-            <div class="d-flex justify-content-between fs-5"><strong class="text-dark">TOTAL:</strong> <strong class="text-success">$${grandTotal.toFixed(2)}</strong></div>
+            <div class="d-flex justify-content-between fs-5"><strong class="text-dark">TOTAL:</strong> <strong class="text-success">${window.formatPHP(grandTotal)}</strong></div>
         </div>
         
         <div class="d-flex gap-2 mt-4">
@@ -480,5 +490,146 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML;
 }
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeModal();
+    }
+});
 </script>
+
+<style>
+.calendar-wrapper {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+}
+
+.calendar-nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #1a2744, #243356);
+    color: white;
+}
+
+.calendar-nav-bar .btn-outline-light {
+    border-color: rgba(255,255,255,0.3);
+    color: white;
+    border-radius: 25px;
+    padding: 0.4rem 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.calendar-nav-bar .btn-outline-light:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: #c9a84c;
+    color: #c9a84c;
+}
+
+.filter-btn-custom {
+    border-radius: 25px;
+    padding: 0.4rem 1.2rem;
+    border: 1.5px solid #dee2e6;
+    background: transparent;
+    color: #6b7280;
+    transition: all 0.3s ease;
+}
+
+.filter-btn-custom:hover {
+    border-color: #c9a84c;
+    color: #a88838;
+}
+
+.filter-btn-custom.active {
+    background: linear-gradient(135deg, #c9a84c, #a88838);
+    color: #1a2744;
+    border-color: #c9a84c;
+    font-weight: 700;
+}
+
+.legend-dot {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 15, 26, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 1050;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content-custom {
+    background: white;
+    border-radius: 20px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.25);
+}
+
+.modal-header-custom {
+    background: linear-gradient(135deg, #1a2744, #243356);
+    color: white;
+    padding: 1.2rem 1.5rem;
+    border-radius: 20px 20px 0 0;
+}
+
+.more-bookings {
+    font-size: 0.7rem;
+    padding: 0.2rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.more-bookings:hover {
+    color: #c9a84c !important;
+}
+
+.dark-mode .calendar-wrapper {
+    background: #1c2135;
+}
+
+.dark-mode .calendarday-cell:hover {
+    background: rgba(201, 168, 76, 0.08);
+}
+
+.dark-mode .modal-content-custom {
+    background: #1c2135;
+}
+
+.dark-mode .filter-btn-custom {
+    border-color: rgba(255,255,255,0.1);
+    color: #8b8a95;
+}
+
+.dark-mode .filter-btn-custom:hover {
+    border-color: #c9a84c;
+    color: #dfc278;
+}
+
+.dark-mode .legend-item {
+    color: #d4cec4;
+}
+</style>
 {% endblock %}

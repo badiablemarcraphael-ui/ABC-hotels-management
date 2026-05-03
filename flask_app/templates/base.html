@@ -3,90 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <meta name="theme-color" content="#1a2744">
-    <meta name="description" content="Grand Hotel & Resort — Luxury Hospitality Management Suite">
-    <meta name="author" content="Grand Hotel Management">
+    <meta name="theme-color" content="#1a1a3e">
+    <meta name="description" content="ABC hotels & Resort — Luxury Hospitality Management Suite">
+    <meta name="author" content="ABC hotels Management">
     <meta name="robots" content="noindex, nofollow">
     
-    <title>{% block title %}Grand Hotel | Luxury Management Suite{% endblock %}</title>
+    <title>{% block title %}ABC hotels | Luxury Management Suite{% endblock %}</title>
     
-    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏨</text></svg>">
     
-    <!-- =============================================
-         CORE STYLESHEETS
-         ============================================= -->
-    
-    <!-- Custom Luxury Hotel CSS (60-30-10 Design System) -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=16">
-    
-    <!-- Bootstrap 5.1.3 (Grid & Core Components) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=35">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- =============================================
-         TYPOGRAPHY
-         ============================================= -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- =============================================
-         JAVASCRIPT LIBRARIES
-         ============================================= -->
-    
-    <!-- Chart.js (Analytics & Visualization) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
-    <!-- Leaflet Maps & Routing Engine -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     
-    <!-- =============================================
-         COMPREHENSIVE DESIGN SYSTEM
-         60% Neutral | 30% Rich Accent | 10% Gold
-         ============================================= -->
     <style>
-        /* ─────────────────────────────────────────────
-           DESIGN TOKENS & CSS CUSTOM PROPERTIES
-           ───────────────────────────────────────────── */
         :root {
-            /* ══════ 60% NEUTRAL BASE ══════ */
             --surface-primary: #fdfcf9;
             --surface-secondary: #faf8f4;
             --surface-tertiary: #f5f0e8;
-            --surface-quaternary: #ede5d8;
-            
-            --neutral-100: #fdfcf9;
             --neutral-200: #f5f0e8;
             --neutral-300: #e8e0d5;
             --neutral-400: #d4cec4;
             --neutral-500: #c8c0b4;
-            --neutral-600: #b0a89c;
             
-            /* ══════ 30% RICH ACCENT ══════ */
             --navy-950: #0a0f1a;
             --navy-900: #1a2744;
             --navy-800: #243356;
             --navy-700: #2c3e6b;
-            --navy-600: #354a82;
-            --navy-500: #4a6099;
             
             --bronze-800: #5a4a38;
-            --bronze-700: #6b5a45;
             --bronze-600: #8b7355;
             --bronze-500: #a89269;
             --bronze-400: #c4b393;
-            --bronze-300: #d9cebc;
-            --bronze-200: #e8e0d5;
             
-            /* ══════ 10% GOLD HIGHLIGHT ══════ */
             --gold-800: #8a6e2e;
-            --gold-700: #a07d35;
             --gold-600: #a88838;
             --gold-500: #c9a84c;
             --gold-400: #dfc278;
@@ -94,711 +55,1002 @@
             --gold-200: #f8f2e0;
             --gold-100: #fcf9f2;
             
-            /* ══════ FUNCTIONAL COLORS ══════ */
-            --success-700: #1b4332;
             --success-600: #2d6a4f;
             --success-500: #3d8b6a;
-            --success-100: #d8f3dc;
-            
-            --danger-700: #6b2121;
             --danger-600: #8b3a3a;
             --danger-500: #a84848;
-            --danger-100: #fce4e4;
-            
-            --warning-700: #8b6508;
             --warning-600: #b8860b;
             --warning-500: #d4a020;
-            --warning-100: #fef3cd;
-            
-            --info-700: #2c5f72;
             --info-600: #4a7c96;
-            --info-500: #5d94b0;
-            --info-100: #d6ecf5;
             
-            /* ══════ DARK MODE SURFACES ══════ */
+            --peso-blue: #0038A8;
+            --peso-red: #CE1126;
+            --peso-gold: #FCD116;
+            
             --dark-bg: #0a0f1a;
             --dark-surface: #141929;
             --dark-surface-alt: #1c2135;
-            --dark-surface-hover: #222840;
-            --dark-border: rgba(201, 168, 76, 0.12);
             --dark-text: #d4cec4;
             --dark-text-muted: #8b8a95;
             
-            /* ══════ TYPOGRAPHY ══════ */
-            --font-display: 'Cormorant Garamond', 'Playfair Display', Georgia, 'Times New Roman', serif;
-            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, sans-serif;
-            --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', 'Monaco', monospace;
+            --font-display: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             
-            --text-xs: 0.7rem;
-            --text-sm: 0.82rem;
-            --text-base: 0.95rem;
-            --text-lg: 1.1rem;
-            --text-xl: 1.25rem;
-            --text-2xl: 1.5rem;
-            --text-3xl: 2rem;
-            --text-4xl: 2.5rem;
-            
-            --leading-tight: 1.25;
-            --leading-normal: 1.5;
-            --leading-relaxed: 1.75;
-            
-            --tracking-tight: -0.02em;
-            --tracking-normal: -0.01em;
-            --tracking-wide: 0.02em;
-            --tracking-wider: 0.05em;
-            --tracking-widest: 0.1em;
-            
-            /* ══════ SPACING SCALE (4px Base) ══════ */
-            --space-0: 0;
-            --space-1: 4px;
-            --space-2: 8px;
-            --space-3: 12px;
-            --space-4: 16px;
-            --space-5: 20px;
-            --space-6: 24px;
-            --space-8: 32px;
-            --space-10: 40px;
-            --space-12: 48px;
-            --space-16: 64px;
-            --space-20: 80px;
-            
-            /* ══════ BORDER RADIUS ══════ */
-            --radius-none: 0;
-            --radius-xs: 4px;
-            --radius-sm: 6px;
-            --radius-md: 10px;
-            --radius-lg: 14px;
-            --radius-xl: 20px;
-            --radius-2xl: 28px;
-            --radius-full: 9999px;
-            
-            /* ══════ SHADOW SYSTEM ══════ */
-            --shadow-2xs: 0 1px 2px rgba(10, 15, 26, 0.03);
-            --shadow-xs: 0 1px 3px rgba(10, 15, 26, 0.04);
             --shadow-sm: 0 2px 8px rgba(10, 15, 26, 0.05);
             --shadow-md: 0 4px 16px rgba(10, 15, 26, 0.07);
             --shadow-lg: 0 8px 32px rgba(10, 15, 26, 0.09);
             --shadow-xl: 0 12px 48px rgba(10, 15, 26, 0.12);
             --shadow-2xl: 0 20px 60px rgba(10, 15, 26, 0.16);
-            
             --shadow-gold-sm: 0 2px 8px rgba(201, 168, 76, 0.12);
             --shadow-gold-md: 0 4px 20px rgba(201, 168, 76, 0.18);
             --shadow-gold-lg: 0 8px 40px rgba(201, 168, 76, 0.25);
             
-            /* ══════ TRANSITIONS ══════ */
-            --ease-out: cubic-bezier(0, 0, 0.2, 1);
-            --ease-in: cubic-bezier(0.4, 0, 1, 1);
-            --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
             --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-            
-            --duration-100: 100ms;
-            --duration-200: 200ms;
-            --duration-300: 300ms;
-            --duration-500: 500ms;
-            --duration-700: 700ms;
-            
+            --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
             --transition-fast: 150ms var(--ease-in-out);
             --transition-base: 250ms var(--ease-in-out);
             --transition-slow: 400ms var(--ease-in-out);
             --transition-spring: 500ms var(--ease-spring);
+            --transition-bounce: 600ms var(--ease-bounce);
             
-            /* ══════ Z-INDEX SCALE ══════ */
-            --z-base: 1;
-            --z-dropdown: 1000;
             --z-sticky: 1020;
             --z-overlay: 1030;
-            --z-sidebar: 1040;
-            --z-modal: 1055;
-            --z-popover: 1070;
+            --z-nav: 1035;
             --z-tooltip: 1080;
             --z-notification: 9999;
+            --z-preloader: 99999;
             
-            /* ══════ LAYOUT ══════ */
-            --sidebar-width: 270px;
-            --sidebar-collapsed-width: 80px;
-            --topbar-height: 65px;
+            --sticky-bar-height: 65px;
             --mobile-breakpoint: 992px;
         }
         
-        /* ─────────────────────────────────────────────
-           CSS RESET & BASE STYLES
-           ───────────────────────────────────────────── */
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        /* =============================================
+           PRELOADER
+           ============================================= */
+        .grand-preloader {
+            position: fixed;
+            inset: 0;
+            z-index: var(--z-preloader);
+            background: var(--navy-950);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
         }
+        
+        .grand-preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        
+        .preloader-logo {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gold-500);
+            letter-spacing: 4px;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: preloaderFadeIn 0.7s ease forwards;
+        }
+        
+        .preloader-spinner {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+        
+        .preloader-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 3px solid transparent;
+        }
+        
+        .preloader-ring:nth-child(1) {
+            border-top-color: var(--gold-500);
+            animation: preloaderSpin 1.2s linear infinite;
+        }
+        
+        .preloader-ring:nth-child(2) {
+            inset: 8px;
+            border-right-color: var(--gold-400);
+            animation: preloaderSpin 0.9s linear infinite reverse;
+        }
+        
+        .preloader-ring:nth-child(3) {
+            inset: 16px;
+            border-bottom-color: var(--peso-blue);
+            animation: preloaderSpin 0.6s linear infinite;
+        }
+        
+        @keyframes preloaderSpin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes preloaderFadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .preloader-text {
+            font-size: 0.65rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 1.5rem;
+            opacity: 0;
+            animation: preloaderFadeIn 0.7s ease 0.3s forwards;
+        }
+        
+        /* =============================================
+           PAGE TRANSITION OVERLAY
+           ============================================= */
+        .page-transition-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            background: var(--navy-950);
+            transform: scaleY(0);
+            transform-origin: top;
+            transition: transform 0.5s var(--ease-in-out);
+            pointer-events: none;
+        }
+        
+        .page-transition-overlay.active {
+            transform: scaleY(1);
+            transform-origin: bottom;
+        }
+        
+        /* =============================================
+           GLOBAL RESET & BASE
+           ============================================= */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         
         html {
             scroll-behavior: smooth;
             -webkit-text-size-adjust: 100%;
-            text-size-adjust: 100%;
             -webkit-tap-highlight-color: rgba(201, 168, 76, 0.1);
+            scrollbar-gutter: stable;
         }
         
         body {
             font-family: var(--font-body);
-            font-size: var(--text-base);
+            font-size: 0.95rem;
             font-weight: 400;
-            line-height: var(--leading-normal);
+            line-height: 1.5;
             color: var(--navy-900);
             background-color: var(--neutral-200);
-            letter-spacing: var(--tracking-normal);
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            text-rendering: optimizeLegibility;
             min-height: 100vh;
             overflow-x: hidden;
-            transition: background-color var(--transition-slow),
-                        color var(--transition-slow);
+            padding-top: var(--sticky-bar-height);
+            transition: background-color var(--transition-slow), color var(--transition-slow);
+            position: relative;
         }
         
-        /* ── Typography ── */
+        /* Ambient background pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(201, 168, 76, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(0, 56, 168, 0.02) 0%, transparent 40%),
+                radial-gradient(ellipse at 60% 80%, rgba(206, 17, 38, 0.02) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
         h1, h2, h3, h4, h5, h6 {
             font-family: var(--font-display);
             font-weight: 600;
-            line-height: var(--leading-tight);
-            letter-spacing: var(--tracking-tight);
+            line-height: 1.25;
             color: var(--navy-900);
         }
         
-        h1 { font-size: var(--text-4xl); font-weight: 700; margin-bottom: var(--space-6); }
-        h2 { font-size: var(--text-3xl); font-weight: 600; margin-bottom: var(--space-5); }
-        h3 { font-size: var(--text-2xl); font-weight: 600; margin-bottom: var(--space-4); }
-        h4 { font-size: var(--text-xl); font-weight: 600; margin-bottom: var(--space-3); }
-        h5 { font-size: var(--text-lg); font-weight: 600; margin-bottom: var(--space-2); }
-        h6 { font-size: var(--text-base); font-weight: 600; margin-bottom: var(--space-2); }
-        
-        p { margin-bottom: var(--space-4); line-height: var(--leading-relaxed); }
-        
-        a {
-            color: var(--navy-700);
-            text-decoration: none;
-            transition: color var(--transition-fast);
-        }
-        
+        a { color: var(--navy-700); text-decoration: none; transition: color var(--transition-fast); }
         a:hover { color: var(--gold-500); }
         
-        /* ── Selection ── */
         ::selection { background-color: rgba(201, 168, 76, 0.25); color: var(--navy-900); }
-        ::-moz-selection { background-color: rgba(201, 168, 76, 0.25); color: var(--navy-900); }
-        
-        /* ── Focus ── */
-        :focus-visible {
-            outline: 2px solid var(--gold-500);
-            outline-offset: 3px;
-            border-radius: var(--radius-xs);
-        }
-        
+        :focus-visible { outline: 2px solid var(--gold-500); outline-offset: 3px; border-radius: 4px; }
         :focus:not(:focus-visible) { outline: none; }
-        
-        /* ── Images ── */
         img { max-width: 100%; height: auto; display: block; }
         
-        /* =============================================
-           SKIP NAVIGATION (Accessibility)
-           ============================================= */
+        /* Ripple effect for buttons */
+        .ripple-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple-effect .ripple-wave {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: rippleAnim 0.6s ease-out forwards;
+            pointer-events: none;
+        }
+        
+        @keyframes rippleAnim {
+            to { transform: scale(4); opacity: 0; }
+        }
+        
+        /* Skip Navigation */
         .skip-link {
             position: absolute;
             top: -100%;
-            left: var(--space-4);
+            left: 1rem;
             background: var(--gold-500);
             color: var(--navy-900);
-            padding: var(--space-2) var(--space-4);
-            border-radius: var(--radius-sm);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
             font-weight: 600;
             z-index: var(--z-tooltip);
             transition: top var(--transition-fast);
         }
-        
-        .skip-link:focus { top: var(--space-4); }
+        .skip-link:focus { top: 1rem; }
         
         /* =============================================
-           TOP NAVIGATION BAR (60% Neutral Base)
+           STICKY BOOKING BAR — MAIN NAVIGATION
            ============================================= */
-        .top-navbar {
-            position: sticky;
-            top: var(--space-4);
+        .sticky-booking-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
             z-index: var(--z-sticky);
-            background: linear-gradient(180deg, 
-                rgba(253, 252, 249, 0.98) 0%, 
-                rgba(253, 252, 249, 0.94) 100%);
+            background: linear-gradient(135deg, var(--navy-950) 0%, var(--navy-900) 100%);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
-            padding: 0.875rem 1.75rem;
-            border-radius: var(--radius-xl);
-            margin-bottom: 1.75rem;
-            box-shadow: var(--shadow-sm), var(--shadow-gold-sm);
-            border: 1px solid rgba(201, 168, 76, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: var(--space-4);
-            transition: all var(--transition-base);
+            box-shadow: var(--shadow-lg), var(--shadow-gold-sm);
+            border-bottom: 2px solid var(--gold-500);
+            height: var(--sticky-bar-height);
+            animation: barSlideDown 0.8s var(--ease-spring);
+            transition: height var(--transition-base), background var(--transition-slow);
         }
         
-        .top-navbar::after {
+        /* Subtle shimmer on the bar */
+        .sticky-booking-bar::before {
             content: '';
             position: absolute;
-            bottom: 0;
-            left: var(--space-8);
-            right: var(--space-8);
-            height: 1px;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(201, 168, 76, 0.2) 20%, 
-                rgba(201, 168, 76, 0.2) 80%, 
-                transparent 100%);
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+            animation: barShimmer 8s ease-in-out infinite;
             pointer-events: none;
         }
         
-        /* ── Page Title (30% Navy + 10% Gold gradient) ── */
-        #pageTitle {
+        @keyframes barShimmer {
+            0%, 100% { left: -100%; }
+            50% { left: 100%; }
+        }
+        
+        @keyframes barSlideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .sticky-booking-bar::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold-500) 20%, var(--peso-blue) 40%, var(--peso-red) 60%, var(--gold-500) 80%, transparent);
+            background-size: 200% 100%;
+            animation: gradientShift 6s ease infinite;
+            border-radius: 0 0 2px 2px;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Glow dots on the bar */
+        .bar-glow-dot {
+            position: absolute;
+            bottom: 0;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--gold-500);
+            box-shadow: 0 0 8px var(--gold-400), 0 0 16px var(--gold-400);
+            animation: glowDotFloat 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        .bar-glow-dot:nth-child(1) { left: 15%; animation-delay: 0s; }
+        .bar-glow-dot:nth-child(2) { left: 50%; animation-delay: 1.5s; }
+        .bar-glow-dot:nth-child(3) { left: 85%; animation-delay: 3s; }
+        
+        @keyframes glowDotFloat {
+            0%, 100% { transform: translateY(0); opacity: 0.4; }
+            50% { transform: translateY(-8px); opacity: 1; }
+        }
+        
+        .sticky-booking-bar .container-fluid {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            padding: 0 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Brand */
+        .sticky-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-shrink: 0;
+            text-decoration: none;
+            transition: transform var(--transition-spring);
+        }
+        
+        .sticky-brand:hover {
+            transform: scale(1.03);
+        }
+        
+        .sticky-brand-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--gold-500), var(--gold-600));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--navy-950);
+            transition: all var(--transition-spring);
+            animation: iconFloat 3s ease-in-out infinite;
+            box-shadow: 0 4px 15px rgba(201, 168, 76, 0.3);
+        }
+        
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        
+        .sticky-brand:hover .sticky-brand-icon {
+            transform: scale(1.1) rotate(8deg);
+            box-shadow: 0 6px 25px rgba(201, 168, 76, 0.5);
+        }
+        
+        .sticky-brand-text {
             font-family: var(--font-display);
+            font-size: 1.2rem;
             font-weight: 700;
-            font-size: 1.6rem;
-            background: linear-gradient(135deg, 
-                var(--navy-900) 0%, 
-                var(--navy-700) 40%, 
-                var(--bronze-600) 100%);
+            color: white;
+            letter-spacing: 1.5px;
+            background: linear-gradient(135deg, #fff, var(--gold-400));
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
-            margin: 0;
+        }
+        
+        .sticky-brand-tagline {
+            font-family: var(--font-body);
+            font-size: 0.55rem;
+            letter-spacing: 2px;
+            color: var(--bronze-400);
+            text-transform: uppercase;
+            display: block;
+            opacity: 0.7;
+        }
+        
+        /* Navigation Links */
+        .sticky-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            flex-wrap: wrap;
+        }
+        
+        .sticky-nav .nav-link-sticky {
+            color: rgba(212, 206, 196, 0.75);
+            padding: 0.5rem 0.9rem;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.8rem;
+            letter-spacing: 0.3px;
+            transition: all var(--transition-bounce);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
             white-space: nowrap;
+            position: relative;
+            overflow: hidden;
         }
         
-        /* ── Toggle Button ── */
-        .toggle-btn {
-            background: none;
-            border: 1.5px solid transparent;
-            color: var(--navy-700);
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: var(--radius-md);
-            transition: all var(--transition-base);
-            line-height: 1;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 38px;
-            height: 38px;
-        }
-        
-        .toggle-btn:hover {
-            color: var(--gold-500);
-            background-color: rgba(201, 168, 76, 0.06);
-            border-color: rgba(201, 168, 76, 0.2);
-            transform: scale(1.08);
-        }
-        
-        .toggle-btn:active { transform: scale(0.94); transition: transform 50ms var(--ease-out); }
-        
-        /* ── User Avatar ── */
-        .user-avatar-wrapper { position: relative; flex-shrink: 0; }
-        
-        .user-avatar {
-            width: 38px;
-            height: 38px;
-            background: linear-gradient(135deg, var(--gold-500) 0%, var(--gold-600) 100%);
-            border-radius: var(--radius-full);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: var(--shadow-gold-sm);
-            transition: all var(--transition-base);
-        }
-        
-        .user-avatar i { color: white; font-size: 0.85rem; }
-        
-        .user-avatar-wrapper:hover .user-avatar {
-            transform: scale(1.05);
-            box-shadow: var(--shadow-gold-md);
-        }
-        
-        /* Online indicator */
-        .user-status-indicator {
+        .sticky-nav .nav-link-sticky::before {
+            content: '';
             position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 11px;
-            height: 11px;
-            background: var(--success-600);
-            border-radius: var(--radius-full);
-            border: 2px solid var(--surface-primary);
-            box-shadow: 0 0 0 2px rgba(45, 106, 79, 0.2);
+            inset: 0;
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.15), rgba(201, 168, 76, 0.05));
+            opacity: 0;
+            border-radius: 9999px;
+            transition: opacity var(--transition-fast);
         }
         
-        /* ── Dropdown ── */
-        .dropdown-menu {
+        /* Hover glow effect */
+        .sticky-nav .nav-link-sticky::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            width: 60%;
+            height: 2px;
+            background: var(--gold-500);
+            border-radius: 2px;
+            transition: transform var(--transition-spring);
+        }
+        
+        .sticky-nav .nav-link-sticky:hover {
+            color: var(--gold-400);
+            transform: translateY(-3px);
+            text-shadow: 0 0 10px rgba(201, 168, 76, 0.3);
+        }
+        
+        .sticky-nav .nav-link-sticky:hover::before { opacity: 1; }
+        .sticky-nav .nav-link-sticky:hover::after { transform: translateX(-50%) scaleX(1); }
+        
+        .sticky-nav .nav-link-sticky i {
+            font-size: 0.85rem;
+            transition: all var(--transition-spring);
+            color: var(--bronze-400);
+        }
+        
+        .sticky-nav .nav-link-sticky:hover i {
+            color: var(--gold-400);
+            transform: scale(1.2) rotate(-5deg);
+        }
+        
+        .sticky-nav .nav-link-sticky.active {
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.2), rgba(201, 168, 76, 0.08));
+            color: var(--gold-400);
+            font-weight: 600;
+            box-shadow: 0 0 20px rgba(201, 168, 76, 0.15), inset 0 1px 0 rgba(255,255,255,0.05);
+            animation: activePulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes activePulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(201, 168, 76, 0.15), inset 0 1px 0 rgba(255,255,255,0.05); }
+            50% { box-shadow: 0 0 30px rgba(201, 168, 76, 0.3), inset 0 1px 0 rgba(255,255,255,0.08); }
+        }
+        
+        .sticky-nav .nav-link-sticky.active i { color: var(--gold-500); }
+        
+        .nav-active-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--gold-500);
+            border-radius: 50%;
+            opacity: 0;
+            transition: all var(--transition-spring);
+            box-shadow: 0 0 6px var(--gold-400);
+        }
+        .sticky-nav .nav-link-sticky.active .nav-active-dot {
+            opacity: 1;
+            animation: dotBlink 2s ease-in-out infinite;
+        }
+        
+        @keyframes dotBlink {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.5); }
+        }
+        
+        /* Overflow Dropdown */
+        .nav-overflow-dropdown { position: relative; }
+        .nav-overflow-dropdown .dropdown-toggle::after { display: none; }
+        
+        .nav-overflow-dropdown .sticky-dropdown-menu {
             background: var(--surface-primary);
-            border: 1px solid rgba(201, 168, 76, 0.12);
-            border-radius: var(--radius-lg);
+            border: 1px solid rgba(201, 168, 76, 0.15);
+            border-radius: 14px;
             box-shadow: var(--shadow-2xl);
-            padding: var(--space-2);
-            min-width: 230px;
-            margin-top: var(--space-3) !important;
-            animation: dropdownReveal 250ms var(--ease-spring);
+            padding: 0.5rem;
+            min-width: 200px;
+            margin-top: 0.5rem !important;
+            animation: dropdownReveal 300ms var(--ease-spring);
             transform-origin: top right;
         }
         
         @keyframes dropdownReveal {
-            from { opacity: 0; transform: translateY(-8px) scale(0.96); }
+            from { opacity: 0; transform: translateY(-12px) scale(0.94); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
         
-        .dropdown-header {
+        .nav-overflow-dropdown .dropdown-item {
             font-family: var(--font-body);
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: var(--tracking-widest);
-            color: var(--bronze-500);
-            padding: var(--space-2) var(--space-4) var(--space-1);
-        }
-        
-        .dropdown-item {
-            font-family: var(--font-body);
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             font-weight: 500;
-            padding: var(--space-3) var(--space-4);
-            border-radius: var(--radius-sm);
+            padding: 0.65rem 1rem;
+            border-radius: 8px;
             transition: all var(--transition-fast);
             color: var(--navy-900);
             display: flex;
             align-items: center;
-            gap: var(--space-3);
+            gap: 0.75rem;
             cursor: pointer;
-        }
-        
-        .dropdown-item i { width: 1.4rem; text-align: center; font-size: 0.95rem; color: var(--bronze-500); transition: color var(--transition-fast); }
-        .dropdown-item:hover { background-color: rgba(201, 168, 76, 0.06); color: var(--gold-600); transform: translateX(3px); }
-        .dropdown-item:hover i { color: var(--gold-500); }
-        .dropdown-item.text-danger:hover { background-color: rgba(139, 58, 58, 0.06); color: var(--danger-600); }
-        .dropdown-divider { border-color: rgba(201, 168, 76, 0.08); margin: var(--space-1) 0; }
-        
-        /* =============================================
-           SIDEBAR NAVIGATION (30% Navy Accent base)
-           ============================================= */
-        .sidebar {
-            position: fixed;
-            left: 0;
-            top: 0;
-            width: var(--sidebar-width);
-            height: 100vh;
-            height: 100dvh;
-            background: linear-gradient(175deg, 
-                var(--navy-950) 0%, 
-                var(--navy-900) 30%, 
-                var(--navy-900) 100%);
-            color: var(--neutral-300);
-            padding: var(--space-6) var(--space-5);
-            z-index: var(--z-sidebar);
-            border-right: 1px solid rgba(201, 168, 76, 0.1);
-            box-shadow: var(--shadow-xl);
-            display: flex;
-            flex-direction: column;
-            transition: all var(--transition-base);
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-        
-        /* ── Sidebar Brand ── */
-        .sidebar-brand { text-align: center; padding-bottom: var(--space-6); margin-bottom: var(--space-5); border-bottom: 1px solid rgba(201, 168, 76, 0.1); flex-shrink: 0; }
-        .sidebar-brand-icon { font-size: 2.2rem; color: var(--gold-400); margin-bottom: var(--space-2); display: block; transition: transform var(--transition-spring); }
-        .sidebar:hover .sidebar-brand-icon { transform: scale(1.05); }
-        
-        .sidebar-brand h4 {
-            font-family: var(--font-display);
-            font-size: 1.3rem;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            color: var(--gold-400);
-            text-transform: uppercase;
-            margin: 0 0 var(--space-1) 0;
-            line-height: 1.2;
-        }
-        
-        .sidebar-brand .brand-tagline {
-            font-family: var(--font-body);
-            font-size: 0.6rem;
-            letter-spacing: 2px;
-            color: var(--bronze-400);
-            text-transform: uppercase;
-            opacity: 0.7;
-        }
-        
-        /* ── Navigation ── */
-        .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 1px; overflow-y: auto; }
-        
-        .sidebar .nav-link {
-            font-family: var(--font-body);
-            font-weight: 450;
-            font-size: 0.88rem;
-            letter-spacing: 0.2px;
-            color: rgba(212, 206, 196, 0.65);
-            padding: 0.7rem 0.9rem;
-            border-radius: var(--radius-md);
             position: relative;
-            transition: all var(--transition-base);
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            text-decoration: none;
-            white-space: nowrap;
-            cursor: pointer;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
         }
         
-        .sidebar .nav-link i { width: 1.4rem; text-align: center; font-size: 0.9rem; flex-shrink: 0; transition: all var(--transition-base); color: var(--bronze-400); }
-        
-        /* Gold accent line */
-        .sidebar .nav-link::after {
+        .nav-overflow-dropdown .dropdown-item::before {
             content: '';
             position: absolute;
             left: 0;
             top: 50%;
             transform: translateY(-50%) scaleY(0);
             width: 3px;
-            height: 55%;
+            height: 60%;
             background: var(--gold-500);
             border-radius: 0 3px 3px 0;
             transition: transform var(--transition-spring);
         }
         
-        .sidebar .nav-link:hover { background: rgba(201, 168, 76, 0.05); color: var(--gold-300); padding-left: 1.1rem; }
-        .sidebar .nav-link:hover::after { transform: translateY(-50%) scaleY(1); }
-        .sidebar .nav-link:hover i { color: var(--gold-400); }
-        
-        .sidebar .nav-link.active {
-            background: linear-gradient(90deg, rgba(201, 168, 76, 0.12) 0%, rgba(201, 168, 76, 0.03) 100%);
-            color: var(--gold-400);
-            font-weight: 600;
-            box-shadow: inset 3px 0 0 var(--gold-500);
-        }
-        
-        .sidebar .nav-link.active i { color: var(--gold-500); }
-        .sidebar .nav-link.active::after { transform: translateY(-50%) scaleY(1); }
-        
-        /* Active indicator diamond */
-        .nav-active-indicator { margin-left: auto; color: var(--gold-400); font-size: 0.4rem; opacity: 0; transition: opacity var(--transition-base); }
-        .sidebar .nav-link.active .nav-active-indicator { opacity: 1; }
-        
-        /* ── Sidebar Footer ── */
-        .sidebar-footer { margin-top: auto; padding-top: var(--space-5); border-top: 1px solid rgba(201, 168, 76, 0.1); text-align: center; flex-shrink: 0; }
-        .sidebar-footer small {
-            font-family: var(--font-body);
-            font-size: 0.58rem;
-            color: var(--bronze-400);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.4rem;
-            opacity: 0.6;
-        }
-        
-        /* ── Loading State ── */
-        .sidebar-loading {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: var(--space-3);
-            padding: var(--space-12) var(--space-4);
-            color: var(--bronze-400);
+        .nav-overflow-dropdown .dropdown-item i {
+            width: 1.2rem;
             text-align: center;
+            font-size: 0.9rem;
+            color: var(--bronze-500);
+            transition: all var(--transition-fast);
         }
         
-        .sidebar-loading i { font-size: 1.5rem; color: var(--gold-400); animation: goldPulse 1.8s var(--ease-in-out) infinite; }
-        .sidebar-loading span { font-size: 0.8rem; letter-spacing: 0.5px; }
+        .nav-overflow-dropdown .dropdown-item:hover {
+            background-color: rgba(201, 168, 76, 0.08);
+            color: var(--gold-600);
+            transform: translateX(6px);
+            padding-left: 1.3rem;
+        }
+        .nav-overflow-dropdown .dropdown-item:hover::before { transform: translateY(-50%) scaleY(1); }
+        .nav-overflow-dropdown .dropdown-item:hover i { color: var(--gold-500); }
         
-        @keyframes goldPulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(0.9); }
+        .nav-overflow-dropdown .dropdown-item.active {
+            background: linear-gradient(90deg, rgba(201, 168, 76, 0.12), rgba(201, 168, 76, 0.03));
+            color: var(--gold-600);
+            font-weight: 600;
+        }
+        .nav-overflow-dropdown .dropdown-item.active i { color: var(--gold-500); }
+        
+        /* Right Side Actions */
+        .sticky-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-shrink: 0;
         }
         
-        /* =============================================
-           MAIN CONTENT AREA (60% Neutral Cream)
-           ============================================= */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            padding: var(--space-6);
-            min-height: 100vh;
-            min-height: 100dvh;
-            transition: margin-left var(--transition-base);
-            background-color: var(--neutral-200);
+        .sticky-user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(212, 206, 196, 0.8);
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+        }
+        
+        .sticky-user-info:hover {
+            color: var(--gold-400);
+            background: rgba(201, 168, 76, 0.06);
+        }
+        
+        .sticky-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-500), var(--gold-600));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--navy-950);
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all var(--transition-spring);
+            border: 2px solid transparent;
+            flex-shrink: 0;
             position: relative;
         }
         
-        .main-content.expanded { margin-left: var(--sidebar-collapsed-width); }
+        .sticky-avatar:hover {
+            transform: scale(1.15) rotate(5deg);
+            border-color: white;
+            box-shadow: var(--shadow-gold-md), 0 0 20px rgba(201, 168, 76, 0.3);
+        }
         
-        /* ── Content Animation ── */
-        .content-fade-in { animation: contentReveal 450ms var(--ease-out) forwards; }
+        .sticky-status-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--success-500);
+            border-radius: 50%;
+            border: 2px solid var(--navy-900);
+            position: absolute;
+            bottom: -1px;
+            right: -1px;
+            animation: statusPulse 2s ease-in-out infinite;
+        }
         
-        @keyframes contentReveal {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes statusPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(61, 139, 106, 0.6); }
+            50% { box-shadow: 0 0 0 6px rgba(61, 139, 106, 0); }
+        }
+        
+        .sticky-theme-toggle {
+            background: none;
+            border: 1.5px solid transparent;
+            color: rgba(212, 206, 196, 0.7);
+            cursor: pointer;
+            padding: 0.4rem;
+            border-radius: 10px;
+            transition: all var(--transition-bounce);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sticky-theme-toggle:hover {
+            color: var(--gold-500);
+            background: rgba(201, 168, 76, 0.08);
+            border-color: rgba(201, 168, 76, 0.2);
+            transform: scale(1.15) rotate(15deg);
+        }
+        
+        /* Mobile Nav Toggle */
+        .sticky-nav-toggle {
+            display: none;
+            background: linear-gradient(135deg, var(--gold-500), var(--gold-600));
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: var(--navy-950);
+            cursor: pointer;
+            transition: all var(--transition-spring);
+            font-size: 1.1rem;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .sticky-nav-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-gold-lg), 0 0 25px rgba(201, 168, 76, 0.4);
+        }
+        
+        .sticky-nav-toggle:active {
+            transform: scale(0.9);
+        }
+        
+        /* Hamburger animation */
+        .sticky-nav-toggle .hamburger-lines {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            transition: all var(--transition-fast);
+            width: 18px;
+        }
+        
+        .sticky-nav-toggle .hamburger-lines span {
+            display: block;
+            height: 2px;
+            background: var(--navy-950);
+            border-radius: 2px;
+            transition: all var(--transition-bounce);
+            transform-origin: center;
+        }
+        
+        .sticky-nav-toggle.open .hamburger-lines span:nth-child(1) {
+            transform: translateY(6px) rotate(45deg);
+        }
+        
+        .sticky-nav-toggle.open .hamburger-lines span:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+        
+        .sticky-nav-toggle.open .hamburger-lines span:nth-child(3) {
+            transform: translateY(-6px) rotate(-45deg);
+        }
+        
+        /* User Dropdown */
+        .sticky-dropdown-menu {
+            background: var(--surface-primary);
+            border: 1px solid rgba(201, 168, 76, 0.12);
+            border-radius: 14px;
+            box-shadow: var(--shadow-2xl);
+            padding: 0.5rem;
+            min-width: 220px;
+            margin-top: 0.75rem !important;
+            animation: dropdownReveal 300ms var(--ease-spring);
+            transform-origin: top right;
+        }
+        
+        .sticky-dropdown-menu .dropdown-header {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--bronze-500);
+            padding: 0.5rem 1rem 0.25rem;
+        }
+        
+        .sticky-dropdown-menu .dropdown-item {
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            transition: all var(--transition-fast);
+            color: var(--navy-900);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+        
+        .sticky-dropdown-menu .dropdown-item i {
+            width: 1.2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--bronze-500);
+            transition: all var(--transition-fast);
+        }
+        
+        .sticky-dropdown-menu .dropdown-item:hover {
+            background-color: rgba(201, 168, 76, 0.06);
+            color: var(--gold-600);
+            transform: translateX(4px);
+        }
+        .sticky-dropdown-menu .dropdown-item:hover i { color: var(--gold-500); }
+        
+        .sticky-dropdown-menu .dropdown-item.text-danger:hover {
+            background-color: rgba(139, 58, 58, 0.06);
+            color: var(--danger-600);
         }
         
         /* =============================================
-           SIDEBAR OVERLAY (Mobile)
+           MAIN CONTENT AREA
            ============================================= */
-        .sidebar-overlay {
+        .main-content {
+            padding: 1.5rem;
+            min-height: calc(100vh - var(--sticky-bar-height));
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: transparent;
+            animation: contentReveal 500ms var(--ease-in-out) forwards;
+            position: relative;
+        }
+        
+        @keyframes contentReveal {
+            from { opacity: 0; transform: translateY(16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Mobile Nav Overlay */
+        .mobile-nav-overlay {
             position: fixed;
             inset: 0;
             background: rgba(10, 15, 26, 0.75);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             z-index: var(--z-overlay);
             opacity: 0;
             visibility: hidden;
             transition: all var(--transition-base);
         }
         
-        .sidebar-overlay.active { opacity: 1; visibility: visible; }
+        .mobile-nav-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
         
         /* =============================================
-           COLLAPSED SIDEBAR (Desktop)
+           SCROLL TO TOP BUTTON
            ============================================= */
-        .sidebar.collapsed { width: var(--sidebar-collapsed-width); padding: var(--space-4) var(--space-2); }
-        .sidebar.collapsed .sidebar-brand-icon { font-size: 1.6rem; }
-        .sidebar.collapsed .sidebar-brand h4,
-        .sidebar.collapsed .sidebar-brand .brand-tagline,
-        .sidebar.collapsed .nav-link span,
-        .sidebar.collapsed .nav-link .nav-active-indicator,
-        .sidebar.collapsed .sidebar-footer small span { display: none; }
-        .sidebar.collapsed .nav-link { justify-content: center; padding: 0.75rem 0; gap: 0; }
-        .sidebar.collapsed .nav-link i { margin-right: 0; font-size: 1.15rem; width: auto; }
-        .sidebar.collapsed .nav-link:hover { padding-left: 0; }
-        .sidebar.collapsed .sidebar-footer small { font-size: 0; }
-        .sidebar.collapsed .sidebar-footer small i { font-size: 0.9rem; }
-        
-        /* Tooltip on collapsed nav items */
-        .sidebar.collapsed .nav-link { position: relative; }
-        .sidebar.collapsed .nav-link::before {
-            content: attr(data-tooltip);
-            position: absolute;
-            left: calc(100% + 12px);
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--navy-900);
-            color: var(--gold-300);
-            padding: 0.35rem 0.75rem;
-            border-radius: var(--radius-sm);
-            font-size: 0.75rem;
-            white-space: nowrap;
-            pointer-events: none;
+        .scroll-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--gold-500), var(--gold-600));
+            color: var(--navy-950);
+            border: none;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            cursor: pointer;
+            z-index: 99;
             opacity: 0;
-            transition: opacity var(--transition-fast);
-            z-index: var(--z-tooltip);
-            box-shadow: var(--shadow-lg);
-            border: 1px solid rgba(201, 168, 76, 0.2);
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all var(--transition-spring);
+            box-shadow: var(--shadow-gold-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .sidebar.collapsed .nav-link:hover::before { opacity: 1; }
+        
+        .scroll-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .scroll-to-top:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: var(--shadow-gold-lg);
+        }
+        
+        .scroll-to-top:active {
+            transform: translateY(0) scale(0.95);
+        }
         
         /* =============================================
            DARK MODE
            ============================================= */
-        .dark-mode { color: var(--dark-text); background-color: var(--dark-bg); }
-        
-        .dark-mode .top-navbar {
-            background: linear-gradient(180deg, 
-                rgba(20, 25, 41, 0.98) 0%, 
-                rgba(20, 25, 41, 0.94) 100%);
-            border-color: rgba(201, 168, 76, 0.06);
-        }
-        .dark-mode .top-navbar::after { background: linear-gradient(90deg, transparent, rgba(201, 168, 76, 0.1), transparent); }
-        
-        .dark-mode #pageTitle {
-            background: linear-gradient(135deg, 
-                var(--gold-400) 0%, 
-                var(--gold-500) 40%, 
-                var(--gold-300) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
+        .dark-mode {
+            color: var(--dark-text);
+            background-color: var(--dark-bg);
         }
         
-        .dark-mode .toggle-btn { color: var(--dark-text); }
-        .dark-mode .toggle-btn:hover { color: var(--gold-400); background: rgba(201, 168, 76, 0.08); }
-        .dark-mode .dropdown-menu { background: var(--dark-surface); border-color: rgba(201, 168, 76, 0.08); }
-        .dark-mode .dropdown-item { color: var(--dark-text); }
-        .dark-mode .dropdown-item i { color: var(--bronze-400); }
-        .dark-mode .main-content { background-color: var(--dark-bg); }
+        .dark-mode::before {
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(201, 168, 76, 0.02) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(0, 56, 168, 0.01) 0%, transparent 40%);
+        }
+        
+        .dark-mode .sticky-booking-bar {
+            background: linear-gradient(135deg, #0a0f1a 0%, #141929 100%);
+            border-bottom-color: rgba(201, 168, 76, 0.3);
+        }
+        
+        .dark-mode .sticky-booking-bar::after { opacity: 0.7; }
+        
+        .dark-mode .sticky-dropdown-menu,
+        .dark-mode .nav-overflow-dropdown .sticky-dropdown-menu {
+            background: var(--dark-surface);
+            border-color: rgba(201, 168, 76, 0.08);
+        }
+        
+        .dark-mode .sticky-dropdown-menu .dropdown-item,
+        .dark-mode .nav-overflow-dropdown .dropdown-item {
+            color: var(--dark-text);
+        }
+        
+        .dark-mode .nav-overflow-dropdown .dropdown-item:hover {
+            background-color: rgba(201, 168, 76, 0.1);
+            color: var(--gold-400);
+        }
+        
+        .dark-mode .nav-overflow-dropdown .dropdown-item.active {
+            background: linear-gradient(90deg, rgba(201, 168, 76, 0.15), rgba(201, 168, 76, 0.05));
+            color: var(--gold-400);
+        }
+        
+        .dark-mode .main-content { background-color: transparent; }
         .dark-mode h1, .dark-mode h2, .dark-mode h3,
         .dark-mode h4, .dark-mode h5, .dark-mode h6 { color: var(--gold-200); }
-        .dark-mode .user-status-indicator { border-color: var(--dark-surface); }
-        
-        /* =============================================
-           SCROLLBAR STYLING
-           ============================================= */
-        @media (hover: hover) {
-            ::-webkit-scrollbar { width: 6px; height: 6px; }
-            ::-webkit-scrollbar-track { background: transparent; }
-            ::-webkit-scrollbar-thumb { background: var(--neutral-500); border-radius: var(--radius-full); border: 1px solid transparent; background-clip: padding-box; }
-            ::-webkit-scrollbar-thumb:hover { background: var(--neutral-600); }
-            .sidebar::-webkit-scrollbar-thumb { background: rgba(201, 168, 76, 0.2); }
-            .sidebar::-webkit-scrollbar-thumb:hover { background: rgba(201, 168, 76, 0.35); }
-        }
-        
-        @-moz-document url-prefix() {
-            * { scrollbar-width: thin; scrollbar-color: var(--neutral-500) transparent; }
-            .sidebar { scrollbar-color: rgba(201, 168, 76, 0.2) transparent; }
-        }
+        .dark-mode .sticky-status-dot { border-color: var(--dark-surface); }
+        .dark-mode .scroll-to-top { box-shadow: 0 4px 20px rgba(201, 168, 76, 0.2); }
         
         /* =============================================
            RESPONSIVE DESIGN
            ============================================= */
         @media (max-width: 1200px) {
-            :root { --sidebar-width: 250px; }
+            .sticky-nav .nav-link-sticky span { display: none; }
+            .sticky-nav .nav-link-sticky i { font-size: 1.1rem; }
+            .sticky-nav .nav-link-sticky { padding: 0.5rem 0.65rem; }
         }
         
         @media (max-width: 992px) {
-            .sidebar { transform: translateX(-100%); width: 285px; }
-            .sidebar.show-mobile { transform: translateX(0); box-shadow: var(--shadow-2xl); }
-            .sidebar.collapsed { width: 285px; transform: translateX(-100%); }
-            .sidebar.collapsed .sidebar-brand h4,
-            .sidebar.collapsed .sidebar-brand .brand-tagline,
-            .sidebar.collapsed .nav-link span,
-            .sidebar.collapsed .sidebar-footer small span { display: initial; }
-            .sidebar.collapsed .nav-link { justify-content: flex-start; padding: 0.7rem 0.9rem; gap: 0.8rem; }
-            .sidebar.collapsed .nav-link::before { display: none; }
-            .main-content { margin-left: 0 !important; }
-            .main-content.expanded { margin-left: 0 !important; }
+            .sticky-nav {
+                position: fixed;
+                top: var(--sticky-bar-height);
+                left: 0;
+                right: 0;
+                background: linear-gradient(180deg, var(--navy-950) 0%, var(--navy-900) 100%);
+                flex-direction: column;
+                padding: 1rem;
+                gap: 0.25rem;
+                transform: translateY(-120%);
+                transition: transform 0.5s var(--ease-spring);
+                z-index: var(--z-nav);
+                box-shadow: var(--shadow-xl);
+                border-bottom: 2px solid var(--gold-500);
+                max-height: calc(100vh - var(--sticky-bar-height));
+                overflow-y: auto;
+            }
+            
+            .sticky-nav.mobile-open { transform: translateY(0); }
+            .sticky-nav-toggle { display: flex; }
+            
+            .sticky-nav .nav-link-sticky {
+                width: 100%;
+                padding: 0.85rem 1rem;
+                border-radius: 12px;
+                animation: mobileNavItemIn 0.4s var(--ease-spring) both;
+            }
+            
+            @keyframes mobileNavItemIn {
+                from { opacity: 0; transform: translateX(-20px); }
+                to { opacity: 1; transform: translateX(0); }
+            }
+            
+            .sticky-nav .nav-link-sticky span { display: inline; }
+            .sticky-nav .nav-link-sticky::before { border-radius: 12px; }
+            
+            .nav-overflow-dropdown { width: 100%; }
+            
+            .nav-overflow-dropdown .sticky-dropdown-menu {
+                position: static !important;
+                transform: none !important;
+                width: 100%;
+                margin-top: 0.25rem !important;
+                background: rgba(255,255,255,0.05);
+                border: 1px solid rgba(201, 168, 76, 0.15);
+                box-shadow: none;
+                animation: none;
+            }
+            
+            .dark-mode .nav-overflow-dropdown .sticky-dropdown-menu {
+                background: rgba(255,255,255,0.03);
+            }
+            
+            .main-content { padding: 1rem; }
+            .sticky-user-info span { display: none; }
+            .scroll-to-top { bottom: 1.5rem; right: 1.5rem; width: 40px; height: 40px; }
         }
         
         @media (max-width: 768px) {
-            .top-navbar { padding: 0.7rem 1rem; flex-wrap: wrap; gap: 0.6rem; border-radius: var(--radius-lg); }
-            #pageTitle { font-size: 1.15rem; }
-            .main-content { padding: var(--space-4); }
+            :root { --sticky-bar-height: 55px; }
+            .sticky-booking-bar .container-fluid { padding: 0 1rem; }
+            .sticky-brand-text { font-size: 1rem; }
+            .sticky-brand-icon { width: 36px; height: 36px; font-size: 1.1rem; }
+            .main-content { padding: 0.75rem; }
+            .sticky-actions { gap: 0.5rem; }
         }
         
         @media (max-width: 480px) {
-            .user-avatar { width: 32px; height: 32px; }
-            .user-avatar i { font-size: 0.7rem; }
-            #username { display: none; }
+            .sticky-avatar { width: 30px; height: 30px; font-size: 0.7rem; }
+            .sticky-brand-tagline { display: none; }
         }
         
         /* =============================================
            PRINT STYLES
            ============================================= */
         @media print {
-            .sidebar, .sidebar-overlay, .top-navbar,
-            #darkModeToggleSidebar, #darkModeToggleTop,
-            .toggle-btn, .skip-link { display: none !important; }
-            .main-content { margin-left: 0 !important; padding: 0 !important; width: 100% !important; }
-            body { background: white !important; color: black !important; font-size: 12pt; line-height: 1.6; }
+            .sticky-booking-bar, .sticky-nav-toggle, .mobile-nav-overlay,
+            .skip-link, .scroll-to-top, .grand-preloader, .page-transition-overlay,
+            .bar-glow-dot { display: none !important; }
+            body { padding-top: 0 !important; }
+            .main-content { margin: 0 !important; padding: 0 !important; max-width: 100% !important; }
+            body { background: white !important; color: black !important; }
             * { background: transparent !important; box-shadow: none !important; text-shadow: none !important; }
-            a[href]::after { content: " (" attr(href) ")"; font-size: 0.8em; color: #666; }
             @page { margin: 2cm; size: A4; }
         }
         
@@ -807,20 +1059,8 @@
            ============================================= */
         .text-gold { color: var(--gold-500) !important; }
         .text-navy { color: var(--navy-900) !important; }
-        .text-bronze { color: var(--bronze-500) !important; }
-        
-        .bg-gold-light { background-color: var(--gold-100) !important; }
-        .bg-cream { background-color: var(--neutral-200) !important; }
-        .bg-surface { background-color: var(--surface-primary) !important; }
-        
-        .font-display { font-family: var(--font-display) !important; }
-        .font-body { font-family: var(--font-body) !important; }
-        
         .shadow-gold { box-shadow: var(--shadow-gold-sm) !important; }
         .shadow-lux { box-shadow: var(--shadow-xl) !important; }
-        
-        .radius-lg { border-radius: var(--radius-lg) !important; }
-        .radius-xl { border-radius: var(--radius-xl) !important; }
         
         .visually-hidden {
             position: absolute !important;
@@ -834,7 +1074,6 @@
             border: 0 !important;
         }
         
-        /* Reduced motion preference */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
@@ -844,14 +1083,15 @@
             }
         }
         
-        /* Smooth theme transitions */
-        body, .sidebar, .main-content, .top-navbar,
-        .dropdown-menu, .nav-link, .card,
-        input, select, textarea {
-            transition: background-color var(--transition-slow),
-                        color var(--transition-slow),
-                        border-color var(--transition-slow),
-                        box-shadow var(--transition-slow);
+        .currency-amount::before, .currency-peso::before {
+            content: "₱";
+            margin-right: 2px;
+            font-weight: 700;
+        }
+        
+        @supports not ((-webkit-backdrop-filter: blur(20px)) or (backdrop-filter: blur(20px))) {
+            .sticky-booking-bar { background: var(--navy-900); }
+            .dark-mode .sticky-booking-bar { background: var(--dark-surface); }
         }
     </style>
     
@@ -859,641 +1099,423 @@
 </head>
 <body>
     
-    <!-- Skip Navigation Link (Accessibility) -->
+    <!-- Preloader -->
+    <div class="grand-preloader" id="grandPreloader">
+        <div class="preloader-logo">ABC hotels</div>
+        <div class="preloader-spinner">
+            <div class="preloader-ring"></div>
+            <div class="preloader-ring"></div>
+            <div class="preloader-ring"></div>
+        </div>
+        <div class="preloader-text">Luxury Hospitality</div>
+    </div>
+    
+    <!-- Page Transition Overlay -->
+    <div class="page-transition-overlay" id="pageTransitionOverlay"></div>
+    
     <a href="#mainContent" class="skip-link">Skip to main content</a>
+    <div class="mobile-nav-overlay" id="mobileNavOverlay" aria-hidden="true"></div>
 
-    <!-- Sidebar Overlay (Mobile) -->
-    <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+    <!-- Glow Dots -->
+    <span class="bar-glow-dot"></span>
+    <span class="bar-glow-dot"></span>
+    <span class="bar-glow-dot"></span>
 
-    <!-- =============================================
-         SIDEBAR NAVIGATION
-         60% Navy Base | 10% Gold Accents
-         ============================================= -->
-    <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main Navigation">
-        <div class="sidebar-brand">
-            <span class="sidebar-brand-icon" aria-hidden="true">
-                <i class="fas fa-building-columns"></i>
-            </span>
-            <h4>Grand Hotel</h4>
-            <p class="brand-tagline">Management Suite</p>
-        </div>
-        
-        <nav class="sidebar-nav" id="mainNavMenu" aria-label="Primary Navigation">
-            <div class="sidebar-loading">
-                <i class="fas fa-spinner fa-pulse" aria-hidden="true"></i> 
-                <span>Authenticating...</span>
-            </div>
-        </nav>
-        
-        <div class="sidebar-footer">
-            <small>
-                <i class="fas fa-shield-halved" aria-hidden="true"></i>
-                <span>Secure v2.1 &bull; Est. 2025</span>
-            </small>
-        </div>
-    </aside>
-
-    <!-- =============================================
-         MAIN CONTENT AREA
-         60% Cream Base
-         ============================================= -->
-    <main class="main-content" id="mainContent">
-        
-        <!-- Top Navigation Bar (30% Navy accent, 10% Gold) -->
-        <header class="top-navbar" role="banner">
-            <div class="d-flex align-items-center gap-3">
-                <button id="sidebarToggle" 
-                        class="toggle-btn" 
-                        title="Toggle Sidebar Navigation (Ctrl+B)" 
-                        aria-label="Toggle sidebar"
-                        aria-expanded="true"
-                        type="button">
-                    <i class="fas fa-bars-staggered" aria-hidden="true"></i>
-                </button>
-                <h5 class="mb-0" id="pageTitle">Executive Dashboard</h5>
-            </div>
+    <!-- Sticky Booking Bar -->
+    <header class="sticky-booking-bar" id="stickyBookingBar" role="banner">
+        <div class="container-fluid">
             
-            <div class="d-flex align-items-center gap-3">
-                <!-- Dark Mode Toggle (10% Gold highlight) -->
-                <button id="darkModeToggleTop" 
-                        class="toggle-btn" 
-                        title="Toggle Dark Mode" 
-                        aria-label="Toggle dark mode"
-                        type="button">
+            <a href="/dashboard" class="sticky-brand" aria-label="ABC hotels Home">
+                <span class="sticky-brand-icon" aria-hidden="true"><i class="fas fa-crown"></i></span>
+                <div>
+                    <span class="sticky-brand-text">ABC hotels</span>
+                    <span class="sticky-brand-tagline">Luxury Management</span>
+                </div>
+            </a>
+            
+            <nav class="sticky-nav" id="stickyNav" role="navigation" aria-label="Main Navigation">
+                <div class="text-center py-3 w-100" id="navLoading">
+                    <i class="fas fa-spinner fa-pulse text-gold" aria-hidden="true"></i>
+                    <span class="text-muted ms-2">Loading navigation...</span>
+                </div>
+            </nav>
+            
+            <div class="sticky-actions">
+                <button id="darkModeToggle" class="sticky-theme-toggle" title="Toggle Dark Mode" aria-label="Toggle dark mode" type="button">
                     <i class="fas fa-moon" aria-hidden="true"></i>
                 </button>
                 
-                <!-- User Dropdown -->
                 <div class="dropdown">
-                    <button class="btn btn-link text-decoration-none d-flex align-items-center gap-2 dropdown-toggle p-0 border-0 bg-transparent" 
-                            id="userDropdownButton"
-                            data-bs-toggle="dropdown" 
-                            aria-expanded="false"
-                            aria-haspopup="true"
-                            type="button">
-                        <div class="user-avatar-wrapper">
-                            <div class="user-avatar">
-                                <i class="fas fa-user" aria-hidden="true"></i>
-                            </div>
-                            <span class="user-status-indicator" aria-label="Online"></span>
+                    <button class="sticky-user-info dropdown-toggle p-0 border-0 bg-transparent" id="userDropdownButton" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" type="button">
+                        <div style="position: relative;">
+                            <div class="sticky-avatar"><i class="fas fa-user" aria-hidden="true"></i></div>
+                            <span class="sticky-status-dot" aria-label="Online"></span>
                         </div>
-                        <span id="username" class="fw-semibold d-none d-sm-inline" 
-                              style="color: var(--navy-900); font-size: 0.88rem;">
-                            Authenticating...
-                        </span>
+                        <span id="username" class="d-none d-md-inline">Authenticating...</span>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="userDropdownButton">
+                    <ul class="dropdown-menu dropdown-menu-end sticky-dropdown-menu" aria-labelledby="userDropdownButton">
                         <li><h6 class="dropdown-header">Account</h6></li>
-                        
-                        <li>
-                            <a class="dropdown-item text-danger" href="/logout">
-                                <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
-                                Secure Logout
-                            </a>
-                        </li>
+                        <li><a class="dropdown-item text-danger" href="/logout"><i class="fas fa-sign-out-alt"></i>Secure Logout</a></li>
                     </ul>
                 </div>
+                
+                <button id="stickyNavToggle" class="sticky-nav-toggle" title="Toggle Navigation" aria-label="Toggle navigation menu" aria-expanded="false" type="button">
+                    <div class="hamburger-lines">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </button>
             </div>
-        </header>
-        
-        <!-- Dynamic Content Area -->
-        <div class="container-fluid p-0 content-fade-in">
-            {% block content %}
-            <!-- Child templates inject content here -->
-            {% endblock %}
+            
         </div>
-        
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <div class="container-fluid p-0" id="dynamicContent">
+            {% block content %}{% endblock %}
+        </div>
     </main>
 
-    <!-- Global Modals Container -->
+    <!-- Scroll to Top -->
+    <button class="scroll-to-top" id="scrollToTop" aria-label="Scroll to top" title="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
     <div id="modals-container" aria-live="polite" aria-atomic="true"></div>
     
-    <!-- =============================================
-         JAVASCRIPT DEPENDENCIES
-         ============================================= -->
+    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}?v=6"></script>
-    <script src="{{ url_for('static', filename='js/modals.js') }}?v=6"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=20"></script>
+    <script src="{{ url_for('static', filename='js/modals.js') }}?v=20"></script>
     
-    <!-- =============================================
-         GRAND HOTEL APPLICATION CORE
-         Module Revealing Pattern | Robust Error Handling
-         ============================================= -->
     <script>
-        /**
-         * Grand Hotel Luxury Management System
-         * Application Core v2.1.0
-         * 
-         * Architecture: Module Revealing Pattern
-         * Dependencies: jQuery 3.6+, Bootstrap 5.1.3
-         */
         (function() {
             'use strict';
             
-            // ── Immutable Configuration ──
+            // =============================================
+            // PRELOADER
+            // =============================================
+            const preloader = document.getElementById('grandPreloader');
+            const hidePreloader = () => {
+                preloader?.classList.add('hidden');
+                document.body.style.overflow = '';
+            };
+            
+            window.addEventListener('load', () => setTimeout(hidePreloader, 800));
+            setTimeout(hidePreloader, 4000); // Fallback
+            
+            // =============================================
+            // PAGE TRANSITION
+            // =============================================
+            const transitionOverlay = document.getElementById('pageTransitionOverlay');
+            
+            function pageTransition(url) {
+                if (!transitionOverlay) { window.location.href = url; return; }
+                transitionOverlay.classList.add('active');
+                setTimeout(() => { window.location.href = url; }, 500);
+            }
+            
+            // Intercept internal navigation for smooth transitions
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('a[href]');
+                if (link && link.href && link.href.startsWith(window.location.origin) && 
+                    !link.hasAttribute('data-no-transition') && 
+                    !link.hasAttribute('data-bs-toggle') &&
+                    !link.hasAttribute('onclick') &&
+                    link.getAttribute('target') !== '_blank') {
+                    e.preventDefault();
+                    pageTransition(link.href);
+                }
+            });
+            
+            // =============================================
+            // SCROLL TO TOP
+            // =============================================
+            const scrollToTopBtn = document.getElementById('scrollToTop');
+            
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 400) {
+                    scrollToTopBtn?.classList.add('visible');
+                } else {
+                    scrollToTopBtn?.classList.remove('visible');
+                }
+            }, { passive: true });
+            
+            scrollToTopBtn?.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            
+            // =============================================
+            // RIPPLE EFFECT ON BUTTONS
+            // =============================================
+            document.addEventListener('click', function(e) {
+                const btn = e.target.closest('.btn, .sticky-nav-toggle, .sticky-theme-toggle');
+                if (!btn) return;
+                
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple-wave');
+                
+                const rect = btn.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+                ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+                
+                btn.appendChild(ripple);
+                
+                ripple.addEventListener('animationend', () => ripple.remove());
+            });
+            
+            // =============================================
+            // CONFIGURATION
+            // =============================================
             const CONFIG = Object.freeze({
-                version: '2.1.0',
+                version: '3.0.0',
                 storage: {
-                    themeKey: 'grand_hotel_theme_v2',
-                    sidebarKey: 'grand_hotel_sidebar_state'
+                    themeKey: 'grand_hotel_theme_v4',
+                    sidebarStateKey: 'grand_hotel_nav_state'
                 },
-                sidebar: {
-                    expandedWidth: 270,
-                    collapsedWidth: 80,
-                    mobileBreakpoint: 992
-                },
-                api: {
-                    authEndpoint: '/api/users/check-auth',
-                    timeout: 15000,
-                    retryAttempts: 1
-                },
+                stickyBar: { height: 65, mobileBreakpoint: 992, maxVisibleNavItems: 7 },
+                api: { authEndpoint: '/api/users/check-auth', timeout: 15000, retryAttempts: 2 },
                 menu: {
                     admin: [
-                        { name: 'Executive Dashboard', icon: 'fas fa-crown', path: '/dashboard' },
+                        { name: 'Dashboard', icon: 'fas fa-crown', path: '/dashboard' },
                         { name: 'Reservations', icon: 'fas fa-calendar-check', path: '/bookings' },
-                        { name: 'Room Management', icon: 'fas fa-door-open', path: '/rooms' },
+                        { name: 'Room Mgmt', icon: 'fas fa-door-open', path: '/rooms' },
                         { name: 'Amenities', icon: 'fas fa-spa', path: '/amenities' },
                         { name: 'Promotions', icon: 'fas fa-ticket-alt', path: '/coupons' },
-                        { name: 'Guest Registry', icon: 'fas fa-users', path: '/users' },
-                        { name: 'Financial Reports', icon: 'fas fa-chart-pie', path: '/reports' },
-                        { name: 'Booking Calendar', icon: 'fas fa-calendar-alt', path: '/calendar' },
-                        { name: 'Guest Reviews', icon: 'fas fa-star', path: '/reviews' }
+                        { name: 'Guests', icon: 'fas fa-users', path: '/users' },
+                        { name: 'Reports', icon: 'fas fa-chart-pie', path: '/reports' },
+                        { name: 'Calendar', icon: 'fas fa-calendar-alt', path: '/calendar' },
+                        { name: 'Reviews', icon: 'fas fa-star', path: '/reviews' }
                     ],
                     receptionist: [
                         { name: 'Front Desk', icon: 'fas fa-concierge-bell', path: '/dashboard' },
                         { name: 'Reservations', icon: 'fas fa-calendar-check', path: '/bookings' },
                         { name: 'Room Status', icon: 'fas fa-door-open', path: '/rooms' },
-                        { name: 'Calendar View', icon: 'fas fa-calendar-alt', path: '/calendar' }
-                        
+                        { name: 'Calendar', icon: 'fas fa-calendar-alt', path: '/calendar' }
                     ],
-                    // In base.html, find CONFIG.menu and update the manager array:
-manager: [
-    { name: 'Management Dashboard', icon: 'fas fa-chart-line', path: '/dashboard' },
-    { name: 'Reservations', icon: 'fas fa-calendar-check', path: '/bookings' },
-    { name: 'Room Management', icon: 'fas fa-door-open', path: '/rooms' },
-    { name: 'Amenities', icon: 'fas fa-spa', path: '/amenities' },
-    { name: 'Promotions', icon: 'fas fa-ticket-alt', path: '/coupons' },
-    { name: 'Guest Registry', icon: 'fas fa-users', path: '/users' },
-    { name: 'Performance Reports', icon: 'fas fa-chart-bar', path: '/reports' },
-    { name: 'Booking Calendar', icon: 'fas fa-calendar-alt', path: '/calendar' },
-    { name: 'Guest Reviews', icon: 'fas fa-star', path: '/reviews' }
-],
+                    manager: [
+                        { name: 'Dashboard', icon: 'fas fa-chart-line', path: '/dashboard' },
+                        { name: 'Reservations', icon: 'fas fa-calendar-check', path: '/bookings' },
+                        { name: 'Room Mgmt', icon: 'fas fa-door-open', path: '/rooms' },
+                        { name: 'Amenities', icon: 'fas fa-spa', path: '/amenities' },
+                        { name: 'Promotions', icon: 'fas fa-ticket-alt', path: '/coupons' },
+                        { name: 'Guests', icon: 'fas fa-users', path: '/users' },
+                        { name: 'Reports', icon: 'fas fa-chart-bar', path: '/reports' },
+                        { name: 'Calendar', icon: 'fas fa-calendar-alt', path: '/calendar' },
+                        { name: 'Reviews', icon: 'fas fa-star', path: '/reviews' }
+                    ],
                     guest: [
-                        { name: 'Guest Portal', icon: 'fas fa-home', path: '/dashboard' },
-                        { name: 'My Reservations', icon: 'fas fa-bookmark', path: '/my-bookings' },
+                        { name: 'Dashboard', icon: 'fas fa-home', path: '/dashboard' },
+                        { name: 'My Bookings', icon: 'fas fa-bookmark', path: '/my-bookings' },
                         { name: 'My Reviews', icon: 'fas fa-star', path: '/my-reviews' },
                         { name: 'Browse Rooms', icon: 'fas fa-search', path: '/browse-rooms' },
-                        { name: 'Booking Calendar', icon: 'fas fa-calendar-alt', path: '/calendar' },
+                        { name: 'Calendar', icon: 'fas fa-calendar-alt', path: '/calendar' }
                     ]
                 }
             });
             
-            // ── Application State ──
             const state = {
-                isInitialized: false,
-                isMobile: false,
-                isSidebarCollapsed: false,
-                isMobileSidebarOpen: false,
-                isDarkMode: false,
-                currentUser: null,
-                isAuthenticated: false,
-                authCheckAttempts: 0
+                isInitialized: false, isMobile: false, isMobileNavOpen: false,
+                isDarkMode: false, currentUser: null, isAuthenticated: false,
+                authCheckAttempts: 0, overflowItems: []
             };
             
-            // ── DOM Reference Cache (Lazy Getters) ──
             const DOM = {
                 get body() { return document.body; },
-                get sidebar() { return document.getElementById('sidebar'); },
-                get sidebarOverlay() { return document.getElementById('sidebarOverlay'); },
-                get mainContent() { return document.getElementById('mainContent'); },
-                get sidebarToggle() { return document.getElementById('sidebarToggle'); },
-                get darkModeToggleTop() { return document.getElementById('darkModeToggleTop'); },
-                get darkModeToggleSidebar() { return document.getElementById('darkModeToggleSidebar'); },
-                get pageTitle() { return document.getElementById('pageTitle'); },
-                get username() { return document.getElementById('username'); },
-                get navMenu() { return document.getElementById('mainNavMenu'); }
+                get stickyNav() { return document.getElementById('stickyNav'); },
+                get stickyNavToggle() { return document.getElementById('stickyNavToggle'); },
+                get mobileNavOverlay() { return document.getElementById('mobileNavOverlay'); },
+                get darkModeToggle() { return document.getElementById('darkModeToggle'); },
+                get username() { return document.getElementById('username'); }
             };
             
-            // ── Utility Functions ──
-            function detectMobile() {
-                return window.innerWidth <= CONFIG.sidebar.mobileBreakpoint;
-            }
+            const detectMobile = () => window.innerWidth <= CONFIG.stickyBar.mobileBreakpoint;
             
-            function debounce(fn, delay = 250) {
-                let timer;
-                return function(...args) {
-                    clearTimeout(timer);
-                    timer = setTimeout(() => fn.apply(this, args), delay);
-                };
-            }
+            const getMaxVisibleItems = () => {
+                const w = window.innerWidth;
+                if (w < 1200) return 4;
+                if (w < 1400) return 5;
+                return CONFIG.stickyBar.maxVisibleNavItems;
+            };
             
-            function escapeHTML(str) {
-                if (!str) return '';
-                const div = document.createElement('div');
-                div.textContent = str;
-                return div.innerHTML;
-            }
+            const debounce = (fn, delay = 250) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), delay); }; };
+            const save = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch { return false; } };
+            const load = (k, d = null) => { try { const i = localStorage.getItem(k); return i ? JSON.parse(i) : d; } catch { return d; } };
             
-            function saveToStorage(key, value) {
-                try {
-                    localStorage.setItem(key, JSON.stringify(value));
-                    return true;
-                } catch (e) {
-                    console.warn('localStorage unavailable:', e.message);
-                    return false;
-                }
-            }
+            const formatPHP = a => a == null ? '₱0.00' : '₱' + parseFloat(a).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            window.formatPHP = formatPHP;
+            window.formatCurrency = formatPHP;
             
-            function getFromStorage(key, defaultValue = null) {
-                try {
-                    const item = localStorage.getItem(key);
-                    return item ? JSON.parse(item) : defaultValue;
-                } catch (e) {
-                    return defaultValue;
-                }
-            }
+            // Navigation
+            const toggleMobileNav = () => {
+                state.isMobileNavOpen = !state.isMobileNavOpen;
+                DOM.stickyNav?.classList.toggle('mobile-open', state.isMobileNavOpen);
+                DOM.mobileNavOverlay?.classList.toggle('active', state.isMobileNavOpen);
+                DOM.stickyNavToggle?.classList.toggle('open', state.isMobileNavOpen);
+                document.body.style.overflow = state.isMobileNavOpen ? 'hidden' : '';
+                DOM.stickyNavToggle?.setAttribute('aria-expanded', String(state.isMobileNavOpen));
+                DOM.mobileNavOverlay?.setAttribute('aria-hidden', String(!state.isMobileNavOpen));
+            };
             
-            // ── Sidebar Management ──
-            function toggleSidebar() {
-                state.isMobile = detectMobile();
-                
-                if (state.isMobile) {
-                    toggleMobileSidebar();
-                } else {
-                    toggleDesktopSidebar();
-                }
-            }
-            
-            function toggleMobileSidebar() {
-                state.isMobileSidebarOpen = !state.isMobileSidebarOpen;
-                
-                DOM.sidebar?.classList.toggle('show-mobile', state.isMobileSidebarOpen);
-                DOM.sidebarOverlay?.classList.toggle('active', state.isMobileSidebarOpen);
-                DOM.sidebar?.classList.remove('collapsed');
-                DOM.mainContent?.classList.remove('expanded');
-                
-                document.body.style.overflow = state.isMobileSidebarOpen ? 'hidden' : '';
-                updateAriaAttributes();
-            }
-            
-            function closeMobileSidebar() {
-                if (!state.isMobileSidebarOpen) return;
-                state.isMobileSidebarOpen = false;
-                DOM.sidebar?.classList.remove('show-mobile');
-                DOM.sidebarOverlay?.classList.remove('active');
+            const closeMobileNav = () => {
+                if (!state.isMobileNavOpen) return;
+                state.isMobileNavOpen = false;
+                DOM.stickyNav?.classList.remove('mobile-open');
+                DOM.mobileNavOverlay?.classList.remove('active');
+                DOM.stickyNavToggle?.classList.remove('open');
                 document.body.style.overflow = '';
-                updateAriaAttributes();
-            }
+                DOM.stickyNavToggle?.setAttribute('aria-expanded', 'false');
+            };
             
-            function toggleDesktopSidebar() {
-                state.isSidebarCollapsed = !state.isSidebarCollapsed;
-                
-                DOM.sidebar?.classList.toggle('collapsed', state.isSidebarCollapsed);
-                DOM.mainContent?.classList.toggle('expanded', state.isSidebarCollapsed);
-                DOM.sidebar?.classList.remove('show-mobile');
-                DOM.sidebarOverlay?.classList.remove('active');
-                
-                updateToggleIcon();
-                updateAriaAttributes();
-                saveSidebarState();
-            }
-            
-            function updateToggleIcon() {
-                const icon = DOM.sidebarToggle?.querySelector('i');
-                if (!icon) return;
-                icon.classList.toggle('fa-bars-staggered', !state.isSidebarCollapsed);
-                icon.classList.toggle('fa-indent', state.isSidebarCollapsed);
-            }
-            
-            function updateAriaAttributes() {
-                if (!DOM.sidebarToggle) return;
-                const isExpanded = !state.isSidebarCollapsed && !state.isMobileSidebarOpen;
-                DOM.sidebarToggle.setAttribute('aria-expanded', String(isExpanded));
-                DOM.sidebarOverlay?.setAttribute('aria-hidden', String(!state.isMobileSidebarOpen));
-            }
-            
-            function saveSidebarState() {
-                saveToStorage(CONFIG.storage.sidebarKey, {
-                    collapsed: state.isSidebarCollapsed
-                });
-            }
-            
-            function restoreSidebarState() {
-                const saved = getFromStorage(CONFIG.storage.sidebarKey);
-                if (saved?.collapsed && !detectMobile()) {
-                    state.isSidebarCollapsed = true;
-                    DOM.sidebar?.classList.add('collapsed');
-                    DOM.mainContent?.classList.add('expanded');
-                    updateToggleIcon();
-                }
-            }
-            
-            // ── Authentication & Menu Building ──
-            async function authenticate() {
-                if (state.authCheckAttempts > CONFIG.api.retryAttempts) {
-                    handleAuthFailure('Authentication failed after multiple attempts');
-                    return;
-                }
-                
-                state.authCheckAttempts++;
-                
-                try {
-                    const response = await $.ajax({
-                        url: CONFIG.api.authEndpoint,
-                        method: 'GET',
-                        dataType: 'json',
-                        timeout: CONFIG.api.timeout
-                    });
-                    
-                    if (response.authenticated) {
-                        state.isAuthenticated = true;
-                        state.currentUser = {
-                            role: response.role,
-                            username: response.user,
-                            fullName: response.full_name || response.user || 'Valued Guest',
-                            userId: response.user_id
-                        };
-                        
-                        if (DOM.username) {
-                            DOM.username.textContent = state.currentUser.fullName;
-                        }
-                        
-                        buildNavigationMenu(state.currentUser.role);
-                        updateActiveMenuAndTitle();
-                        
-                        // Dispatch custom event for other modules
-                        document.dispatchEvent(new CustomEvent('userAuthenticated', {
-                            detail: state.currentUser
-                        }));
-                    } else {
-                        handleAuthFailure('Session expired');
-                    }
-                } catch (error) {
-                    console.error('Authentication error:', error);
-                    handleAuthFailure('Connection error');
-                }
-            }
-            
-            function handleAuthFailure(reason) {
-                if (DOM.username) {
-                    DOM.username.textContent = reason;
-                }
-                
-                if (typeof window.showNotification === 'function') {
-                    window.showNotification('Redirecting to login...', 'warning', 2500);
-                }
-                
-                setTimeout(() => {
-                    window.location.href = '/login';
-                }, 2000);
-            }
-            
-            function buildNavigationMenu(role) {
-                if (!DOM.navMenu) return;
-                
-                const menuItems = CONFIG.menu[role] || CONFIG.menu.guest;
-                const currentPath = window.location.pathname;
-                
-                let html = '';
-                
-                menuItems.forEach(item => {
-                    const itemPath = item.path.split('#')[0];
-                    const isActive = checkActiveState(itemPath, currentPath);
-                    
-                    html += `
-                        <a class="nav-link${isActive ? ' active' : ''}" 
-                           href="${item.path}" 
-                           data-nav-item="${item.name.toLowerCase().replace(/\s+/g, '-')}"
-                           data-tooltip="${escapeHTML(item.name)}"
-                           ${isActive ? 'aria-current="page"' : ''}>
-                            <i class="${item.icon}" aria-hidden="true"></i>
-                            <span>${item.name}</span>
-                            <span class="nav-active-indicator" aria-hidden="true">◆</span>
-                        </a>
-                    `;
-                });
-                
-                // Theme toggle within sidebar
-                html += `
-                    <div class="mt-3 pt-2" style="border-top: 1px solid rgba(201, 168, 76, 0.15);"></div>
-                    <button class="nav-link" id="darkModeToggleSidebar" type="button" data-tooltip="Toggle Theme">
-                        <i class="fas fa-moon" aria-hidden="true"></i>
-                        <span>Evening Mode</span>
-                    </button>
-                `;
-                
-                DOM.navMenu.innerHTML = html;
-                bindDarkModeToggles();
-            }
-            
-            function checkActiveState(itemPath, currentPath) {
+            const checkActive = (itemPath, currentPath) => {
                 if (currentPath === itemPath) return true;
                 if (currentPath === '/' && itemPath === '/dashboard') return true;
                 if (itemPath !== '/dashboard' && itemPath !== '/' && currentPath.startsWith(itemPath)) return true;
                 return false;
-            }
+            };
             
-            function updateActiveMenuAndTitle() {
+            const buildNav = (role) => {
+                if (!DOM.stickyNav) return;
+                const items = CONFIG.menu[role] || CONFIG.menu.guest;
                 const currentPath = window.location.pathname;
-                let activeTitle = 'Grand Hotel';
+                const maxVisible = getMaxVisibleItems();
                 
-                document.querySelectorAll('.sidebar .nav-link[data-nav-item]').forEach(link => {
-                    const linkPath = (link.getAttribute('href') || '').split('#')[0];
-                    const isActive = checkActiveState(linkPath, currentPath);
-                    
-                    link.classList.toggle('active', isActive);
-                    link.setAttribute('aria-current', isActive ? 'page' : 'false');
-                    
-                    if (isActive) {
-                        const span = link.querySelector('span:first-of-type');
-                        if (span) activeTitle = span.textContent.trim();
-                    }
-                });
-                
-                if (DOM.pageTitle) {
-                    DOM.pageTitle.textContent = activeTitle;
+                let visible = [], overflow = [];
+                if (items.length > maxVisible) {
+                    visible = items.slice(0, maxVisible - 1);
+                    overflow = items.slice(maxVisible - 1);
+                } else {
+                    visible = items;
                 }
-            }
-            
-            // ── Dark Mode Management ──
-            function initDarkMode() {
-                const saved = getFromStorage(CONFIG.storage.themeKey);
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                state.overflowItems = overflow;
                 
-                state.isDarkMode = saved === 'dark' || (!saved && prefersDark);
-                applyDarkMode();
-                
-                // Listen for system theme changes
-                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-                    if (!localStorage.getItem(CONFIG.storage.themeKey)) {
-                        state.isDarkMode = e.matches;
-                        applyDarkMode();
-                    }
+                let html = '';
+                visible.forEach((item, idx) => {
+                    const isActive = checkActive(item.path.split('#')[0], currentPath);
+                    html += `<a class="nav-link-sticky${isActive ? ' active' : ''}" href="${item.path}" data-nav-item="${item.name.toLowerCase().replace(/\s+/g, '-')}"${isActive ? ' aria-current="page"' : ''} style="animation-delay:${idx * 0.05}s"><i class="${item.icon}"></i><span>${item.name}</span><span class="nav-active-dot"></span></a>`;
                 });
                 
-                bindDarkModeToggles();
-            }
-            
-            function bindDarkModeToggles() {
-                const topToggle = document.getElementById('darkModeToggleTop');
-                const sidebarToggle = document.getElementById('darkModeToggleSidebar');
+                if (overflow.length) {
+                    const hasActive = overflow.some(item => checkActive(item.path.split('#')[0], currentPath));
+                    html += `<div class="dropdown nav-overflow-dropdown">
+                        <button class="nav-link-sticky${hasActive ? ' active' : ''} dropdown-toggle" type="button" id="navOverflowDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">
+                            <i class="fas fa-ellipsis-h"></i><span>More</span>${hasActive ? '<span class="nav-active-dot" style="opacity:1;"></span>' : ''}
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end sticky-dropdown-menu" aria-labelledby="navOverflowDropdown">
+                            ${overflow.map(item => { const isActive = checkActive(item.path.split('#')[0], currentPath); return `<li><a class="dropdown-item${isActive ? ' active' : ''}" href="${item.path}"${isActive ? ' aria-current="page"' : ''}><i class="${item.icon}"></i>${item.name}${isActive ? '<span class="nav-active-dot ms-auto" style="opacity:1;"></span>' : ''}</a></li>`; }).join('')}
+                        </ul>
+                    </div>`;
+                }
                 
-                [topToggle, sidebarToggle].forEach(btn => {
-                    if (btn && !btn._bound) {
-                        btn.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            toggleDarkMode();
-                        });
-                        btn._bound = true;
+                DOM.stickyNav.innerHTML = html;
+                const trigger = document.getElementById('navOverflowDropdown');
+                if (trigger && typeof bootstrap !== 'undefined') new bootstrap.Dropdown(trigger);
+            };
+            
+            // Auth
+            async function authenticate() {
+                if (state.authCheckAttempts > CONFIG.api.retryAttempts) return handleAuthFailure('Authentication failed');
+                state.authCheckAttempts++;
+                try {
+                    const r = await $.ajax({ url: CONFIG.api.authEndpoint, method: 'GET', dataType: 'json', timeout: CONFIG.api.timeout });
+                    if (r.authenticated) {
+                        state.isAuthenticated = true;
+                        state.currentUser = { role: r.role, username: r.user, fullName: r.full_name || r.user || 'Valued Guest', userId: r.user_id };
+                        if (DOM.username) DOM.username.textContent = state.currentUser.fullName;
+                        buildNav(state.currentUser.role);
+                        document.dispatchEvent(new CustomEvent('userAuthenticated', { detail: state.currentUser }));
+                    } else {
+                        handleAuthFailure('Session expired');
                     }
-                });
+                } catch (e) { handleAuthFailure('Connection error'); }
             }
             
-            function toggleDarkMode() {
-                state.isDarkMode = !state.isDarkMode;
-                saveToStorage(CONFIG.storage.themeKey, state.isDarkMode ? 'dark' : 'light');
+            function handleAuthFailure(reason) {
+                if (DOM.username) DOM.username.textContent = reason;
+                if (typeof window.showNotification === 'function') window.showNotification('Redirecting to login...', 'warning', 2500);
+                setTimeout(() => { window.location.href = '/login'; }, 2000);
+            }
+            
+            // Dark Mode
+            const initDarkMode = () => {
+                const saved = load(CONFIG.storage.themeKey);
+                state.isDarkMode = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
                 applyDarkMode();
-            }
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => { if (!localStorage.getItem(CONFIG.storage.themeKey)) { state.isDarkMode = e.matches; applyDarkMode(); } });
+            };
             
-            function applyDarkMode() {
+            const toggleDarkMode = () => { state.isDarkMode = !state.isDarkMode; save(CONFIG.storage.themeKey, state.isDarkMode ? 'dark' : 'light'); applyDarkMode(); };
+            
+            const applyDarkMode = () => {
                 document.body.classList.toggle('dark-mode', state.isDarkMode);
-                updateDarkModeUI();
-            }
+                const icon = DOM.darkModeToggle?.querySelector('i');
+                if (icon) { icon.classList.toggle('fa-moon', !state.isDarkMode); icon.classList.toggle('fa-sun', state.isDarkMode); }
+                const meta = document.querySelector('meta[name="theme-color"]');
+                if (meta) meta.content = state.isDarkMode ? '#0a0f1a' : '#1a1a3e';
+            };
             
-            function updateDarkModeUI() {
-                const isDark = state.isDarkMode;
+            // Events
+            const bindEvents = () => {
+                DOM.stickyNavToggle?.addEventListener('click', e => { e.preventDefault(); toggleMobileNav(); });
+                DOM.mobileNavOverlay?.addEventListener('click', closeMobileNav);
+                DOM.darkModeToggle?.addEventListener('click', e => { e.preventDefault(); toggleDarkMode(); });
                 
-                // Update all dark mode toggle icons
-                document.querySelectorAll('#darkModeToggleTop i, #darkModeToggleSidebar i').forEach(icon => {
-                    icon.classList.toggle('fa-moon', !isDark);
-                    icon.classList.toggle('fa-sun', isDark);
-                });
-                
-                const sidebarToggle = document.getElementById('darkModeToggleSidebar');
-                if (sidebarToggle) {
-                    const span = sidebarToggle.querySelector('span');
-                    if (span) span.textContent = isDark ? 'Morning Mode' : 'Evening Mode';
-                }
-                
-                // Update meta theme-color
-                const metaTheme = document.querySelector('meta[name="theme-color"]');
-                if (metaTheme) {
-                    metaTheme.content = isDark ? '#0a0f1a' : '#1a2744';
-                }
-            }
-            
-            // ── Event Binding ──
-            function bindEvents() {
-                // Sidebar toggle button
-                DOM.sidebarToggle?.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    toggleSidebar();
-                });
-                
-                // Overlay click (mobile close)
-                DOM.sidebarOverlay?.addEventListener('click', closeMobileSidebar);
-                
-                // Keyboard shortcuts
-                document.addEventListener('keydown', (e) => {
-                    // Ctrl/Cmd + B: Toggle sidebar
-                    if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
-                        e.preventDefault();
-                        toggleSidebar();
-                    }
-                    
-                    // Escape: Close mobile sidebar
-                    if (e.key === 'Escape' && state.isMobileSidebarOpen) {
-                        closeMobileSidebar();
+                document.addEventListener('keydown', e => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'b') { e.preventDefault(); if (detectMobile()) toggleMobileNav(); }
+                    if (e.key === 'Escape') {
+                        if (state.isMobileNavOpen) closeMobileNav();
+                        document.querySelectorAll('.dropdown-menu.show').forEach(d => { const dd = bootstrap.Dropdown.getInstance(d.previousElementSibling); if (dd) dd.hide(); });
                     }
                 });
                 
-                // Resize handler (debounced)
                 window.addEventListener('resize', debounce(() => {
-                    const wasMobile = state.isMobile;
+                    const was = state.isMobile;
                     state.isMobile = detectMobile();
-                    
-                    if (!state.isMobile && wasMobile) {
-                        closeMobileSidebar();
-                        restoreSidebarState();
-                    }
-                    
-                    if (state.isMobile) {
-                        DOM.sidebar?.classList.remove('collapsed');
-                        DOM.mainContent?.classList.remove('expanded');
-                    }
+                    if (!state.isMobile && was) closeMobileNav();
+                    if (state.currentUser) buildNav(state.currentUser.role);
                 }, 300));
                 
-                // Mobile menu link click handler
-                DOM.navMenu?.addEventListener('click', (e) => {
-                    const link = e.target.closest('.nav-link[href]');
-                    if (link && detectMobile()) {
-                        setTimeout(closeMobileSidebar, 200);
+                DOM.stickyNav?.addEventListener('click', e => {
+                    if (e.target.closest('.nav-link-sticky[href]') && detectMobile()) setTimeout(closeMobileNav, 200);
+                });
+                
+                document.addEventListener('click', e => {
+                    if (!e.target.closest('.nav-overflow-dropdown')) {
+                        const btn = document.getElementById('navOverflowDropdown');
+                        if (btn) { const dd = bootstrap.Dropdown.getInstance(btn); if (dd && btn.parentElement.querySelector('.dropdown-menu.show')) dd.hide(); }
                     }
                 });
-            }
+            };
             
-            // ── Application Initialization ──
+            // Init
             async function initialize() {
-                if (state.isInitialized) {
-                    console.warn('Application already initialized');
-                    return;
-                }
-                
-                console.log(`%c🏨 Grand Hotel Luxury Management System v${CONFIG.version} %cInitializing...`,
-                    'color: #c9a84c; font-size: 1.1em; font-weight: bold;',
-                    'color: #8b7355;');
-                
+                if (state.isInitialized) return;
+                console.log(`%c🏨 ABC hotels v${CONFIG.version} %cInitializing...`, 'color:#c9a84c;font-size:1.1em;font-weight:bold;', 'color:#8b7355;');
                 state.isMobile = detectMobile();
-                
                 bindEvents();
-                restoreSidebarState();
                 initDarkMode();
-                
                 await authenticate();
-                
                 state.isInitialized = true;
-                
-                console.log('%c✅ Application initialized successfully',
-                    'color: #2d6a4f; font-weight: bold;');
+                console.log('%c✅ Ready', 'color:#2d6a4f;font-weight:bold;');
             }
             
-            // ── Start on DOM Ready ──
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initialize);
-            } else {
-                initialize();
-            }
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialize);
+            else initialize();
             
-            // ── Public API ──
             window.GrandHotel = Object.freeze({
-                version: CONFIG.version,
-                toggleSidebar,
-                toggleDarkMode,
-                closeMobileSidebar,
-                getState: () => ({ ...state }),
-                getCurrentUser: () => state.currentUser ? { ...state.currentUser } : null,
-                isAuthenticated: () => state.isAuthenticated
+                version: CONFIG.version, toggleMobileNav, toggleDarkMode, closeMobileNav,
+                pageTransition,
+                refreshNavigation: () => { if (state.currentUser) buildNav(state.currentUser.role); },
+                getState: () => ({ ...state }), getCurrentUser: () => state.currentUser ? { ...state.currentUser } : null,
+                isAuthenticated: () => state.isAuthenticated, formatPHP, formatCurrency: formatPHP
             });
-            
         })();
     </script>
-    
-    <!-- =============================================
-         SAFARI BACKDROP-FILTER FALLBACK
-         ============================================= -->
-    <style>
-        @supports not ((-webkit-backdrop-filter: blur(20px)) or (backdrop-filter: blur(20px))) {
-            .top-navbar { background: var(--surface-primary); }
-            .dark-mode .top-navbar { background: var(--dark-surface); }
-        }
-        
-        /* High contrast mode adjustments */
-        @media (forced-colors: active) {
-            .sidebar .nav-link.active { border: 2px solid Highlight; }
-            .toggle-btn:focus-visible { outline: 2px solid Highlight; }
-        }
-    </style>
     
     {% block extra_scripts %}{% endblock %}
 </body>

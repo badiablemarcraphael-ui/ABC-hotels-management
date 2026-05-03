@@ -1,25 +1,68 @@
 // =====================================================
-// GRAND HOTEL — LUXURY MODAL MANAGEMENT SYSTEM
+// ABC hotels — LUXURY MODAL MANAGEMENT SYSTEM
 // 60-30-10 Design: Gold Accents, Navy Depth, Cream Base
+// Philippine Peso (₱) Currency Support
+// Enhanced with Live Map & GPS Tracking
 // =====================================================
 
 'use strict';
 
 // =====================================================
-// HOTEL CONFIGURATION
+// HOTEL CONFIGURATION - CHANGE YOUR LOCATION HERE
 // =====================================================
 const HotelLocation = {
-    name: 'Grand Hotel & Resort',
-    address: '123 Luxury Avenue, Prestige District, Metropolitan City',
-    phone: '+1-234-567-8900',
-    email: 'concierge@grandhotel.com',
+    name: 'ABC Hotels',
+    address: 'Laguna University, Laguna Sports Complex, Bubukal, Santa Cruz, 4009 Laguna, Philippines',
+    phone: '+63 (49) 501-1234',
+    email: 'reservations@abchotels.ph',
     coordinates: {
-        lat: 14.5995,
-        lng: 120.9842
+        lat: 14.2825,  // Laguna University / Laguna Sports Complex area
+        lng: 121.4126  // Santa Cruz, Laguna
     },
-    rating: 5,
-    starDisplay: '★★★★★'
+    rating: 4,
+    starDisplay: '★★★★☆'
 };
+
+// =====================================================
+// MAP CONFIGURATION - LAGUNA AREA
+// =====================================================
+const MapConfig = {
+    // Tile layer - change map style here
+    tileLayer: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+    // Alternative tile layers:
+    // 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'  // OpenStreetMap default
+    // 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'  // ESRI Street
+    
+    defaultZoom: 16,
+    minZoom: 3,
+    maxZoom: 19,
+    
+    // Nearby places around Laguna University / Santa Cruz
+    nearbyPlaces: [
+        { name: 'Laguna University', lat: 14.2826, lng: 121.4130, icon: '🎓', type: 'University' },
+        { name: 'Laguna Sports Complex', lat: 14.2818, lng: 121.4120, icon: '🏟️', type: 'Sports Complex' },
+        { name: 'Santa Cruz Public Market', lat: 14.2810, lng: 121.4150, icon: '🛒', type: 'Market' },
+        { name: 'Santa Cruz Town Plaza', lat: 14.2795, lng: 121.4155, icon: '🌳', type: 'Town Plaza' },
+        { name: 'Pagsanjan Falls', lat: 14.2645, lng: 121.4538, icon: '💧', type: 'Tourist Spot' },
+        { name: 'Calamba Medical Center', lat: 14.2022, lng: 121.1578, icon: '🏥', type: 'Hospital' },
+        { name: 'SM City Calamba', lat: 14.2050, lng: 121.1522, icon: '🛍️', type: 'Shopping Mall' },
+        { name: 'Los Baños Hot Springs', lat: 14.1789, lng: 121.2255, icon: '♨️', type: 'Hot Springs' }
+    ]
+};
+
+// =====================================================
+// GLOBAL MAP VARIABLES
+// =====================================================
+let hotelMap = null;
+let routingControl = null;
+let hotelMarker = null;
+let userMarker = null;
+let nearbyMarkers = [];
+let liveLocationWatchId = null;
+let isLiveTracking = false;
+let pulseCircle = null;
+let currentRouteDistance = null;
+let currentRouteDuration = null;
 
 // =====================================================
 // ELEGANT MODAL STYLES INJECTION
@@ -29,20 +72,20 @@ $('head').append(`
         /* Luxury Modal Base Styles */
         .grand-modal .modal-content {
             border: none;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(26, 39, 68, 0.15), 0 4px 16px rgba(201, 168, 76, 0.08);
+            border-radius: 20px;
+            box-shadow: 0 25px 80px rgba(10, 15, 26, 0.2), 0 4px 16px rgba(201, 168, 76, 0.1);
             overflow: hidden;
         }
         
         .grand-modal .modal-header {
-            background: linear-gradient(135deg, var(--navy-900, #1a2744) 0%, var(--navy-800, #243356) 100%);
+            background: linear-gradient(135deg, #1a2744 0%, #243356 100%);
             color: white;
-            border-bottom: 2px solid var(--gold-500, #c9a84c);
+            border-bottom: 2px solid #c9a84c;
             padding: 20px 24px;
         }
         
         .grand-modal .modal-header .modal-title {
-            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
             font-weight: 600;
             letter-spacing: 0.5px;
             font-size: 1.3rem;
@@ -51,27 +94,28 @@ $('head').append(`
         .grand-modal .btn-close {
             filter: brightness(0) invert(1);
             opacity: 0.8;
-            transition: opacity 0.2s ease;
+            transition: all 0.3s ease;
         }
         
         .grand-modal .btn-close:hover {
             opacity: 1;
+            transform: rotate(90deg) scale(1.1);
         }
         
         .grand-modal .modal-body {
             padding: 24px;
-            background: var(--warm-white, #fdfcf9);
+            background: #fdfcf9;
         }
         
         .grand-modal .modal-footer {
-            background: var(--cream, #f5f0e8);
+            background: #f5f0e8;
             border-top: 1px solid rgba(201, 168, 76, 0.2);
             padding: 16px 24px;
         }
         
         .grand-modal .form-label {
             font-weight: 600;
-            color: var(--navy-900, #1a2744);
+            color: #1a2744;
             font-size: 0.85rem;
             letter-spacing: 0.3px;
             text-transform: uppercase;
@@ -80,8 +124,8 @@ $('head').append(`
         
         .grand-modal .form-control,
         .grand-modal .form-select {
-            border: 2px solid var(--taupe, #e8e0d5);
-            border-radius: 10px;
+            border: 2px solid #e8e0d5;
+            border-radius: 12px;
             padding: 10px 14px;
             font-size: 0.95rem;
             transition: all 0.3s ease;
@@ -90,52 +134,55 @@ $('head').append(`
         
         .grand-modal .form-control:focus,
         .grand-modal .form-select:focus {
-            border-color: var(--gold-500, #c9a84c);
-            box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.1);
+            border-color: #c9a84c;
+            box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.1), 0 0 20px rgba(201, 168, 76, 0.08);
             outline: none;
         }
         
         .grand-modal .btn-primary {
-            background: linear-gradient(135deg, var(--gold-500, #c9a84c) 0%, var(--gold-600, #a88838) 100%);
+            background: linear-gradient(135deg, #c9a84c 0%, #a88838 100%);
             border: none;
             padding: 10px 24px;
             font-weight: 600;
             letter-spacing: 0.5px;
             text-transform: uppercase;
             font-size: 0.85rem;
-            border-radius: 8px;
-            color: white;
+            border-radius: 10px;
+            color: #0a0f1a;
             transition: all 0.3s ease;
         }
         
         .grand-modal .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(201, 168, 76, 0.3);
+            box-shadow: 0 8px 24px rgba(201, 168, 76, 0.35);
+            filter: brightness(1.05);
         }
         
         .grand-modal .btn-secondary {
             background: transparent;
-            border: 2px solid var(--navy-900, #1a2744);
-            color: var(--navy-900, #1a2744);
+            border: 2px solid #1a2744;
+            color: #1a2744;
             padding: 10px 24px;
             font-weight: 600;
             letter-spacing: 0.5px;
             text-transform: uppercase;
             font-size: 0.85rem;
-            border-radius: 8px;
+            border-radius: 10px;
             transition: all 0.3s ease;
         }
         
         .grand-modal .btn-secondary:hover {
-            background: var(--navy-900, #1a2744);
+            background: #1a2744;
             color: white;
+            transform: translateY(-2px);
         }
         
         /* Map Styles */
         .map-container {
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
-            border: 2px solid var(--taupe, #e8e0d5);
+            border: 2px solid #e8e0d5;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
         }
         
         .custom-div-icon {
@@ -143,24 +190,107 @@ $('head').append(`
             background: none !important;
         }
         
+        .hotel-popup .leaflet-popup-content-wrapper {
+            border-radius: 14px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+        
+        /* Route Info Panel */
+        .route-info-panel {
+            background: white;
+            border-radius: 14px;
+            padding: 16px;
+            margin-top: 12px;
+            border: 1px solid #e8e0d5;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            display: none;
+        }
+        
+        .route-info-panel.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .route-stat {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .route-stat:last-child {
+            border-bottom: none;
+        }
+        
+        .route-stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        
+        .route-stat-icon.distance {
+            background: rgba(201, 168, 76, 0.1);
+            color: #c9a84c;
+        }
+        
+        .route-stat-icon.duration {
+            background: rgba(45, 106, 79, 0.1);
+            color: #2d6a4f;
+        }
+        
+        .route-stat-icon.arrival {
+            background: rgba(74, 124, 150, 0.1);
+            color: #4a7c96;
+        }
+        
+        .route-stat-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #1a2744;
+        }
+        
+        .route-stat-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
         /* Tab Styles */
+        .luxury-tabs {
+            border-bottom: 2px solid #e8e0d5;
+            gap: 0.5rem;
+        }
+        
         .luxury-tabs .nav-link {
-            color: var(--bronze-500, #a89269);
+            color: #8b7355;
             font-weight: 600;
             border: none;
             border-bottom: 3px solid transparent;
             padding: 12px 20px;
             transition: all 0.3s ease;
+            border-radius: 8px 8px 0 0;
         }
         
         .luxury-tabs .nav-link:hover {
-            color: var(--gold-600, #a88838);
+            color: #a88838;
             border-bottom-color: rgba(201, 168, 76, 0.3);
+            background: rgba(201, 168, 76, 0.03);
         }
         
         .luxury-tabs .nav-link.active {
-            color: var(--gold-600, #a88838);
-            border-bottom-color: var(--gold-500, #c9a84c);
+            color: #a88838;
+            border-bottom-color: #c9a84c;
             background: transparent;
         }
         
@@ -175,29 +305,8 @@ $('head').append(`
         .rating-star:hover,
         .rating-star.active,
         .rating-star.fas {
-            color: var(--gold-500, #c9a84c);
-            transform: scale(1.1);
-        }
-        
-        /* Dark Mode */
-        .dark-mode .grand-modal .modal-body {
-            background: var(--dark-surface, #1e1e30);
-        }
-        
-        .dark-mode .grand-modal .modal-footer {
-            background: #252540;
-            border-top-color: rgba(201, 168, 76, 0.15);
-        }
-        
-        .dark-mode .grand-modal .form-control,
-        .dark-mode .grand-modal .form-select {
-            background: #2a2a3e;
-            border-color: rgba(201, 168, 76, 0.2);
-            color: var(--taupe, #e8e0d5);
-        }
-        
-        .dark-mode .grand-modal .form-label {
-            color: var(--bronze-400, #c4b393);
+            color: #c9a84c;
+            transform: scale(1.15);
         }
         
         /* Coupon Switch */
@@ -239,11 +348,130 @@ $('head').append(`
         }
         
         .luxury-switch input:checked + .slider {
-            background: var(--gold-500, #c9a84c);
+            background: #c9a84c;
         }
         
         .luxury-switch input:checked + .slider:before {
             transform: translateX(22px);
+        }
+        
+        /* Map Buttons */
+        .map-action-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .map-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        
+        /* Dark Mode */
+        .dark-mode .grand-modal .modal-body {
+            background: #1c2135;
+        }
+        
+        .dark-mode .grand-modal .modal-footer {
+            background: #252540;
+            border-top-color: rgba(201, 168, 76, 0.12);
+        }
+        
+        .dark-mode .grand-modal .form-control,
+        .dark-mode .grand-modal .form-select {
+            background: #2a2a3e;
+            border-color: rgba(201, 168, 76, 0.2);
+            color: #d4cec4;
+        }
+        
+        .dark-mode .grand-modal .form-label {
+            color: #c4b393;
+        }
+        
+        .dark-mode .luxury-tabs .nav-link {
+            color: #8b8a95;
+        }
+        
+        .dark-mode .luxury-tabs .nav-link.active {
+            color: #dfc278;
+        }
+        
+        .dark-mode .route-info-panel {
+            background: #1c2135;
+            border-color: rgba(255,255,255,0.05);
+        }
+        
+        .dark-mode .route-stat-value {
+            color: #d4cec4;
+        }
+        
+        .dark-mode .map-container {
+            border-color: rgba(255,255,255,0.1);
+        }
+        
+        /* Peso Input Styling */
+        .peso-input-group .input-group-text {
+            background: #f5f0e8;
+            border-color: #e8e0d5;
+            font-weight: 700;
+            color: #1a2744;
+        }
+        
+        .dark-mode .peso-input-group .input-group-text {
+            background: #2a2a3e;
+            border-color: rgba(201, 168, 76, 0.2);
+            color: #d4cec4;
+        }
+        
+        /* Live tracking indicator */
+        .live-tracking-dot {
+            width: 10px;
+            height: 10px;
+            background: #ef4444;
+            border-radius: 50%;
+            display: inline-block;
+            animation: livePulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+            50% { opacity: 0.5; box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+        }
+        
+        @keyframes markerPulse {
+            0%, 100% { box-shadow: 0 6px 20px rgba(201, 168, 76, 0.5), 0 0 30px rgba(201, 168, 76, 0.3); }
+            50% { box-shadow: 0 6px 30px rgba(201, 168, 76, 0.7), 0 0 50px rgba(201, 168, 76, 0.5); }
+        }
+        
+        /* Leaflet control customization */
+        .leaflet-control-locate a {
+            border-radius: 10px !important;
+        }
+        
+        .leaflet-control-zoom a {
+            border-radius: 8px !important;
+        }
+        
+        .route-steps {
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+        
+        .route-steps::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .route-steps::-webkit-scrollbar-thumb {
+            background: #c9a84c;
+            border-radius: 2px;
         }
     </style>
 `);
@@ -260,13 +488,13 @@ const ModalManager = {
         $.ajax({
             url: '/api/rooms/available',
             method: 'GET',
-            timeout: GrandHotel.config.apiTimeout,
+            timeout: GrandHotelConfig ? GrandHotelConfig.apiTimeout : 15000,
             success: function(rooms) {
                 let roomOptions = '<option value="">Select a luxurious room</option>';
                 
                 if (rooms && rooms.length > 0) {
                     rooms.forEach(room => {
-                        const price = window.formatCurrency(room.base_price);
+                        const price = window.formatPHP ? window.formatPHP(room.base_price) : '₱' + parseFloat(room.base_price).toFixed(2);
                         roomOptions += `
                             <option value="${room.room_id}">
                                 Room ${room.room_number} — ${room.type_name} (${price}/night)
@@ -281,7 +509,7 @@ const ModalManager = {
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title">
-                                        <i class="fas fa-calendar-plus me-2" style="color: var(--gold-400, #dfc278);"></i>
+                                        <i class="fas fa-calendar-plus me-2" style="color: #dfc278;"></i>
                                         New Reservation
                                     </h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -295,7 +523,7 @@ const ModalManager = {
                                         </li>
                                         <li class="nav-item">
                                             <a class="nav-link" data-bs-toggle="tab" href="#mapTab">
-                                                <i class="fas fa-map-location-dot me-2"></i>Location & Directions
+                                                <i class="fas fa-map-location-dot me-2"></i>Location & Map
                                             </a>
                                         </li>
                                     </ul>
@@ -307,7 +535,7 @@ const ModalManager = {
                                                 <div class="row g-3">
                                                     <div class="col-md-6">
                                                         <label class="form-label">
-                                                            <i class="fas fa-user me-1" style="color: var(--gold-500);"></i>
+                                                            <i class="fas fa-user me-1" style="color: #c9a84c;"></i>
                                                             Guest Name *
                                                         </label>
                                                         <input type="text" class="form-control" name="guest_name" 
@@ -315,7 +543,7 @@ const ModalManager = {
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">
-                                                            <i class="fas fa-envelope me-1" style="color: var(--gold-500);"></i>
+                                                            <i class="fas fa-envelope me-1" style="color: #c9a84c;"></i>
                                                             Email Address *
                                                         </label>
                                                         <input type="email" class="form-control" name="guest_email" 
@@ -323,15 +551,15 @@ const ModalManager = {
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">
-                                                            <i class="fas fa-phone me-1" style="color: var(--gold-500);"></i>
+                                                            <i class="fas fa-phone me-1" style="color: #c9a84c;"></i>
                                                             Phone Number *
                                                         </label>
                                                         <input type="tel" class="form-control" name="guest_phone" 
-                                                               placeholder="+1 (234) 567-8900" required>
+                                                               placeholder="+63 9XX XXX XXXX" required>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">
-                                                            <i class="fas fa-door-open me-1" style="color: var(--gold-500);"></i>
+                                                            <i class="fas fa-door-open me-1" style="color: #c9a84c;"></i>
                                                             Select Room
                                                         </label>
                                                         <select class="form-select" name="room_id" id="roomSelect">
@@ -340,7 +568,7 @@ const ModalManager = {
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">
-                                                            <i class="fas fa-calendar-check me-1" style="color: var(--gold-500);"></i>
+                                                            <i class="fas fa-calendar-check me-1" style="color: #c9a84c;"></i>
                                                             Check-in Date *
                                                         </label>
                                                         <input type="date" class="form-control" name="check_in" 
@@ -348,14 +576,14 @@ const ModalManager = {
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">
-                                                            <i class="fas fa-calendar-times me-1" style="color: var(--gold-500);"></i>
+                                                            <i class="fas fa-calendar-times me-1" style="color: #c9a84c;"></i>
                                                             Check-out Date *
                                                         </label>
                                                         <input type="date" class="form-control" name="check_out" required>
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">
-                                                            <i class="fas fa-user-friends me-1" style="color: var(--gold-500);"></i>
+                                                            <i class="fas fa-user-friends me-1" style="color: #c9a84c;"></i>
                                                             Adults
                                                         </label>
                                                         <input type="number" class="form-control" name="adults" 
@@ -363,7 +591,7 @@ const ModalManager = {
                                                     </div>
                                                     <div class="col-md-6">
                                                         <label class="form-label">
-                                                            <i class="fas fa-child me-1" style="color: var(--gold-500);"></i>
+                                                            <i class="fas fa-child me-1" style="color: #c9a84c;"></i>
                                                             Children
                                                         </label>
                                                         <input type="number" class="form-control" name="children" 
@@ -371,14 +599,14 @@ const ModalManager = {
                                                     </div>
                                                     <div class="col-12">
                                                         <label class="form-label">
-                                                            <i class="fas fa-ticket-alt me-1" style="color: var(--gold-500);"></i>
+                                                            <i class="fas fa-ticket-alt me-1" style="color: #c9a84c;"></i>
                                                             Promotional Code
                                                         </label>
                                                         <div class="input-group">
                                                             <input type="text" class="form-control" name="coupon_code" 
                                                                    id="couponCode" placeholder="Enter code (optional)"
                                                                    style="text-transform: uppercase;">
-                                                            <button class="btn btn-outline-gold" type="button" 
+                                                            <button class="btn btn-gold" type="button" 
                                                                     onclick="validateCouponCode()">
                                                                 <i class="fas fa-check me-1"></i> Apply
                                                             </button>
@@ -391,26 +619,70 @@ const ModalManager = {
                                         
                                         <!-- Map Tab -->
                                         <div class="tab-pane fade" id="mapTab">
-                                            <div class="alert alert-luxury mb-3">
-                                                <i class="fas fa-hotel me-2" style="color: var(--gold-500);"></i>
-                                                <strong>${HotelLocation.name}</strong><br>
-                                                <small>${HotelLocation.address}</small>
+                                            <div class="alert" style="background: rgba(201, 168, 76, 0.08); border: 1px solid rgba(201, 168, 76, 0.2); margin-bottom: 1rem; border-radius: 12px;">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <i class="fas fa-hotel me-2" style="color: #c9a84c;"></i>
+                                                        <strong>${HotelLocation.name}</strong><br>
+                                                        <small class="text-muted">${HotelLocation.address}</small>
+                                                    </div>
+                                                    <span id="liveTrackingStatus" style="display: none;">
+                                                        <span class="live-tracking-dot"></span>
+                                                        <small class="fw-bold text-danger ms-1">LIVE</small>
+                                                    </span>
+                                                </div>
                                             </div>
                                             <div class="map-container mb-3">
                                                 <div id="hotelMap" style="height: 400px; width: 100%;"></div>
                                             </div>
-                                            <div class="d-flex gap-2">
-                                                <button class="btn btn-gold btn-sm" id="getDirectionsBtn">
-                                                    <i class="fas fa-location-dot me-1"></i> Get Directions
+                                            <div class="d-flex gap-2 flex-wrap">
+                                                <button class="map-action-btn" id="getDirectionsBtn" 
+                                                        style="background: linear-gradient(135deg, #c9a84c, #a88838); color: #1a2744;">
+                                                    <i class="fas fa-location-dot"></i> Get Directions
                                                 </button>
-                                                <button class="btn btn-outline-gold btn-sm" id="resetMapBtn">
-                                                    <i class="fas fa-undo me-1"></i> Reset Map
+                                                <button class="map-action-btn" id="startLiveTrackingBtn"
+                                                        style="background: #2d6a4f; color: white;">
+                                                    <i class="fas fa-satellite-dish"></i> Live Track Me
+                                                </button>
+                                                <button class="map-action-btn" id="stopLiveTrackingBtn"
+                                                        style="background: #8b3a3a; color: white; display: none;">
+                                                    <i class="fas fa-stop"></i> Stop Tracking
+                                                </button>
+                                                <button class="map-action-btn" id="resetMapBtn"
+                                                        style="background: #f0f0f0; color: #1a2744; border: 1px solid #d4d0c8;">
+                                                    <i class="fas fa-undo"></i> Reset Map
                                                 </button>
                                             </div>
-                                            <div id="directionsInfo" class="mt-3" style="display: none;">
-                                                <div class="route-summary"></div>
-                                                <div id="directionsSteps" class="route-steps"></div>
+                                            <div class="route-info-panel" id="routeInfoPanel">
+                                                <div class="route-stat">
+                                                    <div class="route-stat-icon distance">
+                                                        <i class="fas fa-route"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="route-stat-value" id="routeDistance">-- km</div>
+                                                        <div class="route-stat-label">Total Distance</div>
+                                                    </div>
+                                                </div>
+                                                <div class="route-stat">
+                                                    <div class="route-stat-icon duration">
+                                                        <i class="fas fa-clock"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="route-stat-value" id="routeDuration">-- mins</div>
+                                                        <div class="route-stat-label">Estimated Time</div>
+                                                    </div>
+                                                </div>
+                                                <div class="route-stat">
+                                                    <div class="route-stat-icon arrival">
+                                                        <i class="fas fa-flag-checkered"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="route-stat-value" id="routeArrival">--</div>
+                                                        <div class="route-stat-label">Estimated Arrival</div>
+                                                    </div>
+                                                </div>
                                             </div>
+                                            <div id="directionsSteps" class="route-steps mt-3" style="display: none;"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -429,14 +701,25 @@ const ModalManager = {
                 
                 $('#modals-container').html(modalHtml);
                 
-                // Initialize map when modal is shown
+                // Initialize map when map tab is shown
                 $('#bookingModal').on('shown.bs.modal', function() {
+                    setTimeout(() => {
+                        if ($('#mapTab').hasClass('active')) {
+                            initializeHotelMap();
+                        }
+                    }, 200);
+                });
+                
+                // Initialize map when switching to map tab
+                $('a[href="#mapTab"]').on('shown.bs.tab', function() {
                     setTimeout(() => initializeHotelMap(), 200);
                 });
                 
                 // Map button handlers
                 $('#getDirectionsBtn').on('click', getUserLocationAndRoute);
                 $('#resetMapBtn').on('click', resetMapToHotel);
+                $('#startLiveTrackingBtn').on('click', startLiveTracking);
+                $('#stopLiveTrackingBtn').on('click', stopLiveTracking);
                 
                 // Date validation
                 $('input[name="check_in"]').on('change', function() {
@@ -448,6 +731,16 @@ const ModalManager = {
                 if (roomId) {
                     $('#roomSelect').val(roomId);
                 }
+                
+                // Clean up when hidden
+                $('#bookingModal').on('hidden.bs.modal', function() {
+                    stopLiveTracking();
+                    destroyMap();
+                    $('#bookingModal').remove();
+                    $('.modal-backdrop').remove();
+                    $('body').removeClass('modal-open');
+                    $('body').css('overflow', '');
+                });
                 
                 $('#bookingModal').modal('show');
             },
@@ -474,7 +767,7 @@ const ModalManager = {
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">
-                                <i class="fas fa-spa me-2" style="color: var(--gold-400);"></i>
+                                <i class="fas fa-spa me-2" style="color: #dfc278;"></i>
                                 ${isEdit ? 'Edit' : 'Add'} Amenity
                             </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -499,10 +792,10 @@ const ModalManager = {
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">
-                                        <i class="fas fa-dollar-sign me-1"></i> Price per Day
+                                        <i class="fas fa-peso-sign me-1"></i> Price per Day
                                     </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text" style="background: var(--cream); border-color: var(--taupe);">$</span>
+                                    <div class="input-group peso-input-group">
+                                        <span class="input-group-text">₱</span>
                                         <input type="number" step="0.01" class="form-control" name="price_per_day" 
                                                value="${isEdit ? amenity.price_per_day : '0.00'}" min="0">
                                     </div>
@@ -521,86 +814,76 @@ const ModalManager = {
         `;
         
         $('#modals-container').html(modalHtml);
+        
+        $('#amenityModal').on('hidden.bs.modal', function() {
+            $('#amenityModal').remove();
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open');
+            $('body').css('overflow', '');
+        });
+        
         $('#amenityModal').modal('show');
     },
     
     // ==========================================
-    // USER MODAL
+    // ROOM TYPE MODAL
     // ==========================================
-    showUserModal: function(user = null) {
-        const isEdit = user !== null;
+    showRoomTypeModal: function(roomType = null) {
+        const isEdit = roomType !== null;
         
         const modalHtml = `
-            <div class="modal fade grand-modal" id="userModal" tabindex="-1">
+            <div class="modal fade grand-modal" id="roomTypeModal" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">
-                                <i class="fas fa-user-plus me-2" style="color: var(--gold-400);"></i>
-                                ${isEdit ? 'Edit' : 'Add'} Guest Profile
+                                <i class="fas fa-door-open me-2" style="color: #dfc278;"></i>
+                                ${isEdit ? 'Edit' : 'Add'} Room Category
                             </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
-                            <form id="userForm">
-                                <input type="hidden" name="user_id" id="userId" value="${isEdit ? user.user_id : ''}">
+                            <form id="roomTypeForm">
+                                <input type="hidden" name="type_id" value="${isEdit ? roomType.type_id : ''}">
                                 <div class="mb-3">
-                                    <label class="form-label" for="username">
-                                        <i class="fas fa-user me-1"></i> Username *
+                                    <label class="form-label">
+                                        <i class="fas fa-tag me-1"></i> Category Name *
                                     </label>
-                                    <input type="text" class="form-control" name="username" id="username" 
-                                           value="${isEdit ? escapeHtml(user.username) : ''}" required>
+                                    <input type="text" class="form-control" name="type_name" 
+                                           value="${isEdit ? escapeHtml(roomType.type_name) : ''}" 
+                                           placeholder="e.g., Deluxe Suite" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label" for="password">
-                                        <i class="fas fa-lock me-1"></i> 
-                                        Password ${isEdit ? '(leave blank to keep current)' : '*'}
+                                    <label class="form-label">
+                                        <i class="fas fa-align-left me-1"></i> Description
                                     </label>
-                                    <input type="password" class="form-control" name="password" id="password" 
-                                           ${isEdit ? '' : 'required'} 
-                                           placeholder="${isEdit ? '••••••••' : 'Enter secure password'}">
+                                    <textarea class="form-control" name="description" rows="3">${isEdit ? escapeHtml(roomType.description || '') : ''}</textarea>
                                 </div>
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <label class="form-label" for="email">
-                                            <i class="fas fa-envelope me-1"></i> Email
+                                        <label class="form-label">
+                                            <i class="fas fa-peso-sign me-1"></i> Base Price *
                                         </label>
-                                        <input type="email" class="form-control" name="email" id="email" 
-                                               value="${isEdit ? escapeHtml(user.email || '') : ''}">
+                                        <div class="input-group peso-input-group">
+                                            <span class="input-group-text">₱</span>
+                                            <input type="number" step="0.01" class="form-control" name="base_price" 
+                                                   value="${isEdit ? roomType.base_price : ''}" required>
+                                        </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label" for="phone">
-                                            <i class="fas fa-phone me-1"></i> Phone
+                                        <label class="form-label">
+                                            <i class="fas fa-users me-1"></i> Capacity
                                         </label>
-                                        <input type="tel" class="form-control" name="phone" id="phone" 
-                                               value="${isEdit ? escapeHtml(user.phone || '') : ''}">
+                                        <input type="number" class="form-control" name="capacity" 
+                                               value="${isEdit ? (roomType.capacity || 2) : 2}" min="1" max="10">
                                     </div>
-                                </div>
-                                <div class="mb-3 mt-3">
-                                    <label class="form-label" for="role">
-                                        <i class="fas fa-shield-halved me-1"></i> Role
-                                    </label>
-                                    <select class="form-select" name="role" id="role">
-                                        <option value="admin" ${isEdit && user.role === 'admin' ? 'selected' : ''}>
-                                            👑 Administrator
-                                        </option>
-                                        <option value="manager" ${isEdit && user.role === 'manager' ? 'selected' : ''}>
-                                            📊 Manager
-                                        </option>
-                                        <option value="receptionist" ${isEdit && user.role === 'receptionist' ? 'selected' : ''}>
-                                            🛎️ Receptionist
-                                        </option>
-                                        <option value="guest" ${isEdit && user.role === 'guest' ? 'selected' : ''}>
-                                            🏨 Guest
-                                        </option>
-                                    </select>
                                 </div>
                             </form>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary" onclick="submitUserForm()">
-                                <i class="fas fa-user-check me-1"></i> Save Profile
+                            <button type="button" class="btn btn-primary" onclick="submitRoomTypeForm()">
+                                <i class="fas fa-save me-1"></i> Save Category
                             </button>
                         </div>
                     </div>
@@ -609,7 +892,144 @@ const ModalManager = {
         `;
         
         $('#modals-container').html(modalHtml);
-        $('#userModal').modal('show');
+        
+        $('#roomTypeModal').on('hidden.bs.modal', function() {
+            $('#roomTypeModal').remove();
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open');
+            $('body').css('overflow', '');
+        });
+        
+        $('#roomTypeModal').modal('show');
+    },
+    
+    // ==========================================
+    // COUPON MODAL
+    // ==========================================
+    showCouponModal: function(coupon = null) {
+        const isEdit = coupon !== null;
+        
+        const modalHtml = `
+            <div class="modal fade grand-modal" id="couponModal" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="fas fa-ticket-alt me-2" style="color: #dfc278;"></i>
+                                ${isEdit ? 'Edit' : 'Create'} Promotion
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="couponForm">
+                                <input type="hidden" name="coupon_id" id="couponId" value="${isEdit ? coupon.coupon_id : ''}">
+                                
+                                <div class="mb-3">
+                                    <label class="form-label" for="couponCodeInput">
+                                        <i class="fas fa-tag me-1"></i> Promo Code *
+                                    </label>
+                                    <input type="text" class="form-control text-uppercase" name="coupon_code" 
+                                           id="couponCodeInput" required 
+                                           placeholder="e.g., WELCOME20"
+                                           value="${isEdit ? escapeHtml(coupon.coupon_code) : ''}">
+                                    <small class="text-muted">Use uppercase letters and numbers</small>
+                                </div>
+                                
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="discountType">
+                                            <i class="fas fa-percent me-1"></i> Discount Type
+                                        </label>
+                                        <select class="form-select" name="discount_type" id="discountType" required>
+                                            <option value="percentage" ${isEdit && coupon.discount_type === 'percentage' ? 'selected' : ''}>
+                                                Percentage (%)
+                                            </option>
+                                            <option value="fixed" ${isEdit && coupon.discount_type === 'fixed' ? 'selected' : ''}>
+                                                Fixed Amount (₱)
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="discountValue">
+                                            <i class="fas fa-peso-sign me-1"></i> Discount Value *
+                                        </label>
+                                        <input type="number" step="0.01" class="form-control" name="discount_value" 
+                                               id="discountValue" required 
+                                               value="${isEdit ? coupon.discount_value : ''}">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label" for="minAmount">
+                                        <i class="fas fa-chart-line me-1"></i> Minimum Booking Amount
+                                    </label>
+                                    <div class="input-group peso-input-group">
+                                        <span class="input-group-text">₱</span>
+                                        <input type="number" step="0.01" class="form-control" name="min_booking_amount" 
+                                               id="minAmount" value="${isEdit ? (coupon.min_booking_amount || 0) : 0}">
+                                    </div>
+                                    <small class="text-muted">Set 0 for no minimum</small>
+                                </div>
+                                
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="validFrom">
+                                            <i class="fas fa-calendar-day me-1"></i> Valid From
+                                        </label>
+                                        <input type="date" class="form-control" name="valid_from" id="validFrom"
+                                               value="${isEdit && coupon.valid_from ? coupon.valid_from : ''}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label" for="validUntil">
+                                            <i class="fas fa-calendar-xmark me-1"></i> Valid Until
+                                        </label>
+                                        <input type="date" class="form-control" name="valid_until" id="validUntil"
+                                               value="${isEdit && coupon.valid_until ? coupon.valid_until : ''}">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label" for="usageLimit">
+                                        <i class="fas fa-hashtag me-1"></i> Usage Limit
+                                    </label>
+                                    <input type="number" class="form-control" name="usage_limit" id="usageLimit" 
+                                           value="${isEdit ? coupon.usage_limit : 1}" min="1">
+                                </div>
+                                
+                                <div class="p-3 rounded" style="background: rgba(201, 168, 76, 0.05); border: 1px solid #e8e0d5;">
+                                    <label class="luxury-switch mb-0">
+                                        <input type="checkbox" name="is_active" id="isActive" 
+                                               ${isEdit && (coupon.is_active === 1 || coupon.is_active === true) ? 'checked' : 'checked'}>
+                                        <span class="slider"></span>
+                                    </label>
+                                    <span class="ms-3 fw-semibold" style="color: #1a2744;">
+                                        <i class="fas fa-circle-check me-1" style="color: #2d6a4f;"></i>
+                                        Coupon Active
+                                    </span>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" onclick="submitCouponForm()">
+                                <i class="fas fa-save me-1"></i> Save Promotion
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        $('#modals-container').html(modalHtml);
+        
+        $('#couponModal').on('hidden.bs.modal', function() {
+            $('#couponModal').remove();
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open');
+            $('body').css('overflow', '');
+        });
+        
+        $('#couponModal').modal('show');
     },
     
     // ==========================================
@@ -622,7 +1042,7 @@ const ModalManager = {
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">
-                                <i class="fas fa-star me-2" style="color: var(--gold-400);"></i>
+                                <i class="fas fa-star me-2" style="color: #dfc278;"></i>
                                 Share Your Experience
                             </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -697,7 +1117,6 @@ const ModalManager = {
             });
         });
         
-        // Star rating hover effect
         $('#starRating .rating-star').on('mouseenter', function() {
             const rating = $(this).data('rating');
             $('#starRating .rating-star').each(function(index) {
@@ -737,207 +1156,20 @@ const ModalManager = {
             }
         });
         
+        $('#commentModal').on('hidden.bs.modal', function() {
+            $('#commentModal').remove();
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open');
+            $('body').css('overflow', '');
+        });
+        
         $('#commentModal').modal('show');
-    },
-    
-    // ==========================================
-    // ROOM TYPE MODAL
-    // ==========================================
-    showRoomTypeModal: function(roomType = null) {
-        const isEdit = roomType !== null;
-        
-        const modalHtml = `
-            <div class="modal fade grand-modal" id="roomTypeModal" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">
-                                <i class="fas fa-door-open me-2" style="color: var(--gold-400);"></i>
-                                ${isEdit ? 'Edit' : 'Add'} Room Category
-                            </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="roomTypeForm">
-                                <input type="hidden" name="type_id" value="${isEdit ? roomType.type_id : ''}">
-                                <div class="mb-3">
-                                    <label class="form-label">
-                                        <i class="fas fa-tag me-1"></i> Category Name *
-                                    </label>
-                                    <input type="text" class="form-control" name="type_name" 
-                                           value="${isEdit ? escapeHtml(roomType.type_name) : ''}" 
-                                           placeholder="e.g., Deluxe Suite" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">
-                                        <i class="fas fa-align-left me-1"></i> Description
-                                    </label>
-                                    <textarea class="form-control" name="description" rows="3">${isEdit ? escapeHtml(roomType.description || '') : ''}</textarea>
-                                </div>
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label">
-                                            <i class="fas fa-dollar-sign me-1"></i> Base Price *
-                                        </label>
-                                        <div class="input-group">
-                                            <span class="input-group-text" style="background: var(--cream);">$</span>
-                                            <input type="number" step="0.01" class="form-control" name="base_price" 
-                                                   value="${isEdit ? roomType.base_price : ''}" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">
-                                            <i class="fas fa-users me-1"></i> Capacity
-                                        </label>
-                                        <input type="number" class="form-control" name="capacity" 
-                                               value="${isEdit ? (roomType.capacity || 2) : 2}" min="1" max="10">
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary" onclick="submitRoomTypeForm()">
-                                <i class="fas fa-save me-1"></i> Save Category
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        $('#modals-container').html(modalHtml);
-        $('#roomTypeModal').modal('show');
-    },
-    
-    // ==========================================
-    // COUPON MODAL
-    // ==========================================
-    showCouponModal: function(coupon = null) {
-        const isEdit = coupon !== null;
-        
-        const modalHtml = `
-            <div class="modal fade grand-modal" id="couponModal" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">
-                                <i class="fas fa-ticket-alt me-2" style="color: var(--gold-400);"></i>
-                                ${isEdit ? 'Edit' : 'Create'} Promotion
-                            </h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="couponForm">
-                                <input type="hidden" name="coupon_id" id="couponId" value="${isEdit ? coupon.coupon_id : ''}">
-                                
-                                <div class="mb-3">
-                                    <label class="form-label" for="couponCodeInput">
-                                        <i class="fas fa-tag me-1"></i> Promo Code *
-                                    </label>
-                                    <input type="text" class="form-control text-uppercase" name="coupon_code" 
-                                           id="couponCodeInput" required 
-                                           placeholder="e.g., WELCOME20"
-                                           value="${isEdit ? escapeHtml(coupon.coupon_code) : ''}">
-                                    <small class="text-muted">Use uppercase letters and numbers</small>
-                                </div>
-                                
-                                <div class="row g-3 mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label" for="discountType">
-                                            <i class="fas fa-percent me-1"></i> Discount Type
-                                        </label>
-                                        <select class="form-select" name="discount_type" id="discountType" required>
-                                            <option value="percentage" ${isEdit && coupon.discount_type === 'percentage' ? 'selected' : ''}>
-                                                Percentage (%)
-                                            </option>
-                                            <option value="fixed" ${isEdit && coupon.discount_type === 'fixed' ? 'selected' : ''}>
-                                                Fixed Amount ($)
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label" for="discountValue">
-                                            <i class="fas fa-dollar-sign me-1"></i> Discount Value *
-                                        </label>
-                                        <input type="number" step="0.01" class="form-control" name="discount_value" 
-                                               id="discountValue" required 
-                                               value="${isEdit ? coupon.discount_value : ''}">
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label class="form-label" for="minAmount">
-                                        <i class="fas fa-chart-line me-1"></i> Minimum Booking Amount
-                                    </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text" style="background: var(--cream);">$</span>
-                                        <input type="number" step="0.01" class="form-control" name="min_booking_amount" 
-                                               id="minAmount" value="${isEdit ? (coupon.min_booking_amount || 0) : 0}">
-                                    </div>
-                                    <small class="text-muted">Set 0 for no minimum</small>
-                                </div>
-                                
-                                <div class="row g-3 mb-3">
-                                    <div class="col-md-6">
-                                        <label class="form-label" for="validFrom">
-                                            <i class="fas fa-calendar-day me-1"></i> Valid From
-                                        </label>
-                                        <input type="date" class="form-control" name="valid_from" id="validFrom"
-                                               value="${isEdit && coupon.valid_from ? coupon.valid_from : ''}">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label" for="validUntil">
-                                            <i class="fas fa-calendar-xmark me-1"></i> Valid Until
-                                        </label>
-                                        <input type="date" class="form-control" name="valid_until" id="validUntil"
-                                               value="${isEdit && coupon.valid_until ? coupon.valid_until : ''}">
-                                    </div>
-                                </div>
-                                
-                                <div class="mb-3">
-                                    <label class="form-label" for="usageLimit">
-                                        <i class="fas fa-hashtag me-1"></i> Usage Limit
-                                    </label>
-                                    <input type="number" class="form-control" name="usage_limit" id="usageLimit" 
-                                           value="${isEdit ? coupon.usage_limit : 1}" min="1">
-                                </div>
-                                
-                                <div class="p-3 rounded" style="background: rgba(201, 168, 76, 0.05); border: 1px solid var(--taupe);">
-                                    <label class="luxury-switch mb-0">
-                                        <input type="checkbox" name="is_active" id="isActive" 
-                                               ${isEdit && (coupon.is_active === 1 || coupon.is_active === true) ? 'checked' : 'checked'}>
-                                        <span class="slider"></span>
-                                    </label>
-                                    <span class="ms-3 fw-semibold" style="color: var(--navy-900);">
-                                        <i class="fas fa-circle-check me-1" style="color: var(--success);"></i>
-                                        Coupon Active
-                                    </span>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-primary" onclick="submitCouponForm()">
-                                <i class="fas fa-save me-1"></i> Save Promotion
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        $('#modals-container').html(modalHtml);
-        $('#couponModal').modal('show');
     }
 };
 
 // =====================================================
-// MAP FUNCTIONS
+// ENHANCED MAP FUNCTIONS
 // =====================================================
-let hotelMap = null;
-let routingControl = null;
-let hotelMarker = null;
 
 function initializeHotelMap() {
     const mapContainer = document.getElementById('hotelMap');
@@ -948,75 +1180,198 @@ function initializeHotelMap() {
         return;
     }
     
-    // Initialize map with luxury styling
-    hotelMap = L.map('hotelMap').setView([HotelLocation.coordinates.lat, HotelLocation.coordinates.lng], 15);
+    // Create map
+    hotelMap = L.map('hotelMap', {
+        center: [HotelLocation.coordinates.lat, HotelLocation.coordinates.lng],
+        zoom: MapConfig.defaultZoom,
+        zoomControl: true,
+        scrollWheelZoom: true,
+        doubleClickZoom: true,
+        dragging: true
+    });
     
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        maxZoom: 19,
-        minZoom: 3
+    // Add tile layer
+    L.tileLayer(MapConfig.tileLayer, {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | ABC hotels',
+        maxZoom: MapConfig.maxZoom,
+        minZoom: MapConfig.minZoom
     }).addTo(hotelMap);
     
-    // Gold hotel marker
+    // Add hotel marker
+    addHotelMarker();
+    
+    // Add nearby places
+    addNearbyPlaces();
+    
+    // Add scale control
+    L.control.scale({
+        imperial: false,
+        metric: true,
+        position: 'bottomleft'
+    }).addTo(hotelMap);
+    
+    // Invalidate size after delay
+    setTimeout(() => {
+        hotelMap.invalidateSize();
+    }, 300);
+}
+
+function addHotelMarker() {
     const hotelIconHtml = `
-        <div style="background: linear-gradient(135deg, #c9a84c, #a88838); color: white; border-radius: 50%; 
-                    width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; 
-                    font-size: 20px; box-shadow: 0 4px 12px rgba(201, 168, 76, 0.4); 
-                    border: 3px solid white;">
+        <div style="
+            background: linear-gradient(135deg, #c9a84c, #a88838);
+            color: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 6px 20px rgba(201, 168, 76, 0.5), 0 0 30px rgba(201, 168, 76, 0.3);
+            border: 3px solid white;
+            animation: markerPulse 2s ease-in-out infinite;
+        ">
             <i class="fas fa-crown"></i>
         </div>
     `;
     
     const hotelIcon = L.divIcon({
         html: hotelIconHtml,
-        iconSize: [44, 44],
+        iconSize: [50, 50],
+        iconAnchor: [25, 25],
+        popupAnchor: [0, -28],
         className: 'custom-div-icon'
     });
     
-    hotelMarker = L.marker([HotelLocation.coordinates.lat, HotelLocation.coordinates.lng], { icon: hotelIcon })
+    hotelMarker = L.marker([HotelLocation.coordinates.lat, HotelLocation.coordinates.lng], { 
+        icon: hotelIcon,
+        zIndexOffset: 1000
+    })
         .addTo(hotelMap)
-        .bindPopup(`
-            <div style="font-family: 'Segoe UI', sans-serif; padding: 5px;">
-                <h6 style="color: #1a2744; margin: 0 0 5px 0;">
-                    ${HotelLocation.starDisplay} ${HotelLocation.name}
-                </h6>
-                <p style="margin: 3px 0; font-size: 0.85rem;">${HotelLocation.address}</p>
-                <p style="margin: 3px 0; font-size: 0.85rem;">📞 ${HotelLocation.phone}</p>
-            </div>
-        `)
+        .bindPopup(createHotelPopup(), { maxWidth: 320 })
         .openPopup();
     
-    // Add nearby points of interest
-    addNearbyPlaces();
+    // Add pulsing circle
+    pulseCircle = L.circle([HotelLocation.coordinates.lat, HotelLocation.coordinates.lng], {
+        radius: 200,
+        color: '#c9a84c',
+        fillColor: '#c9a84c',
+        fillOpacity: 0.1,
+        weight: 1,
+        dashArray: '5, 10',
+        interactive: false
+    }).addTo(hotelMap);
+    
+    // Animate pulse
+    let growing = true;
+    const pulseInterval = setInterval(() => {
+        if (!pulseCircle || !hotelMap) {
+            clearInterval(pulseInterval);
+            return;
+        }
+        const currentRadius = pulseCircle.getRadius();
+        if (growing) {
+            pulseCircle.setRadius(currentRadius + 5);
+            if (currentRadius > 300) growing = false;
+        } else {
+            pulseCircle.setRadius(currentRadius - 5);
+            if (currentRadius < 180) growing = true;
+        }
+    }, 100);
+}
+
+function createHotelPopup() {
+    return `
+        <div style="font-family: 'Inter', sans-serif; padding: 8px; min-width: 220px;">
+            <div style="text-align: center; margin-bottom: 8px;">
+                <h5 style="color: #1a2744; margin: 0; font-weight: 700;">
+                    ${HotelLocation.starDisplay}
+                </h5>
+                <h4 style="color: #1a2744; margin: 5px 0; font-family: 'Playfair Display', serif; font-weight: 700;">
+                    ${HotelLocation.name}
+                </h4>
+            </div>
+            <hr style="margin: 8px 0; border-color: #e8e0d5;">
+            <p style="margin: 5px 0; font-size: 0.82rem;">
+                <i class="fas fa-map-marker-alt" style="color: #c9a84c; width: 18px;"></i> 
+                ${HotelLocation.address}
+            </p>
+            <p style="margin: 5px 0; font-size: 0.82rem;">
+                <i class="fas fa-phone" style="color: #c9a84c; width: 18px;"></i> 
+                ${HotelLocation.phone}
+            </p>
+            <div style="text-align: center; margin-top: 10px;">
+                <button onclick="getUserLocationAndRoute()" 
+                    style="background: linear-gradient(135deg, #c9a84c, #a88838); color: #1a2744; 
+                    border: none; padding: 8px 16px; border-radius: 20px; font-weight: 600; 
+                    cursor: pointer; font-size: 0.8rem; width: 100%;">
+                    <i class="fas fa-location-arrow me-1"></i> Get Directions
+                </button>
+            </div>
+        </div>
+    `;
 }
 
 function addNearbyPlaces() {
-    const places = [
-        { name: 'Airport', lat: HotelLocation.coordinates.lat - 0.008, lng: HotelLocation.coordinates.lng - 0.005, 
-          icon: '✈️', type: 'Transportation' },
-        { name: 'Shopping District', lat: HotelLocation.coordinates.lat + 0.002, lng: HotelLocation.coordinates.lng + 0.003, 
-          icon: '🛍️', type: 'Shopping' },
-        { name: 'Fine Dining', lat: HotelLocation.coordinates.lat + 0.001, lng: HotelLocation.coordinates.lng - 0.004, 
-          icon: '🍽️', type: 'Restaurant' },
-        { name: 'Central Park', lat: HotelLocation.coordinates.lat + 0.003, lng: HotelLocation.coordinates.lng + 0.002, 
-          icon: '🌳', type: 'Park' }
-    ];
+    nearbyMarkers.forEach(m => hotelMap.removeLayer(m));
+    nearbyMarkers = [];
     
-    places.forEach(place => {
+    MapConfig.nearbyPlaces.forEach(place => {
+        const distance = calculateDistance(
+            HotelLocation.coordinates.lat, HotelLocation.coordinates.lng,
+            place.lat, place.lng
+        );
+        
         const placeIcon = L.divIcon({
-            html: `<div style="background: white; border-radius: 50%; width: 32px; height: 32px; 
-                          display: flex; align-items: center; justify-content: center; font-size: 16px; 
-                          box-shadow: 0 2px 8px rgba(0,0,0,0.15); border: 2px solid #8b7355;">
-                        ${place.icon}
-                   </div>`,
-            iconSize: [32, 32],
+            html: `<div style="
+                background: white;
+                border-radius: 50%;
+                width: 36px;
+                height: 36px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+                box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+                border: 2px solid #8b7355;
+                cursor: pointer;
+            ">${place.icon}</div>`,
+            iconSize: [36, 36],
+            iconAnchor: [18, 18],
             className: 'custom-div-icon'
         });
         
-        L.marker([place.lat, place.lng], { icon: placeIcon })
+        const marker = L.marker([place.lat, place.lng], { icon: placeIcon })
             .addTo(hotelMap)
-            .bindPopup(`<b>${place.name}</b><br><small>${place.type}</small>`);
+            .bindPopup(`
+                <div style="font-family: 'Inter', sans-serif; padding: 5px;">
+                    <strong style="color: #1a2744;">${place.name}</strong><br>
+                    <small style="color: #6b7280;">${place.type}</small><br>
+                    <small style="color: #8b7355; font-weight: 600;">
+                        <i class="fas fa-route me-1"></i> ${distance} km
+                    </small><br>
+                    <button onclick="getDirectionsToPlace(${place.lat}, ${place.lng}, '${place.name.replace(/'/g, "\\'")}')" 
+                        style="background: #1a2744; color: white; border: none; padding: 4px 12px; 
+                        border-radius: 12px; font-size: 0.7rem; cursor: pointer; margin-top: 5px;">
+                        <i class="fas fa-directions me-1"></i> Directions
+                    </button>
+                </div>
+            `);
+        
+        nearbyMarkers.push(marker);
     });
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return (R * c).toFixed(1);
 }
 
 function getUserLocationAndRoute() {
@@ -1025,52 +1380,177 @@ function getUserLocationAndRoute() {
         return;
     }
     
-    window.showNotification('Locating your position...', 'info');
+    window.showNotification('📍 Locating your position...', 'info');
     
     navigator.geolocation.getCurrentPosition(
         function(position) {
             const userLat = position.coords.latitude;
             const userLng = position.coords.longitude;
             
-            // Add user marker
-            const userIcon = L.divIcon({
-                html: `<div style="background: #2d6a4f; color: white; border-radius: 50%; width: 36px; height: 36px; 
-                              display: flex; align-items: center; justify-content: center; 
-                              box-shadow: 0 4px 12px rgba(45, 106, 79, 0.4); border: 3px solid white;">
-                            <i class="fas fa-location-dot"></i>
-                       </div>`,
-                iconSize: [36, 36],
-                className: 'custom-div-icon'
-            });
+            addUserMarker(userLat, userLng);
             
-            L.marker([userLat, userLng], { icon: userIcon })
-                .addTo(hotelMap)
-                .bindPopup('<b>Your Location</b>')
-                .openPopup();
-            
-            // Fit bounds to show both points
             const bounds = L.latLngBounds(
-                [userLat, userLng], 
+                [userLat, userLng],
                 [HotelLocation.coordinates.lat, HotelLocation.coordinates.lng]
             );
-            hotelMap.fitBounds(bounds, { padding: [60, 60] });
+            hotelMap.fitBounds(bounds, { padding: [80, 80] });
             
-            // Calculate route
-            calculateRoute(userLat, userLng);
+            calculateRoute(userLat, userLng, HotelLocation.coordinates.lat, HotelLocation.coordinates.lng);
         },
         function(error) {
             const messages = {
-                1: 'Please enable location access to see directions',
+                1: 'Please enable location access in your browser settings',
                 2: 'Unable to determine your location',
                 3: 'Location request timed out'
             };
-            window.showNotification(messages[error.code] || 'Could not get your location', 'warning');
+            window.showNotification(messages[error.code] || 'Could not get location', 'warning');
         },
-        { enableHighAccuracy: true, timeout: 10000 }
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
 }
 
-function calculateRoute(startLat, startLng) {
+function getDirectionsToPlace(lat, lng, placeName) {
+    if (!navigator.geolocation) {
+        window.showNotification('Geolocation not supported', 'warning');
+        return;
+    }
+    
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
+            
+            addUserMarker(userLat, userLng);
+            
+            const bounds = L.latLngBounds(
+                [userLat, userLng],
+                [lat, lng]
+            );
+            hotelMap.fitBounds(bounds, { padding: [80, 80] });
+            
+            calculateRoute(userLat, userLng, lat, lng, placeName);
+        },
+        function(error) {
+            window.showNotification('Could not get your location', 'warning');
+        },
+        { enableHighAccuracy: true, timeout: 15000 }
+    );
+}
+
+function startLiveTracking() {
+    if (!navigator.geolocation) {
+        window.showNotification('Geolocation not supported', 'warning');
+        return;
+    }
+    
+    isLiveTracking = true;
+    window.showNotification('🛰️ Live tracking started! Moving map will update automatically', 'success');
+    
+    // Update UI
+    $('#startLiveTrackingBtn').hide();
+    $('#stopLiveTrackingBtn').show();
+    $('#liveTrackingStatus').show();
+    
+    // Center map on user
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+                hotelMap.setView([position.coords.latitude, position.coords.longitude], 16);
+                addUserMarker(position.coords.latitude, position.coords.longitude);
+            },
+            null,
+            { enableHighAccuracy: true }
+        );
+    }
+    
+    // Start watching position
+    liveLocationWatchId = navigator.geolocation.watchPosition(
+        function(position) {
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
+            
+            addUserMarker(userLat, userLng);
+            
+            // Keep map centered on user during live tracking
+            if (isLiveTracking) {
+                hotelMap.setView([userLat, userLng], hotelMap.getZoom());
+            }
+            
+            // Update route if exists
+            if (routingControl) {
+                routingControl.setWaypoints([
+                    L.latLng(userLat, userLng),
+                    L.latLng(HotelLocation.coordinates.lat, HotelLocation.coordinates.lng)
+                ]);
+            }
+        },
+        function(error) {
+            console.error('Live tracking error:', error);
+            if (error.code === 1) {
+                window.showNotification('Location permission denied', 'error');
+                stopLiveTracking();
+            }
+        },
+        { 
+            enableHighAccuracy: true, 
+            maximumAge: 5000, 
+            timeout: 30000,
+            distanceFilter: 5  // Update every 5 meters
+        }
+    );
+}
+
+function stopLiveTracking() {
+    if (liveLocationWatchId) {
+        navigator.geolocation.clearWatch(liveLocationWatchId);
+        liveLocationWatchId = null;
+    }
+    isLiveTracking = false;
+    
+    $('#startLiveTrackingBtn').show();
+    $('#stopLiveTrackingBtn').hide();
+    $('#liveTrackingStatus').hide();
+    
+    window.showNotification('Live tracking stopped', 'info');
+}
+
+function addUserMarker(lat, lng) {
+    if (userMarker) {
+        hotelMap.removeLayer(userMarker);
+    }
+    
+    const userIcon = L.divIcon({
+        html: `<div style="
+            background: ${isLiveTracking ? '#ef4444' : '#2d6a4f'};
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px ${isLiveTracking ? 'rgba(239, 68, 68, 0.5)' : 'rgba(45, 106, 79, 0.5)'};
+            border: 3px solid white;
+            animation: ${isLiveTracking ? 'livePulse 1.5s ease-in-out infinite' : 'none'};
+        ">
+            <i class="fas fa-location-dot"></i>
+        </div>`,
+        iconSize: [40, 40],
+        iconAnchor: [20, 20],
+        popupAnchor: [0, -22],
+        className: 'custom-div-icon'
+    });
+    
+    userMarker = L.marker([lat, lng], { 
+        icon: userIcon,
+        zIndexOffset: 500
+    })
+        .addTo(hotelMap)
+        .bindPopup('<b>📍 Your Location</b>')
+        .openPopup();
+}
+
+function calculateRoute(startLat, startLng, endLat, endLng, endName = null) {
     if (routingControl) {
         hotelMap.removeControl(routingControl);
     }
@@ -1078,12 +1558,20 @@ function calculateRoute(startLat, startLng) {
     routingControl = L.Routing.control({
         waypoints: [
             L.latLng(startLat, startLng),
-            L.latLng(HotelLocation.coordinates.lat, HotelLocation.coordinates.lng)
+            L.latLng(endLat, endLng)
         ],
         routeWhileDragging: false,
-        showAlternatives: false,
+        showAlternatives: true,
+        altLineOptions: {
+            styles: [
+                { color: '#8b7355', opacity: 0.3, weight: 3 },
+                { color: '#6b7280', opacity: 0.2, weight: 2 }
+            ]
+        },
         lineOptions: {
-            styles: [{ color: '#c9a84c', weight: 5, opacity: 0.7 }]
+            styles: [{ color: '#c9a84c', weight: 5, opacity: 0.8 }],
+            extendToWaypoints: false,
+            missingRouteTolerance: 10
         },
         createMarker: function() { return null; },
         addWaypoints: false,
@@ -1095,54 +1583,101 @@ function calculateRoute(startLat, startLng) {
         const route = e.routes[0];
         const distance = (route.summary.totalDistance / 1000).toFixed(1);
         const duration = Math.round(route.summary.totalTime / 60);
+        const hours = Math.floor(duration / 60);
+        const mins = duration % 60;
+        const durationText = hours > 0 ? `${hours}h ${mins}m` : `${mins} mins`;
         
-        let directionsHtml = '<h6 style="color: #1a2744;">Turn-by-Turn Directions:</h6><ol class="ps-3">';
+        // Calculate estimated arrival
+        const now = new Date();
+        const arrival = new Date(now.getTime() + route.summary.totalTime * 1000);
+        const arrivalText = arrival.toLocaleTimeString('en-PH', { hour: '2-digit', minute: '2-digit' });
+        
+        // Update route info panel
+        $('#routeDistance').text(distance + ' km');
+        $('#routeDuration').text(durationText);
+        $('#routeArrival').text(arrivalText);
+        $('#routeInfoPanel').addClass('show');
+        
+        // Update directions
+        let directionsHtml = '<h6 style="color: #1a2744; margin-bottom: 12px; font-weight: 700;">📍 Turn-by-Turn Directions</h6>';
+        directionsHtml += '<ol style="padding-left: 20px; margin: 0;">';
         route.instructions.forEach(instruction => {
+            const dist = (instruction.distance / 1000).toFixed(1);
             directionsHtml += `
-                <li style="margin-bottom: 8px;">
+                <li style="margin-bottom: 8px; font-size: 0.85rem; color: #4a4a68;">
+                    <i class="fas fa-${getDirectionIcon(instruction.type)}" style="color: #c9a84c; margin-right: 6px;"></i>
                     ${instruction.text} 
-                    <small class="text-muted">(${(instruction.distance / 1000).toFixed(1)} km)</small>
+                    <small style="color: #8b7355; font-weight: 600;">(${dist} km)</small>
                 </li>
             `;
         });
         directionsHtml += '</ol>';
         
-        $('#directionsInfo').slideDown(300);
-        $('.route-summary').html(`
-            <div class="alert alert-luxury">
-                <i class="fas fa-route me-2"></i>
-                <strong>${distance} km</strong> · approximately <strong>${duration} minutes</strong>
-            </div>
-        `);
-        $('#directionsSteps').html(directionsHtml);
+        $('#directionsSteps').html(directionsHtml).slideDown(300);
         
-        window.showNotification(`Route found: ${distance} km (~${duration} min)`, 'success');
+        window.showNotification(`Route found: ${distance} km (~${durationText})`, 'success');
     });
+    
+    routingControl.on('routingerror', function(e) {
+        console.error('Routing error:', e);
+        window.showNotification('Could not find a route. Try a different location.', 'warning');
+    });
+}
+
+function getDirectionIcon(type) {
+    const icons = {
+        'Head': 'fa-arrow-up',
+        'Straight': 'fa-arrow-up',
+        'Continue': 'fa-arrow-up',
+        'TurnRight': 'fa-arrow-right',
+        'SharpRight': 'fa-corner-up-right',
+        'TurnLeft': 'fa-arrow-left',
+        'SharpLeft': 'fa-corner-up-left',
+        'SlightRight': 'fa-arrow-trend-up',
+        'SlightLeft': 'fa-arrow-trend-down',
+        'Roundabout': 'fa-circle-notch',
+        'DestinationReached': 'fa-flag-checkered',
+        'Fork': 'fa-code-branch',
+        'EndOfStreet': 'fa-stop'
+    };
+    return icons[type] || 'fa-location-dot';
 }
 
 function resetMapToHotel() {
     if (hotelMap) {
-        hotelMap.setView([HotelLocation.coordinates.lat, HotelLocation.coordinates.lng], 15);
+        stopLiveTracking();
+        
+        hotelMap.setView([HotelLocation.coordinates.lat, HotelLocation.coordinates.lng], MapConfig.defaultZoom);
         
         if (routingControl) {
             hotelMap.removeControl(routingControl);
             routingControl = null;
         }
         
-        $('#directionsInfo').slideUp(300);
+        if (userMarker) {
+            hotelMap.removeLayer(userMarker);
+            userMarker = null;
+        }
         
-        // Remove user markers only
-        hotelMap.eachLayer(function(layer) {
-            if (layer instanceof L.Marker && layer !== hotelMarker) {
-                const popup = layer.getPopup();
-                if (popup && popup.getContent().includes('Your Location')) {
-                    hotelMap.removeLayer(layer);
-                }
-            }
-        });
+        $('#routeInfoPanel').removeClass('show');
+        $('#directionsSteps').slideUp(300).html('');
         
         window.showNotification('Map reset to hotel location', 'info');
     }
+}
+
+function destroyMap() {
+    stopLiveTracking();
+    
+    if (hotelMap) {
+        hotelMap.remove();
+        hotelMap = null;
+    }
+    hotelMarker = null;
+    userMarker = null;
+    routingControl = null;
+    pulseCircle = null;
+    nearbyMarkers = [];
 }
 
 // =====================================================
@@ -1164,34 +1699,23 @@ window.validateCouponCode = function() {
         return;
     }
     
-    const nights = window.calculateNights(checkIn, checkOut);
+    const nights = window.calculateNights ? window.calculateNights(checkIn, checkOut) : 1;
     const selectedOption = $('#roomSelect option:selected');
-    const priceMatch = selectedOption.text().match(/\$([\d,]+)/);
+    const priceMatch = selectedOption.text().match(/₱([\d,]+)/);
     const roomPrice = priceMatch ? parseFloat(priceMatch[1].replace(/,/g, '')) : 100;
     const totalAmount = roomPrice * nights;
     
     $.ajax({
         url: '/api/coupons/validate',
         method: 'POST',
-        data: {
-            coupon_code: couponCode,
-            total_amount: totalAmount
-        },
+        data: { coupon_code: couponCode, total_amount: totalAmount },
         success: function(response) {
             const $message = $('#couponMessage');
             if (response.valid) {
-                $message.html(`
-                    <span class="text-success">
-                        <i class="fas fa-check-circle me-1"></i> ${response.message}
-                    </span>
-                `);
+                $message.html(`<span class="text-success"><i class="fas fa-check-circle me-1"></i> ${response.message}</span>`);
                 window.showNotification(response.message, 'success');
             } else {
-                $message.html(`
-                    <span class="text-danger">
-                        <i class="fas fa-times-circle me-1"></i> ${response.message}
-                    </span>
-                `);
+                $message.html(`<span class="text-danger"><i class="fas fa-times-circle me-1"></i> ${response.message}</span>`);
                 window.showNotification(response.message, 'warning');
             }
         },
@@ -1205,7 +1729,6 @@ window.validateCouponCode = function() {
 // FORM SUBMISSION HANDLERS
 // =====================================================
 
-// Booking Submission
 window.submitBookingReservation = function() {
     const form = document.getElementById('bookingForm');
     if (!form.checkValidity()) {
@@ -1213,174 +1736,88 @@ window.submitBookingReservation = function() {
         return;
     }
     
-    // Get form data
     const formData = $('#bookingForm').serialize();
     const $btn = $('#bookingModal .btn-primary');
-    const originalText = window.showLoading ? window.showLoading($btn, 'Processing Reservation...') : ($btn.html('<i class="fas fa-spinner fa-spin me-2"></i> Processing...'), $btn.html());
-    
-    // Show loading state
-    $btn.prop('disabled', true);
-    $btn.html('<i class="fas fa-spinner fa-spin me-2"></i> Processing Reservation...');
+    const originalHtml = window.showLoading ? window.showLoading($btn, 'Processing...') : $btn.html();
     
     $.ajax({
         url: '/api/bookings/create',
         method: 'POST',
         data: formData,
-        timeout: 30000, // 30 seconds timeout
+        timeout: 30000,
         success: function(response) {
+            if (window.hideLoading) window.hideLoading($btn);
             if (response.success) {
-                // Show success notification
-                if (window.showNotification) {
-                    window.showNotification(response.message || 'Reservation created successfully!', 'success');
-                } else {
-                    alert(response.message || 'Reservation created successfully!');
-                }
-                
-                // Log discount info if applied
-                if (response.discount_applied && response.discount_applied > 0) {
-                    console.log('Discount applied: $' + response.discount_applied);
-                }
-                
-                // Hide modal
+                window.showNotification(response.message || 'Reservation created!', 'success');
                 $('#bookingModal').modal('hide');
                 
-                // Redirect to payment page
                 if (response.redirect) {
-                    setTimeout(function() {
-                        window.location.href = response.redirect;
-                    }, 500);
+                    setTimeout(() => { window.location.href = response.redirect; }, 500);
                 } else if (response.booking_id) {
-                    // Fallback redirect
-                    setTimeout(function() {
-                        window.location.href = '/api/payments/checkout/' + response.booking_id;
-                    }, 500);
+                    setTimeout(() => { window.location.href = '/api/payments/checkout/' + response.booking_id; }, 500);
                 } else {
-                    setTimeout(function() {
-                        location.reload();
-                    }, 800);
+                    setTimeout(() => { location.reload(); }, 800);
                 }
             } else {
-                // Show error message
-                if (window.showNotification) {
-                    window.showNotification(response.message || 'Unable to create reservation', 'error');
-                } else {
-                    alert(response.message || 'Unable to create reservation');
-                }
-                // Reset button
-                $btn.prop('disabled', false);
-                $btn.html(originalText || 'Proceed to Payment');
+                window.showNotification(response.message || 'Unable to create reservation', 'error');
+                $btn.prop('disabled', false).html(originalHtml);
             }
         },
         error: function(xhr) {
-            console.error('Booking error:', xhr);
+            if (window.hideLoading) window.hideLoading($btn);
             let errorMessage = 'Server error. Please try again.';
-            
-            if (xhr.responseJSON && xhr.responseJSON.message) {
-                errorMessage = xhr.responseJSON.message;
-            } else if (xhr.status === 0) {
-                errorMessage = 'Network error. Please check your connection.';
-            } else if (xhr.status === 500) {
-                errorMessage = 'Server error. Please try again later.';
-            }
-            
-            if (window.showNotification) {
-                window.showNotification(errorMessage, 'error');
-            } else {
-                alert(errorMessage);
-            }
-            
-            // Reset button
-            $btn.prop('disabled', false);
-            $btn.html(originalText || 'Proceed to Payment');
+            if (xhr.responseJSON && xhr.responseJSON.message) errorMessage = xhr.responseJSON.message;
+            window.showNotification(errorMessage, 'error');
         }
     });
 };
 
-// Amenity Submission
 window.submitAmenityForm = function() {
     const formData = $('#amenityForm').serialize();
-    
     $.ajax({
         url: '/api/amenities/save',
         method: 'POST',
         data: formData,
         success: function(response) {
             if (response.success) {
-                window.showNotification('Amenity saved successfully!', 'success');
+                window.showNotification('Amenity saved!', 'success');
                 $('#amenityModal').modal('hide');
-                setTimeout(() => location.reload(), 600);
+                if (typeof loadAmenities === 'function') loadAmenities();
             } else {
                 window.showNotification(response.message || 'Error saving amenity', 'error');
             }
         },
-        error: function() {
-            window.showNotification('Error saving amenity', 'error');
-        }
+        error: function() { window.showNotification('Error saving amenity', 'error'); }
     });
 };
 
-// User Submission
-window.submitUserForm = function() {
-    const userId = $('#userId').val();
-    const username = $('#username').val().trim();
-    const password = $('#password').val();
-    
-    if (!username) {
-        window.showNotification('Username is required', 'error');
-        return;
-    }
-    
-    if (!userId && !password) {
-        window.showNotification('Password is required for new users', 'error');
-        return;
-    }
-    
-    const formData = new FormData($('#userForm')[0]);
-    const $btn = $('#userModal .btn-primary');
-    const originalText = window.showLoading($btn, 'Saving Profile...');
-    
+window.submitRoomTypeForm = function() {
+    const formData = $('#roomTypeForm').serialize();
     $.ajax({
-        url: '/api/users/save',
+        url: '/api/rooms/types/save',
         method: 'POST',
         data: formData,
-        processData: false,
-        contentType: false,
         success: function(response) {
-            window.hideLoading($btn);
             if (response.success) {
-                window.showNotification(userId ? 'Profile updated successfully!' : 'User created successfully!', 'success');
-                $('#userModal').modal('hide');
-                setTimeout(() => location.reload(), 600);
+                window.showNotification('Room category saved!', 'success');
+                $('#roomTypeModal').modal('hide');
+                if (typeof loadRoomTypes === 'function') loadRoomTypes();
             } else {
-                window.showNotification(response.message || 'Error saving user', 'error');
+                window.showNotification(response.message || 'Error saving room category', 'error');
             }
         },
-        error: function() {
-            window.hideLoading($btn);
-            window.showNotification('Error saving user profile', 'error');
-        }
+        error: function() { window.showNotification('Error saving room category', 'error'); }
     });
 };
 
-// Review Submission
 window.submitGuestReview = function() {
     const rating = $('#ratingValue').val();
     const comment = $('textarea[name="comment"]').val().trim();
     
-    if (!rating) {
-        $('#ratingError').slideDown(200);
-        return;
-    }
-    
-    if (!comment) {
-        window.showNotification('Please write a review', 'warning');
-        return;
-    }
+    if (!rating) { $('#ratingError').slideDown(200); return; }
+    if (!comment) { window.showNotification('Please write a review', 'warning'); return; }
     
     const formData = new FormData($('#commentForm')[0]);
-    const $btn = $('#commentModal .btn-primary');
-    const originalText = window.showLoading($btn, 'Submitting Review...');
-    
     $.ajax({
         url: '/api/comments/add',
         method: 'POST',
@@ -1388,7 +1825,6 @@ window.submitGuestReview = function() {
         processData: false,
         contentType: false,
         success: function(response) {
-            window.hideLoading($btn);
             if (response.success) {
                 window.showNotification('Thank you for your review! 🌟', 'success');
                 $('#commentModal').modal('hide');
@@ -1397,37 +1833,10 @@ window.submitGuestReview = function() {
                 window.showNotification(response.message || 'Error submitting review', 'error');
             }
         },
-        error: function() {
-            window.hideLoading($btn);
-            window.showNotification('Error submitting review', 'error');
-        }
+        error: function() { window.showNotification('Error submitting review', 'error'); }
     });
 };
 
-// Room Type Submission
-window.submitRoomTypeForm = function() {
-    const formData = $('#roomTypeForm').serialize();
-    
-    $.ajax({
-        url: '/api/rooms/types/save',
-        method: 'POST',
-        data: formData,
-        success: function(response) {
-            if (response.success) {
-                window.showNotification('Room category saved successfully!', 'success');
-                $('#roomTypeModal').modal('hide');
-                setTimeout(() => location.reload(), 600);
-            } else {
-                window.showNotification(response.message || 'Error saving room category', 'error');
-            }
-        },
-        error: function() {
-            window.showNotification('Error saving room category', 'error');
-        }
-    });
-};
-
-// Coupon Submission
 window.submitCouponForm = function() {
     const couponId = $('#couponId').val();
     const url = couponId ? `/api/coupons/update/${couponId}` : '/api/coupons/create';
@@ -1435,75 +1844,40 @@ window.submitCouponForm = function() {
     formData += '&is_active=' + $('#isActive').is(':checked');
     
     const $btn = $('#couponModal .btn-primary');
-    const originalText = window.showLoading($btn, 'Saving Promotion...');
+    if (window.showLoading) window.showLoading($btn, 'Saving...');
     
     $.ajax({
         url: url,
         method: 'POST',
         data: formData,
         success: function(response) {
-            window.hideLoading($btn);
+            if (window.hideLoading) window.hideLoading($btn);
             if (response.success) {
                 window.showNotification(response.message || 'Promotion saved!', 'success');
                 $('#couponModal').modal('hide');
-                if (typeof loadCoupons === 'function') {
-                    loadCoupons();
-                } else {
-                    setTimeout(() => location.reload(), 600);
-                }
+                if (typeof loadCoupons === 'function') loadCoupons();
             } else {
                 window.showNotification(response.message || 'Error saving promotion', 'error');
             }
         },
         error: function() {
-            window.hideLoading($btn);
+            if (window.hideLoading) window.hideLoading($btn);
             window.showNotification('Error saving promotion', 'error');
         }
     });
 };
 
-// =====================================================
-// DELETE FUNCTIONS
-// =====================================================
-window.deleteAmenity = function(amenityId) {
-    if (confirm('Are you sure you want to remove this amenity?')) {
-        $.ajax({
-            url: `/api/amenities/delete/${amenityId}`,
-            method: 'DELETE',
-            success: function(response) {
-                if (response.success) {
-                    window.showNotification('Amenity removed successfully', 'success');
-                    setTimeout(() => location.reload(), 500);
-                }
-            },
-            error: function() {
-                window.showNotification('Error removing amenity', 'error');
-            }
-        });
-    }
-};
-
-window.deleteUser = function(userId) {
-    if (confirm('Are you sure you want to remove this user profile?')) {
-        $.ajax({
-            url: `/api/users/delete/${userId}`,
-            method: 'DELETE',
-            success: function(response) {
-                if (response.success) {
-                    window.showNotification('User profile removed', 'success');
-                    setTimeout(() => location.reload(), 500);
-                }
-            },
-            error: function() {
-                window.showNotification('Error removing user', 'error');
-            }
-        });
-    }
-};
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
 
 // =====================================================
 // INITIALIZATION
 // =====================================================
-console.log('🏨 Grand Hotel Modal System — Initialized');
-console.log('📍 Location:', HotelLocation.name);
-console.log('🗺️ Map integration ready');
+console.log('%c🏨 ABC hotels Modal System v3.0 %cInitialized', 'color:#c9a84c;font-weight:bold;', 'color:#8b7355;');
+console.log('%c📍 Location: %c' + HotelLocation.name, 'color:#c9a84c;', 'color:#1a2744;');
+console.log('%c🗺️ Live Map %c✓ Ready', 'color:#2d6a4f;', 'color:#6b7280;');
+console.log('%c🛰️ GPS Tracking %c✓ Available', 'color:#2d6a4f;', 'color:#6b7280;');

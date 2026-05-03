@@ -3,27 +3,334 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grand Hotel - Login</title>
+    <title>ABC Hotels - Login</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=3">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
     
     <style>
+        :root {
+            --gold-500: #c9a84c;
+            --gold-600: #a88838;
+            --gold-400: #dfc278;
+            --navy-950: #0a0f1a;
+            --navy-900: #0f1629;
+            --navy-800: #1a2744;
+            --success-600: #2d6a4f;
+            --success-500: #3d8b6a;
+            --danger-600: #8b3a3a;
+            --warning-500: #d4a020;
+            --font-display: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+            --font-body: 'Inter', -apple-system, sans-serif;
+            --shadow-lg: 0 25px 60px rgba(0,0,0,0.4);
+            --shadow-gold: 0 10px 40px rgba(201,168,76,0.3);
+            --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: var(--font-body);
+            background: linear-gradient(160deg, var(--navy-950) 0%, var(--navy-900) 40%, var(--navy-800) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Ambient background orbs */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(201,168,76,0.08), transparent);
+            border-radius: 50%;
+            top: -200px;
+            right: -150px;
+            animation: orbFloat1 15s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        body::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0,56,168,0.06), transparent);
+            border-radius: 50%;
+            bottom: -150px;
+            left: -100px;
+            animation: orbFloat2 12s ease-in-out infinite reverse;
+            pointer-events: none;
+        }
+        
+        @keyframes orbFloat1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(40px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        
+        @keyframes orbFloat2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-30px, -20px) scale(1.15); }
+            66% { transform: translate(25px, 30px) scale(0.85); }
+        }
+        
+        /* Floating particles */
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--gold-500);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFloat linear infinite;
+            opacity: 0;
+        }
+        
+        @keyframes particleFloat {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.2; }
+            100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 440px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .login-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg), 0 0 0 1px rgba(201,168,76,0.1);
+            overflow: hidden;
+            animation: cardSlideUp 0.8s var(--ease-spring);
+        }
+        
+        @keyframes cardSlideUp {
+            from { opacity: 0; transform: translateY(60px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--navy-800) 0%, var(--navy-900) 100%);
+            padding: 30px 30px 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--gold-500);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Shimmer on header */
+        .card-header-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: headerShimmer 6s ease-in-out infinite;
+        }
+        
+        @keyframes headerShimmer {
+            0%, 100% { left: -100%; }
+            50% { left: 100%; }
+        }
+        
+        .card-header-custom .icon-wrapper {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--gold-500), var(--gold-600));
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 1.8rem;
+            color: var(--navy-950);
+            box-shadow: 0 8px 25px rgba(201,168,76,0.3);
+            animation: iconPulse 3s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+        
+        @keyframes iconPulse {
+            0%, 100% { box-shadow: 0 8px 25px rgba(201,168,76,0.3); }
+            50% { box-shadow: 0 8px 40px rgba(201,168,76,0.5); }
+        }
+        
+        .card-header-custom .hotel-name {
+            font-family: var(--font-display);
+            color: var(--gold-400);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .card-header-custom h3 {
+            font-family: var(--font-display);
+            color: white;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+            margin: 5px 0 0 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .card-header-custom .hotel-location {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.7rem;
+            margin: 8px 0 0 0;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .card-body-custom {
+            padding: 25px 30px;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.82rem;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .form-label i {
+            color: var(--gold-600);
+            width: 16px;
+            text-align: center;
+        }
+        
+        .form-control {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 11px 14px;
+            font-size: 0.92rem;
+            transition: all 0.3s ease;
+            background: #f9fafb;
+            font-family: var(--font-body);
+        }
+        
+        .form-control:focus {
+            border-color: var(--gold-500);
+            box-shadow: 0 0 0 4px rgba(201,168,76,0.08), 0 0 20px rgba(201,168,76,0.06);
+            background: white;
+            transform: translateY(-1px);
+        }
+        
         .forgot-password-link {
-            color: #c9a84c;
+            color: var(--gold-600);
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             transition: color 0.3s ease;
             cursor: pointer;
         }
+        
         .forgot-password-link:hover {
-            color: #a88838;
-            text-decoration: underline;
+            color: var(--gold-500);
         }
+        
+        .btn-login {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, var(--gold-500), var(--gold-600));
+            color: var(--navy-950);
+            border: none;
+            border-radius: 14px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.4s var(--ease-spring);
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            font-family: var(--font-body);
+        }
+        
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-gold);
+            filter: brightness(1.05);
+        }
+        
+        .btn-login:hover::before {
+            left: 100%;
+        }
+        
+        .btn-login:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            filter: none;
+        }
+        
+        .footer-link {
+            text-align: center;
+            padding: 18px 20px;
+            background: #f9fafb;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .footer-link a {
+            color: var(--gold-600);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-link a:hover {
+            color: var(--gold-500);
+        }
+        
+        .alert {
+            border-radius: 14px;
+            border: none;
+            font-size: 0.88rem;
+            animation: alertSlideIn 0.4s var(--ease-spring);
+        }
+        
+        @keyframes alertSlideIn {
+            from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        /* OTP Inputs */
         .otp-input-reset {
             width: 50px !important;
             height: 55px;
@@ -31,24 +338,37 @@
             font-size: 1.5rem;
             font-weight: 700;
             border: 2px solid #e5e7eb;
-            border-radius: 10px;
+            border-radius: 12px;
             margin: 0 5px;
             display: inline-block;
+            transition: all 0.3s ease;
+            font-family: var(--font-body);
         }
+        
         .otp-input-reset:focus {
-            border-color: #c9a84c;
-            box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
+            border-color: var(--gold-500);
+            box-shadow: 0 0 0 4px rgba(201,168,76,0.08);
             outline: none;
+            transform: translateY(-2px);
         }
+        
+        .otp-input-reset.filled {
+            border-color: var(--gold-500);
+            background: rgba(201,168,76,0.05);
+        }
+        
+        /* Step dots */
         .step-indicator {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
+            align-items: center;
+            gap: 0;
+            margin-bottom: 24px;
         }
+        
         .step-dot {
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: #e5e7eb;
             display: flex;
@@ -57,70 +377,133 @@
             font-size: 0.8rem;
             font-weight: 700;
             color: #6b7280;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
+            position: relative;
         }
+        
         .step-dot.active {
-            background: #c9a84c;
-            color: #1a2744;
+            background: var(--gold-500);
+            color: var(--navy-950);
+            box-shadow: 0 0 0 6px rgba(201,168,76,0.15);
+            animation: stepActive 2s ease-in-out infinite;
         }
+        
+        @keyframes stepActive {
+            0%, 100% { box-shadow: 0 0 0 6px rgba(201,168,76,0.15); }
+            50% { box-shadow: 0 0 0 12px rgba(201,168,76,0.05); }
+        }
+        
         .step-dot.completed {
-            background: #10b981;
+            background: var(--success-600);
             color: white;
         }
+        
         .step-line {
-            width: 40px;
-            height: 2px;
+            width: 50px;
+            height: 3px;
             background: #e5e7eb;
-            align-self: center;
+            transition: all 0.5s ease;
+            border-radius: 3px;
         }
+        
         .step-line.completed {
-            background: #10b981;
+            background: var(--success-600);
+        }
+        
+        .step-line.active {
+            background: linear-gradient(90deg, var(--success-600), var(--gold-500));
+        }
+        
+        /* Modal styling */
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            border-radius: 20px 20px 0 0 !important;
+        }
+        
+        .btn-outline-secondary:hover {
+            background: #e5e7eb;
+            border-color: var(--gold-500);
+            color: var(--navy-900);
+        }
+        
+        @media (max-width: 576px) {
+            .login-container { max-width: 100%; }
+            .card-body-custom { padding: 20px; }
+            .otp-input-reset { width: 42px !important; height: 48px; font-size: 1.2rem; margin: 0 3px; }
         }
     </style>
 </head>
-<body class="auth-page-body">
-    <div class="login-card">
-        <div class="login-header">
-            <i class="fas fa-hotel"></i>
-            <h3>Grand Hotel</h3>
-            <p class="text-muted">Please login to continue</p>
-        </div>
-        
-        <div id="alertMessage"></div>
-        
-        <!-- Login Form -->
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username"><i class="fas fa-user"></i> Username</label><p></p>
-                <input type="text" id="username" class="form-control" name="username" 
-                       autocomplete="username" required placeholder="Enter username">
+<body>
+    <!-- Floating particles -->
+    <div id="particlesContainer"></div>
+    
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Header -->
+            <div class="card-header-custom">
+                <div class="icon-wrapper">
+                    <i class="fas fa-hotel"></i>
+                </div>
+                <div class="hotel-name">ABC Hotels</div>
+                <h3>Welcome Back</h3>
+                <div class="hotel-location">
+                    <i class="fas fa-map-marker-alt me-1"></i>
+                    Santa Cruz, Laguna, Philippines
+                </div>
             </div>
-            <div class="form-group">
-                <label for="password"><i class="fas fa-lock"></i> Password</label><p></p>
-                <input type="password" id="password" class="form-control" name="password" 
-                       autocomplete="current-password" required placeholder="Enter password">
+            
+            <!-- Body -->
+            <div class="card-body-custom">
+                <div id="alertMessage"></div>
+                
+                <!-- Login Form -->
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label class="form-label" for="username"><i class="fas fa-user"></i> Username</label>
+                        <input type="text" id="username" class="form-control" name="username" 
+                               autocomplete="username" required placeholder="Enter username">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label" for="password"><i class="fas fa-lock"></i> Password</label>
+                        <input type="password" id="password" class="form-control" name="password" 
+                               autocomplete="current-password" required placeholder="Enter password">
+                    </div>
+                    
+                    <div class="text-end mb-3">
+                        <a class="forgot-password-link" onclick="showForgotPassword()">
+                            <i class="fas fa-key me-1"></i>Forgot Password?
+                        </a>
+                    </div>
+                    
+                    <button type="submit" class="btn-login" id="loginBtn">
+                        <i class="fas fa-sign-in-alt me-2"></i> Sign In
+                    </button>
+                </form>
             </div>
-            <div class="text-end mb-3">
-                <a class="forgot-password-link" onclick="showForgotPassword()">
-                    <i class="fas fa-key me-1 "></i>Forgot Password?
-                </a>
+            
+            <!-- Footer -->
+            <div class="footer-link">
+                <p class="mb-0">New customer? <a href="/register">Create Account</a></p>
+                <p class="mt-2 mb-0">
+                    <a href="/landing" class="text-muted small">
+                        <i class="fas fa-arrow-left me-1"></i>Back to Home
+                    </a>
+                </p>
             </div>
-            <button type="submit" class="btn btn-login">
-                <i class="fas fa-sign-in-alt"></i> Login
-            </button>
-        </form>
-        
-        <div class="register-link">
-            <p>New customer? <a href="/register">Register</a></p>
-            <p><a href="/landing" class="text-muted small"><i class="fas fa-arrow-left me-1"></i>Back to Home</a></p>
         </div>
     </div>
 
     <!-- Forgot Password Modal -->
     <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
-                <div class="modal-header border-0" style="background: linear-gradient(135deg, #1a2744, #243356); border-radius: 16px 16px 0 0;">
+            <div class="modal-content border-0">
+                <div class="modal-header border-0" style="background: linear-gradient(135deg, #1a2744, #243356); border-radius: 20px 20px 0 0;">
                     <h5 class="modal-title text-white fw-bold">
                         <i class="fas fa-key me-2" style="color: #c9a84c;"></i>Reset Password
                     </h5>
@@ -128,7 +511,7 @@
                 </div>
                 <div class="modal-body p-4">
                     <!-- Step Indicator -->
-                    <div class="step-indicator mb-4" id="stepIndicator">
+                    <div class="step-indicator" id="stepIndicator">
                         <div class="step-dot active" id="stepDot1">1</div>
                         <div class="step-line" id="stepLine1"></div>
                         <div class="step-dot" id="stepDot2">2</div>
@@ -142,9 +525,10 @@
                         <p class="text-muted mb-3">Enter your registered email to receive a password reset code.</p>
                         <div class="mb-3">
                             <label class="fw-bold text-muted mb-1"><i class="fas fa-envelope me-1"></i>Email Address *</label>
-                            <input type="email" class="form-control shadow-sm" id="resetEmail" placeholder="your@email.com" required>
+                            <input type="email" class="form-control" id="resetEmail" placeholder="your@email.com" required>
                         </div>
-                        <button class="btn btn-primary w-100 shadow-sm fw-bold" onclick="sendResetOTP()">
+                        <button class="btn w-100 fw-bold" onclick="sendResetOTP()" 
+                                style="background: linear-gradient(135deg, #c9a84c, #a88838); color: #1a2744; border: none; padding: 12px; border-radius: 12px; transition: all 0.3s ease;">
                             <i class="fas fa-paper-plane me-2"></i>Send Reset Code
                         </button>
                     </div>
@@ -153,19 +537,20 @@
                     <div id="step2" style="display: none;">
                         <p class="text-muted mb-3">Enter the 6-digit code sent to <strong id="otpEmailDisplay2">your email</strong></p>
                         <div class="d-flex justify-content-center gap-2 mb-4" id="resetOtpInputs">
-                            <input type="text" class="otp-input-reset" maxlength="1" data-index="0">
-                            <input type="text" class="otp-input-reset" maxlength="1" data-index="1">
-                            <input type="text" class="otp-input-reset" maxlength="1" data-index="2">
-                            <input type="text" class="otp-input-reset" maxlength="1" data-index="3">
-                            <input type="text" class="otp-input-reset" maxlength="1" data-index="4">
-                            <input type="text" class="otp-input-reset" maxlength="1" data-index="5">
+                            <input type="text" class="otp-input-reset" maxlength="1" data-index="0" inputmode="numeric">
+                            <input type="text" class="otp-input-reset" maxlength="1" data-index="1" inputmode="numeric">
+                            <input type="text" class="otp-input-reset" maxlength="1" data-index="2" inputmode="numeric">
+                            <input type="text" class="otp-input-reset" maxlength="1" data-index="3" inputmode="numeric">
+                            <input type="text" class="otp-input-reset" maxlength="1" data-index="4" inputmode="numeric">
+                            <input type="text" class="otp-input-reset" maxlength="1" data-index="5" inputmode="numeric">
                         </div>
                         <p class="text-center text-muted small">
                             Didn't receive code? 
-                            <a href="#" onclick="sendResetOTP()" class="text-primary fw-bold" id="resendResetLink">Resend</a>
-                            <span id="resendResetTimer" style="display: none;"> in <span id="timerCountReset">60</span>s</span>
+                            <a href="#" onclick="sendResetOTP()" class="fw-bold" style="color: #c9a84c;" id="resendResetLink">Resend</a>
+                            <span id="resendResetTimer" style="display: none;"> in <span id="timerCountReset" class="fw-bold">60</span>s</span>
                         </p>
-                        <button class="btn btn-primary w-100 shadow-sm fw-bold mt-3" onclick="verifyResetOTP()">
+                        <button class="btn w-100 fw-bold mt-3" onclick="verifyResetOTP()"
+                                style="background: linear-gradient(135deg, #c9a84c, #a88838); color: #1a2744; border: none; padding: 12px; border-radius: 12px; transition: all 0.3s ease;">
                             <i class="fas fa-check-circle me-2"></i>Verify Code
                         </button>
                     </div>
@@ -176,13 +561,14 @@
                         <input type="hidden" id="resetToken">
                         <div class="mb-3">
                             <label class="fw-bold text-muted mb-1"><i class="fas fa-lock me-1"></i>New Password *</label>
-                            <input type="password" class="form-control shadow-sm" id="newPassword" placeholder="Min 6 characters" minlength="6" required>
+                            <input type="password" class="form-control" id="newPassword" placeholder="Min 6 characters" minlength="6" required>
                         </div>
                         <div class="mb-3">
                             <label class="fw-bold text-muted mb-1"><i class="fas fa-lock me-1"></i>Confirm Password *</label>
-                            <input type="password" class="form-control shadow-sm" id="confirmPassword" placeholder="Re-enter password" required>
+                            <input type="password" class="form-control" id="confirmPassword" placeholder="Re-enter password" required>
                         </div>
-                        <button class="btn btn-success w-100 shadow-sm fw-bold" onclick="resetPassword()">
+                        <button class="btn w-100 fw-bold" onclick="resetPassword()"
+                                style="background: linear-gradient(135deg, #2d6a4f, #3d8b6a); color: white; border: none; padding: 12px; border-radius: 12px; transition: all 0.3s ease;">
                             <i class="fas fa-save me-2"></i>Reset Password
                         </button>
                     </div>
@@ -195,6 +581,24 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
+        // =============================================
+        // FLOATING PARTICLES
+        // =============================================
+        (function createParticles() {
+            const container = document.getElementById('particlesContainer');
+            if (!container) return;
+            
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDuration = (Math.random() * 20 + 12) + 's';
+                particle.style.animationDelay = (Math.random() * 15) + 's';
+                particle.style.width = particle.style.height = (Math.random() * 3 + 1) + 'px';
+                container.appendChild(particle);
+            }
+        })();
+        
         var resetEmail = '';
         
         // ============ LOGIN ============
@@ -203,7 +607,7 @@
             
             var $btn = $(this).find('button[type="submit"]');
             var originalText = $btn.html();
-            $btn.html('<span class="spinner-border spinner-border-sm me-2"></span>Logging in...').prop('disabled', true);
+            $btn.html('<span class="spinner-border spinner-border-sm me-2"></span>Signing in...').prop('disabled', true);
             
             $.ajax({
                 url: '/api/users/login',
@@ -234,13 +638,20 @@
             $('#step1, #step2, #step3').hide();
             $('#step' + step).show();
             
-            // Update step indicator
             $('#stepDot1, #stepDot2, #stepDot3').removeClass('active completed');
             $('#stepLine1, #stepLine2').removeClass('completed');
             
             if (step >= 1) $('#stepDot1').addClass('active');
-            if (step >= 2) { $('#stepDot1').removeClass('active').addClass('completed'); $('#stepDot2').addClass('active'); $('#stepLine1').addClass('completed'); }
-            if (step >= 3) { $('#stepDot2').removeClass('active').addClass('completed'); $('#stepDot3').addClass('active'); $('#stepLine2').addClass('completed'); }
+            if (step >= 2) { 
+                $('#stepDot1').removeClass('active').addClass('completed'); 
+                $('#stepDot2').addClass('active'); 
+                $('#stepLine1').addClass('completed'); 
+            }
+            if (step >= 3) { 
+                $('#stepDot2').removeClass('active').addClass('completed'); 
+                $('#stepDot3').addClass('active'); 
+                $('#stepLine2').addClass('completed'); 
+            }
             
             $('#modalAlertMessage').html('');
         }
@@ -291,6 +702,8 @@
             
             if (otp.length !== 6) {
                 showModalAlert('Please enter the complete 6-digit code', 'error');
+                $('#resetOtpInputs input').addClass('shake');
+                setTimeout(() => $('#resetOtpInputs input').removeClass('shake'), 500);
                 return;
             }
             
@@ -309,7 +722,7 @@
                         resetToStep(3);
                     } else {
                         showModalAlert(response.message || 'Invalid code', 'error');
-                        $('#resetOtpInputs input').val('');
+                        $('#resetOtpInputs input').val('').removeClass('filled');
                         $('#resetOtpInputs input:first').focus();
                     }
                     $btn.html(originalText).prop('disabled', false);
@@ -377,16 +790,23 @@
                 var val = $(this).val();
                 
                 if (!/^\d*$/.test(val)) { $(this).val(''); return; }
-                if (val.length === 1 && index < 5) {
-                    $('#resetOtpInputs input[data-index="' + (index + 1) + '"]').focus();
+                
+                if (val.length === 1) {
+                    $(this).addClass('filled');
+                    if (index < 5) {
+                        $('#resetOtpInputs input[data-index="' + (index + 1) + '"]').focus();
+                    }
+                } else {
+                    $(this).removeClass('filled');
                 }
+                
                 if (index === 5 && val.length === 1) {
                     setTimeout(function() {
                         if (getResetOTPValue().length === 6) verifyResetOTP();
                     }, 300);
                 }
                 if (e.key === 'Backspace' && val === '' && index > 0) {
-                    $('#resetOtpInputs input[data-index="' + (index - 1) + '"]').focus();
+                    $('#resetOtpInputs input[data-index="' + (index - 1) + '"]').focus().select();
                 }
             });
             
@@ -394,7 +814,11 @@
                 e.preventDefault();
                 var pasted = (e.originalEvent.clipboardData.getData('text') || '').replace(/\D/g, '').substring(0, 6);
                 var inputs = $('#resetOtpInputs input');
-                for (var i = 0; i < 6; i++) { $(inputs[i]).val(pasted[i] || ''); }
+                for (var i = 0; i < 6; i++) { 
+                    $(inputs[i]).val(pasted[i] || ''); 
+                    if (pasted[i]) $(inputs[i]).addClass('filled');
+                    else $(inputs[i]).removeClass('filled');
+                }
                 if (pasted.length === 6) setTimeout(verifyResetOTP, 300);
             });
         }
@@ -424,24 +848,26 @@
         // ============ ALERTS ============
         function showAlert(message, type) {
             var alertClass = type === 'error' ? 'danger' : 'success';
+            var icon = type === 'error' ? '<i class="fas fa-exclamation-circle me-2"></i>' : '<i class="fas fa-check-circle me-2"></i>';
             $('#alertMessage').html(`
                 <div class="alert alert-${alertClass} alert-dismissible fade show" role="alert">
-                    ${message}
+                    ${icon}<strong>${message}</strong>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             `);
-            setTimeout(function() { $('.alert').fadeOut(); }, 4000);
+            setTimeout(function() { $('.alert').fadeOut(500, function() { $(this).remove(); }); }, 5000);
         }
         
         function showModalAlert(message, type) {
             var alertClass = type === 'error' ? 'danger' : 'success';
+            var icon = type === 'error' ? '<i class="fas fa-exclamation-circle me-2"></i>' : '<i class="fas fa-check-circle me-2"></i>';
             $('#modalAlertMessage').html(`
                 <div class="alert alert-${alertClass} alert-dismissible fade show py-2" role="alert">
-                    ${message}
+                    ${icon}<strong>${message}</strong>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             `);
-            setTimeout(function() { $('#modalAlertMessage .alert').fadeOut(); }, 4000);
+            setTimeout(function() { $('#modalAlertMessage .alert').fadeOut(500, function() { $(this).remove(); }); }, 5000);
         }
     </script>
 </body>

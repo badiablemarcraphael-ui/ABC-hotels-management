@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="d-flex justify-content-between align-items-center mb-4 fade-in">
-    <h2 class="fw-bold"><i class="fas fa-calendar-check text-primary me-2"></i> Manage Bookings</h2>
+    <h2 class="fw-bold mb-0"><i class="fas fa-calendar-check text-primary me-2"></i> Booking Management</h2>
     <button class="btn btn-primary shadow-sm fw-bold" onclick="ModalManager.showBookingModal()">
         <i class="fas fa-plus me-1"></i> New Booking
     </button>
@@ -13,10 +13,10 @@
     <div class="row align-items-end g-3">
         <div class="col-md-3">
             <label for="searchInput" class="fw-bold text-muted mb-1"><i class="fas fa-search me-1"></i> Search Bookings</label>
-            <input type="text" id="searchInput" class="form-control shadow-sm" placeholder="Search by guest name, email, or phone...">
+            <input type="text" id="searchInput" class="form-control shadow-sm" placeholder="Guest name, email, phone...">
         </div>
         <div class="col-md-2">
-            <label for="statusFilter" class="fw-bold text-muted mb-1"><i class="fas fa-filter me-1"></i> Filter by Status</label>
+            <label for="statusFilter" class="fw-bold text-muted mb-1"><i class="fas fa-filter me-1"></i> Status</label>
             <select id="statusFilter" class="form-select shadow-sm">
                 <option value="">All Status</option>
                 <option value="confirmed">Confirmed</option>
@@ -59,7 +59,7 @@
     </div>
 </div>
 
-<div class="table-responsive shadow-sm fade-in" style="border-radius: 12px; animation-delay: 0.2s;">
+<div class="table-responsive shadow-sm fade-in" style="border-radius: 16px; animation-delay: 0.2s;">
     <table class="table table-bordered table-hover mb-0">
         <thead style="background: linear-gradient(135deg, #1a2744 0%, #243356 100%);">
             <tr>
@@ -184,7 +184,6 @@ function filterBookings() {
         return true;
     });
     
-    // Sort: newest bookings first
     filteredBookings.sort(function(a, b) {
         return new Date(b.created_at) - new Date(a.created_at);
     });
@@ -273,7 +272,6 @@ function displayBookings() {
                     statusText = booking.status || 'Unknown';
             }
             
-            // Payment status display
             let paymentBadge = '';
             let paymentStatus = booking.payment_status || 'pending';
             
@@ -295,18 +293,15 @@ function displayBookings() {
             const isPendingPayment = booking.payment_status === 'pending';
             const isConfirmed = booking.status === 'confirmed';
             
-            // Build action buttons
             let actionButtons = '';
             
             if (isConfirmed) {
-                // Check In button always available for confirmed bookings
                 actionButtons += `
                     <button class="btn btn-sm btn-info text-white" onclick="checkIn(${booking.booking_id})" title="Check In">
                         <i class="fas fa-sign-in-alt"></i>
                     </button>
                 `;
                 
-                // Mark as Paid button - ONLY for counter payments (pending)
                 if (isPendingPayment) {
                     actionButtons += `
                         <button class="btn btn-sm btn-success" onclick="markAsPaid(${booking.booking_id})" title="Mark as Paid at Counter">
@@ -315,7 +310,6 @@ function displayBookings() {
                     `;
                 }
                 
-                // Cancel button: ONLY if pending payment (counter)
                 if (isPendingPayment) {
                     actionButtons += `
                         <button class="btn btn-sm btn-danger" onclick="cancelBooking(${booking.booking_id})" title="Cancel">
@@ -324,7 +318,6 @@ function displayBookings() {
                     `;
                 }
                 
-                // If paid online, show lock icon
                 if (isPaidOnline) {
                     actionButtons += `
                         <button class="btn btn-sm btn-outline-secondary" disabled title="Cannot cancel paid bookings">
@@ -342,12 +335,10 @@ function displayBookings() {
                 `;
             }
             
-            // Receipt and Review buttons
             actionButtons += `
                 <button class="btn btn-sm btn-outline-success" onclick="viewReceipt(${booking.booking_id})" title="Receipt">
                     <i class="fas fa-receipt"></i>
                 </button>
-                
             `;
             
             html += `
@@ -363,7 +354,7 @@ function displayBookings() {
                     </td>
                     <td class="align-middle small fw-bold">${formatDate(booking.check_in_date)}</td>
                     <td class="align-middle small fw-bold">${formatDate(booking.check_out_date)}</td>
-                    <td class="align-middle fw-bold text-success">$${parseFloat(booking.total_amount || 0).toFixed(2)}</td>
+                    <td class="align-middle fw-bold text-success">${window.formatPHP(booking.total_amount)}</td>
                     <td class="align-middle">${paymentBadge}</td>
                     <td class="align-middle"><span class="badge ${statusClass} px-3 py-2 shadow-sm">${statusText}</span></td>
                     <td class="align-middle text-center">
@@ -379,7 +370,6 @@ function displayBookings() {
     document.getElementById('bookingsTable').innerHTML = html;
 }
 
-// ============ NEW: Mark as Paid Function ============
 function markAsPaid(bookingId) {
     if(confirm('💰 Mark this booking as paid at the counter?\n\nThis confirms that the guest has paid in person.')) {
         var $btn = $(event.target).closest('button');
@@ -503,18 +493,10 @@ function viewReceipt(bookingId) {
     window.open(`/receipt/${bookingId}`, '_blank');
 }
 
-function addReview(bookingId) {
-    if (typeof ModalManager !== 'undefined' && ModalManager.showCommentModal) {
-        ModalManager.showCommentModal(bookingId);
-    } else {
-        alert('Please refresh the page and try again.');
-    }
-}
-
 function formatDate(dateString) {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString('en-PH', {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
@@ -545,8 +527,8 @@ function showNotification(message, type) {
     margin-top: 1.5rem;
     padding: 1rem 1.5rem;
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
     flex-wrap: wrap;
     gap: 1rem;
 }
@@ -588,6 +570,18 @@ function showNotification(message, type) {
 .page-dots {
     color: #9ca3af;
     font-weight: 700;
+}
+.dark-mode .pagination-container {
+    background: #1c2135;
+}
+.dark-mode .page-btn {
+    background: #2a2a3e;
+    border-color: rgba(255,255,255,0.1);
+    color: #d4cec4;
+}
+.dark-mode .page-btn:hover:not(:disabled) {
+    background: #353550;
+    border-color: #c9a84c;
 }
 </style>
 {% endblock %}

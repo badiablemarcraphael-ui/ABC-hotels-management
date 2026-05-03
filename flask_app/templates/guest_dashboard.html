@@ -2,14 +2,14 @@
 
 {% block content %}
 
-<div class="welcome-banner fade-in">
-    <h2 class="fw-bold mb-2"><i class="fas fa-hand-sparkles text-warning me-2"></i> Welcome back, {{ session.get('username') }}!</h2>
+<div class="welcome-banner fade-in p-4 mb-4 rounded-4 shadow-sm" style="background: linear-gradient(135deg, #1a2744, #243356); color: white;">
+    <h2 class="fw-bold mb-2"><i class="fas fa-hand-sparkles me-2" style="color: #c9a84c;"></i> Welcome back, {{ session.get('username') }}!</h2>
     <p class="mb-0 opacity-75 fs-5">Ready for your next stay? Browse our premium rooms below.</p>
 </div>
 
 <div class="row g-4">
     <div class="col-md-8">
-        <div class="card dashboard-card">
+        <div class="card dashboard-card shadow-sm" style="border-radius: 20px;">
             <div class="card-header border-0 pb-0 bg-transparent mt-3 ms-2">
                 <h4 class="mb-0 fw-bold"><i class="fas fa-bed text-primary me-2"></i> Available Rooms</h4>
             </div>
@@ -25,13 +25,13 @@
     </div>
     
     <div class="col-md-4">
-        <div class="card dashboard-card">
-            <div class="card-header text-white" style="background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); border-radius: 14px 14px 0 0;">
+        <div class="card dashboard-card shadow-sm" style="border-radius: 20px;">
+            <div class="card-header text-white" style="background: linear-gradient(135deg, #c9a84c 0%, #a88838 100%); border-radius: 20px 20px 0 0;">
                 <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-calendar-check me-2"></i> My Bookings</h5>
             </div>
-            <div class="card-body booking-history p-3" id="myBookings">
+            <div class="card-body booking-history p-3" id="myBookings" style="max-height: 600px; overflow-y: auto;">
                 <div class="text-center py-5">
-                    <i class="fas fa-spinner fa-spin fa-2x text-warning mb-3"></i>
+                    <i class="fas fa-spinner fa-spin fa-2x mb-3" style="color: #c9a84c;"></i>
                     <p class="text-muted fw-bold">Loading your itinerary...</p>
                 </div>
             </div>
@@ -40,7 +40,7 @@
 </div>
 
 <div class="text-center mt-4 fade-in">
-    <a href="/browse-rooms" class="btn btn-outline-primary btn-lg shadow-sm fw-bold px-5">
+    <a href="/browse-rooms" class="btn btn-outline-gold btn-lg shadow-sm fw-bold px-5 rounded-pill">
         <i class="fas fa-search me-2"></i>Browse All Rooms
     </a>
 </div>
@@ -73,22 +73,22 @@ function loadAvailableRooms() {
             availableRoomsData = rooms;
             let html = '';
             if (rooms.length === 0) {
-                html = '<div class="col-12 py-5"><p class="text-center text-muted fw-bold"><i class="fas fa-bed fa-2x mb-3 d-block"></i>No rooms available.</p></div>';
+                html = '<div class="col-12 py-5"><p class="text-center text-muted fw-bold"><i class="fas fa-bed fa-2x mb-3 d-block opacity-50"></i>No rooms available.</p></div>';
             } else {
                 rooms.forEach(function(room) {
                     var roomImage = room.image_path || '/static/uploads/rooms/default-room.jpg';
                     html += `
                         <div class="col-md-6 mb-2 fade-in">
-                            <div class="card room-card h-100 border-0 shadow-sm" style="overflow: hidden; border-radius: 12px;">
+                            <div class="card room-card h-100 border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
                                 <div class="room-image-container" style="height: 180px; overflow: hidden;">
                                     <img src="${roomImage}" alt="Room ${escapeHtml(room.room_number)}" 
-                                         style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;"
+                                         style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;"
                                          onerror="this.src='/static/uploads/rooms/default-room.jpg'">
                                 </div>
                                 <div class="card-body d-flex flex-column p-4">
                                     <div class="d-flex justify-content-between align-items-start mb-1">
                                         <h4 class="card-title fw-bold text-primary mb-0">Room ${escapeHtml(room.room_number)}</h4>
-                                        <div class="price-tag fw-bold text-success">$${parseFloat(room.base_price).toFixed(2)}<span class="text-muted fs-6 fw-normal">/night</span></div>
+                                        <div class="price-tag fw-bold text-success">${window.formatPHP(room.base_price)}<span class="text-muted fs-6 fw-normal">/night</span></div>
                                     </div>
                                     <h6 class="card-subtitle mb-3 text-muted fw-bold">${escapeHtml(room.type_name)}</h6>
                                     <div class="p-3 rounded mb-3 mt-auto" style="background: #f8fafc;">
@@ -115,20 +115,18 @@ function loadAvailableRooms() {
 }
 
 function openBookingModal(roomId) {
-    // Find room data
     var room = availableRoomsData.find(function(r) { return r.room_id == roomId; });
     if (!room) return;
     
     var roomImage = room.image_path || '/static/uploads/rooms/default-room.jpg';
     var roomName = 'Room ' + escapeHtml(room.room_number) + ' - ' + escapeHtml(room.type_name);
-    var roomPrice = '$' + parseFloat(room.base_price).toFixed(2);
+    var roomPrice = window.formatPHP(room.base_price);
     
-    // Build modal dynamically (same pattern as admin modals - NO backdrop issues)
     var modalHtml = `
         <div class="modal fade" id="guestBookingModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
-                    <div class="modal-header border-0" style="background: linear-gradient(135deg, #1a2744, #243356); border-radius: 16px 16px 0 0;">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                    <div class="modal-header border-0" style="background: linear-gradient(135deg, #1a2744, #243356); border-radius: 20px 20px 0 0;">
                         <h5 class="modal-title text-white fw-bold">
                             <i class="fas fa-calendar-plus me-2" style="color: #c9a84c;"></i> Book a Room
                         </h5>
@@ -158,17 +156,17 @@ function openBookingModal(roomId) {
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="fw-bold text-muted mb-1"><i class="fas fa-phone me-1"></i> Phone *</label>
-                                    <input type="tel" class="form-control shadow-sm" name="guest_phone" placeholder="Enter phone number" required>
+                                    <input type="tel" class="form-control shadow-sm" name="guest_phone" placeholder="+63 9XX XXX XXXX" required>
                                 </div>
                                 <div class="col-md-6 mb-3"></div>
                             </div>
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label class="fw-bold text-muted mb-1"><i class="fas fa-calendar-check me-1"></i> Check-in Date *</label>
+                                    <label class="fw-bold text-muted mb-1"><i class="fas fa-calendar-check me-1"></i> Check-in *</label>
                                     <input type="date" class="form-control shadow-sm" name="check_in" id="guestCheckIn" required>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="fw-bold text-muted mb-1"><i class="fas fa-calendar-times me-1"></i> Check-out Date *</label>
+                                    <label class="fw-bold text-muted mb-1"><i class="fas fa-calendar-times me-1"></i> Check-out *</label>
                                     <input type="date" class="form-control shadow-sm" name="check_out" id="guestCheckOut" required>
                                 </div>
                             </div>
@@ -187,13 +185,13 @@ function openBookingModal(roomId) {
                                 <input type="text" class="form-control shadow-sm" name="coupon_code" placeholder="Enter coupon code" style="text-transform: uppercase;">
                             </div>
                             
-                            <div class="alert alert-info mt-4 border-0 shadow-sm" style="background: rgba(14, 165, 233, 0.1);">
+                            <div class="alert alert-info mt-4 border-0 shadow-sm rounded-3" style="background: rgba(14, 165, 233, 0.1);">
                                 <i class="fas fa-info-circle me-2"></i> 
                                 <strong>Booking Summary:</strong> After confirming, you will be redirected to the secure payment portal.
                             </div>
                         </form>
                     </div>
-                    <div class="modal-footer bg-light border-0" style="border-radius: 0 0 16px 16px;">
+                    <div class="modal-footer bg-light border-0" style="border-radius: 0 0 20px 20px;">
                         <button type="button" class="btn btn-secondary shadow-sm" data-bs-dismiss="modal">Cancel</button>
                         <button type="button" class="btn btn-primary shadow-sm fw-bold" onclick="submitGuestBooking()">
                             Proceed to Payment <i class="fas fa-arrow-right ms-1"></i>
@@ -204,17 +202,14 @@ function openBookingModal(roomId) {
         </div>
     `;
     
-    // Remove existing modal and backdrop first
     $('#guestBookingModal').remove();
     $('.modal-backdrop').remove();
     $('body').removeClass('modal-open');
     $('body').css('overflow', '');
     $('body').css('padding-right', '');
     
-    // Append new modal
     $('body').append(modalHtml);
     
-    // Set dates
     var today = new Date().toISOString().split('T')[0];
     var tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -236,10 +231,8 @@ function openBookingModal(roomId) {
         }
     });
     
-    // Show modal
     $('#guestBookingModal').modal('show');
     
-    // Clean up when hidden - THIS IS THE KEY
     $('#guestBookingModal').on('hidden.bs.modal', function() {
         $('#guestBookingModal').remove();
         $('.modal-backdrop').remove();
@@ -278,7 +271,7 @@ function loadMyBookings() {
                 var paymentStatus = b.payment_status === 'paid' ? '<span class="badge bg-success">Paid</span>' : '<span class="badge bg-warning text-dark">Pending</span>';
                 
                 html += `
-                    <div class="booking-item fade-in p-3 mb-2 rounded shadow-sm" style="background: white; border: 1px solid #e9ecef;">
+                    <div class="booking-item fade-in p-3 mb-2 rounded-3 shadow-sm" style="background: white; border: 1px solid #e9ecef;">
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <div>
                                 <strong class="text-primary">Room ${escapeHtml(b.room_number)}</strong>
@@ -289,7 +282,7 @@ function loadMyBookings() {
                             <span class="badge ${statusClass}">${b.status}</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
-                            <strong class="text-success">$${parseFloat(b.total_amount || 0).toFixed(2)}</strong>
+                            <strong class="text-success">${window.formatPHP(b.total_amount)}</strong>
                             ${paymentStatus}
                         </div>
                         ${b.status === 'confirmed' && b.payment_status === 'pending' ? `
@@ -339,10 +332,8 @@ function submitGuestBooking() {
             if (response.success) {
                 showNotification('Booking created! Redirecting to payment...', 'success');
                 
-                // Hide modal (cleanup happens in hidden.bs.modal event)
                 $('#guestBookingModal').modal('hide');
                 
-                // Redirect to payment
                 if (response.redirect) {
                     setTimeout(function() {
                         window.location.href = response.redirect;
@@ -405,6 +396,8 @@ function showNotification(message, type) {
 
 <style>
 .room-image-container img:hover { transform: scale(1.05); }
-.card:hover { box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important; }
+.room-card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.12) !important; }
+.booking-item { transition: all 0.2s ease; }
+.booking-item:hover { transform: translateX(4px); border-left: 3px solid #c9a84c; }
 </style>
 {% endblock %}

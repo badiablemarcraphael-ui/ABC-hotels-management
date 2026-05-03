@@ -1,6 +1,7 @@
 // =====================================================
-// GRAND HOTEL MANAGEMENT SYSTEM — CORE JAVASCRIPT
+// ABC hotels MANAGEMENT SYSTEM — CORE JAVASCRIPT
 // Luxury Hotel 60-30-10 Design System Integration
+// Philippine Peso Currency | Enhanced Animations
 // =====================================================
 
 'use strict';
@@ -8,54 +9,38 @@
 // =====================================================
 // GLOBAL CONFIGURATION
 // =====================================================
-const GrandHotel = {
-    config: {
-        animationDuration: 300,
-        notificationDuration: 4000,
-        apiTimeout: 15000,
-        dateLocale: 'en-US',
-        currency: 'USD',
-        currencyLocale: 'en-US'
-    },
-    
-    // Luxury color palette for dynamic elements
-    colors: {
-        gold: '#c9a84c',
-        goldDark: '#a88838',
-        goldLight: '#dfc278',
-        navy: '#1a2744',
-        navyLight: '#2c3e6b',
-        bronze: '#8b7355',
-        cream: '#f5f0e8',
-        warmWhite: '#fdfcf9',
-        success: '#2d6a4f',
-        danger: '#8b3a3a',
-        warning: '#b8860b',
-        info: '#4a7c96'
-    }
+const GrandHotelConfig = {
+    animationDuration: 300,
+    notificationDuration: 4500,
+    apiTimeout: 15000,
+    dateLocale: 'en-PH',
+    currency: 'PHP',
+    currencyLocale: 'en-PH',
+    currencySymbol: '₱'
 };
 
 // =====================================================
 // ELEGANT NOTIFICATION SYSTEM
 // =====================================================
-window.showNotification = function(message, type = 'info', duration = GrandHotel.config.notificationDuration) {
+window.showNotification = function(message, type = 'info', duration = GrandHotelConfig.notificationDuration) {
     // Remove existing notifications with fade
     $('.grand-notification').addClass('notification-exit');
     setTimeout(() => $('.grand-notification').remove(), 400);
     
     const iconMap = {
-        success: { icon: 'fa-circle-check', border: GrandHotel.colors.success },
-        error: { icon: 'fa-circle-exclamation', border: GrandHotel.colors.danger },
-        warning: { icon: 'fa-triangle-exclamation', border: GrandHotel.colors.warning },
-        info: { icon: 'fa-circle-info', border: GrandHotel.colors.navy }
+        success: { icon: 'fa-circle-check', gradient: 'linear-gradient(135deg, #2d6a4f, #3d8b6a)' },
+        error: { icon: 'fa-circle-exclamation', gradient: 'linear-gradient(135deg, #8b3a3a, #a84848)' },
+        warning: { icon: 'fa-triangle-exclamation', gradient: 'linear-gradient(135deg, #b8860b, #d4a020)' },
+        info: { icon: 'fa-circle-info', gradient: 'linear-gradient(135deg, #1a2744, #2c3e6b)' }
     };
     
     const config = iconMap[type] || iconMap.info;
     
     const notification = $(`
         <div class="grand-notification" role="alert" aria-live="polite">
+            <div class="notification-glow" style="background: ${config.gradient};"></div>
             <div class="notification-content">
-                <div class="notification-icon">
+                <div class="notification-icon-wrapper" style="background: ${config.gradient};">
                     <i class="fas ${config.icon}"></i>
                 </div>
                 <div class="notification-body">
@@ -65,16 +50,19 @@ window.showNotification = function(message, type = 'info', duration = GrandHotel
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="notification-progress" style="background: ${config.border};"></div>
+            <div class="notification-progress-bar">
+                <div class="notification-progress-fill" style="background: ${config.gradient};"></div>
+            </div>
         </div>
     `);
     
     $('body').append(notification);
     
     // Animate progress bar
-    setTimeout(() => {
-        notification.find('.notification-progress').css('width', '0%');
-    }, 100);
+    requestAnimationFrame(() => {
+        notification.find('.notification-progress-fill').css('animation', 
+            `notificationShrink ${duration}ms linear forwards`);
+    });
     
     // Auto dismiss
     const timer = setTimeout(() => {
@@ -94,21 +82,28 @@ window.showNotification = function(message, type = 'info', duration = GrandHotel
     // Pause timer on hover
     notification.on('mouseenter', function() {
         clearTimeout(notification.data('timer'));
-        notification.find('.notification-progress').css('animation-play-state', 'paused');
+        notification.find('.notification-progress-fill').css('animation-play-state', 'paused');
     });
     
     notification.on('mouseleave', function() {
+        const remainingDuration = 2000;
+        const progressFill = notification.find('.notification-progress-fill');
+        const currentWidth = parseFloat(progressFill.css('width')) || 100;
+        const newDuration = (remainingDuration * currentWidth) / 100;
+        
+        progressFill.css('animation', `notificationShrink ${newDuration}ms linear forwards`);
+        
         const newTimer = setTimeout(() => {
             dismissNotification(notification);
-        }, 2000);
+        }, newDuration);
         notification.data('timer', newTimer);
-        notification.find('.notification-progress').css('animation-play-state', 'running');
+        progressFill.css('animation-play-state', 'running');
     });
 };
 
 function dismissNotification(notification) {
     notification.addClass('notification-exit');
-    setTimeout(() => notification.remove(), 400);
+    setTimeout(() => notification.remove(), 500);
 }
 
 // =====================================================
@@ -125,24 +120,29 @@ window.formatDate = function(dateString, format = 'long') {
     const options = {
         long: { year: 'numeric', month: 'long', day: 'numeric' },
         short: { year: 'numeric', month: 'short', day: 'numeric' },
-        time: { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' },
-        monthYear: { year: 'numeric', month: 'long' }
+        time: { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true },
+        monthYear: { year: 'numeric', month: 'long' },
+        iso: { year: 'numeric', month: '2-digit', day: '2-digit' }
     };
     
-    return date.toLocaleDateString(GrandHotel.config.dateLocale, options[format] || options.long);
+    return date.toLocaleDateString('en-PH', options[format] || options.long);
 };
 
-// Luxury Currency Formatter
-window.formatCurrency = function(amount, currency = GrandHotel.config.currency) {
-    if (amount === null || amount === undefined) return '$0.00';
+// Philippine Peso Currency Formatter
+window.formatPHP = function(amount) {
+    if (amount === null || amount === undefined) return '₱0.00';
     
-    return new Intl.NumberFormat(GrandHotel.config.currencyLocale, {
-        style: 'currency',
-        currency: currency,
+    const numAmount = parseFloat(amount);
+    if (isNaN(numAmount)) return '₱0.00';
+    
+    return '₱' + numAmount.toLocaleString('en-PH', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
-    }).format(amount);
+    });
 };
+
+// Alias for backward compatibility
+window.formatCurrency = window.formatPHP;
 
 // Calculate nights between two dates
 window.calculateNights = function(checkIn, checkOut) {
@@ -166,6 +166,11 @@ window.escapeHtml = function(text) {
     return String(text).replace(/[&<>"']/g, m => map[m]);
 };
 
+// Escape Regex Special Characters
+window.escapeRegex = function(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
+
 // Debounce function for search inputs
 window.debounce = function(func, wait) {
     let timeout;
@@ -179,23 +184,52 @@ window.debounce = function(func, wait) {
     };
 };
 
+// Generate Star HTML
+window.generateStars = function(rating) {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = (rating - fullStars) >= 0.5;
+    let html = '';
+    
+    for (let i = 1; i <= 5; i++) {
+        if (i <= fullStars) {
+            html += '<i class="fas fa-star text-warning"></i>';
+        } else if (i === fullStars + 1 && hasHalfStar) {
+            html += '<i class="fas fa-star-half-alt text-warning"></i>';
+        } else {
+            html += '<i class="far fa-star text-warning opacity-50"></i>';
+        }
+    }
+    
+    return html;
+};
+
+// Get Initials from Name
+window.getInitials = function(name) {
+    if (!name) return 'G';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+        return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return parts[0].substring(0, 2).toUpperCase();
+};
+
 // =====================================================
 // ELEGANT LOADING STATE MANAGEMENT
 // =====================================================
 window.showLoading = function(button, message = 'Processing...') {
     const $btn = $(button);
     const originalHtml = $btn.html();
-    const originalWidth = $btn.width();
+    const originalWidth = $btn.outerWidth();
     
     $btn.data('original-html', originalHtml);
     $btn.html(`
-        <span class="spinner-gold">
-            <i class="fas fa-spinner fa-pulse"></i>
-        </span>
-        <span class="loading-text">${message}</span>
+        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        <span>${message}</span>
     `);
     $btn.prop('disabled', true);
-    $btn.css('min-width', originalWidth + 'px');
+    if (originalWidth) {
+        $btn.css('min-width', originalWidth + 'px');
+    }
     
     return originalHtml;
 };
@@ -213,127 +247,105 @@ window.hideLoading = function(button) {
 };
 
 // =====================================================
-// LAZY LOADING FOR IMAGES
-// =====================================================
-window.initLazyLoading = function() {
-    if ('IntersectionObserver' in window) {
-        const imageObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const img = entry.target;
-                    img.src = img.dataset.src;
-                    img.classList.remove('lazy-image');
-                    img.classList.add('lazy-loaded');
-                    observer.unobserve(img);
-                }
-            });
-        }, {
-            rootMargin: '50px 0px',
-            threshold: 0.01
-        });
-        
-        document.querySelectorAll('img[data-src]').forEach(img => {
-            imageObserver.observe(img);
-        });
-    } else {
-        // Fallback for older browsers
-        document.querySelectorAll('img[data-src]').forEach(img => {
-            img.src = img.dataset.src;
-            img.classList.remove('lazy-image');
-        });
-    }
-};
-
-// =====================================================
 // INJECT LUXURY ANIMATION STYLES
 // =====================================================
 $('head').append(`
     <style>
-        /* Luxury Notification Styles */
+        /* =============================================
+           LUXURY NOTIFICATION STYLES
+           ============================================= */
         @keyframes notificationSlideIn {
             from {
-                transform: translateX(120%);
+                transform: translateX(120%) scale(0.9);
                 opacity: 0;
             }
             to {
-                transform: translateX(0);
+                transform: translateX(0) scale(1);
                 opacity: 1;
             }
         }
         
         @keyframes notificationSlideOut {
             from {
-                transform: translateX(0);
+                transform: translateX(0) scale(1);
                 opacity: 1;
             }
             to {
-                transform: translateX(120%);
+                transform: translateX(120%) scale(0.9);
                 opacity: 0;
             }
         }
         
-        @keyframes progressShrink {
+        @keyframes notificationShrink {
             from { width: 100%; }
             to { width: 0%; }
         }
         
-        @keyframes goldPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
+        @keyframes notificationGlowPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
         }
         
         .grand-notification {
             position: fixed;
-            top: 24px;
+            top: 80px;
             right: 24px;
             z-index: 9999;
             min-width: 360px;
-            max-width: 480px;
-            background: var(--warm-white, #fdfcf9);
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(26, 39, 68, 0.12), 0 2px 8px rgba(201, 168, 76, 0.08);
+            max-width: 500px;
+            background: #fdfcf9;
+            border-radius: 16px;
+            box-shadow: 0 12px 48px rgba(10, 15, 26, 0.15), 0 4px 16px rgba(201, 168, 76, 0.1);
             overflow: hidden;
-            animation: notificationSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            border-left: 4px solid var(--gold-500, #c9a84c);
+            animation: notificationSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid rgba(201, 168, 76, 0.15);
         }
         
         .grand-notification.notification-exit {
-            animation: notificationSlideOut 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation: notificationSlideOut 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        
+        .notification-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            opacity: 0.8;
         }
         
         .notification-content {
             display: flex;
             align-items: flex-start;
-            padding: 16px 20px;
+            padding: 18px 20px;
             gap: 14px;
         }
         
-        .notification-icon {
+        .notification-icon-wrapper {
             flex-shrink: 0;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.1rem;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
-        
-        .notification-icon .fa-circle-check { color: var(--success, #2d6a4f); }
-        .notification-icon .fa-circle-exclamation { color: var(--danger, #8b3a3a); }
-        .notification-icon .fa-triangle-exclamation { color: var(--warning, #b8860b); }
-        .notification-icon .fa-circle-info { color: var(--navy-900, #1a2744); }
         
         .notification-body {
             flex: 1;
             min-width: 0;
+            display: flex;
+            align-items: center;
         }
         
         .notification-message {
             margin: 0;
-            font-size: 0.9rem;
+            font-size: 0.92rem;
             font-weight: 500;
-            color: var(--navy-900, #1a2744);
+            color: #1a2744;
             line-height: 1.5;
         }
         
@@ -341,75 +353,120 @@ $('head').append(`
             flex-shrink: 0;
             background: none;
             border: none;
-            color: var(--bronze-500, #a89269);
+            color: #8b7355;
             cursor: pointer;
-            padding: 4px;
+            padding: 6px;
             border-radius: 50%;
             transition: all 0.2s ease;
             font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
         }
         
         .notification-close:hover {
-            color: var(--navy-900, #1a2744);
+            color: #1a2744;
+            background: rgba(0, 0, 0, 0.05);
+            transform: rotate(90deg);
+        }
+        
+        .notification-progress-bar {
+            height: 3px;
             background: rgba(0, 0, 0, 0.05);
         }
         
-        .notification-progress {
-            height: 3px;
+        .notification-progress-fill {
+            height: 100%;
             width: 100%;
-            animation: progressShrink 4s linear forwards;
+            transform-origin: left;
         }
         
         /* Dark Mode Notifications */
         .dark-mode .grand-notification {
-            background: var(--dark-surface, #1e1e30);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            background: #1c2135;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
+            border-color: rgba(201, 168, 76, 0.08);
         }
         
         .dark-mode .notification-message {
-            color: var(--taupe, #e8e0d5);
+            color: #d4cec4;
         }
         
         .dark-mode .notification-close {
-            color: var(--bronze-400, #c4b393);
+            color: #8b8a95;
         }
         
-        /* Gold Spinner */
-        .spinner-gold {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+        .dark-mode .notification-close:hover {
+            color: #d4cec4;
+            background: rgba(255, 255, 255, 0.05);
         }
         
-        .spinner-gold i {
-            color: var(--gold-500, #c9a84c);
-            animation: goldPulse 1.5s ease-in-out infinite;
+        /* =============================================
+           ENHANCED ANIMATIONS
+           ============================================= */
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
         
-        .loading-text {
-            margin-left: 8px;
-            font-weight: 500;
-            color: inherit;
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
         
-        /* Lazy Loading Images */
-        .lazy-image {
-            opacity: 0;
-            transition: opacity 0.5s ease;
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(201, 168, 76, 0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(201, 168, 76, 0); }
         }
         
-        .lazy-loaded {
-            opacity: 1;
+        .hover-lift {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         
-        /* Responsive Notifications */
+        .hover-lift:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 36px rgba(10, 15, 26, 0.12);
+        }
+        
+        /* =============================================
+           PHILIPPINE PESO STYLING
+           ============================================= */
+        .currency-peso::before {
+            content: "₱";
+            margin-right: 2px;
+            font-weight: 700;
+        }
+        
+        .currency-amount::before {
+            content: "₱";
+            margin-right: 2px;
+            font-weight: 700;
+        }
+        
+        /* =============================================
+           RESPONSIVE NOTIFICATIONS
+           ============================================= */
         @media (max-width: 576px) {
             .grand-notification {
                 min-width: auto;
                 max-width: calc(100vw - 32px);
                 left: 16px;
                 right: 16px;
-                top: 16px;
+                top: 70px;
             }
         }
     </style>
@@ -419,14 +476,16 @@ $('head').append(`
 // INITIALIZATION
 // =====================================================
 $(document).ready(function() {
-    console.log('🏨 Grand Hotel Core System — Initialized');
-    console.log('✨ Luxury Design System v2.0 Active');
-    
-    // Initialize lazy loading for images
-    window.initLazyLoading();
+    console.log('%c🏨 ABC hotels Core System — Initialized',
+        'color: #c9a84c; font-size: 1.1em; font-weight: bold;');
+    console.log('%c✨ Luxury Design System v2.5 Active | Philippine Peso (₱) Mode',
+        'color: #8b7355;');
     
     // Global AJAX error handler
     $(document).ajaxError(function(event, jqXHR, settings, error) {
+        // Skip notification for aborted requests
+        if (jqXHR.statusText === 'abort') return;
+        
         if (jqXHR.status === 401) {
             window.showNotification('Session expired. Redirecting to login...', 'warning', 3000);
             setTimeout(() => {
@@ -434,27 +493,43 @@ $(document).ready(function() {
             }, 2000);
         } else if (jqXHR.status === 403) {
             window.showNotification('Access denied. Insufficient permissions.', 'error');
+        } else if (jqXHR.status === 404) {
+            window.showNotification('Resource not found. Please try again.', 'error');
+        } else if (jqXHR.status === 0) {
+            window.showNotification('Network error. Please check your connection.', 'error');
         } else if (jqXHR.status >= 500) {
             window.showNotification('Server error. Please try again later.', 'error');
         }
         
         console.error('AJAX Error:', {
             url: settings.url,
+            method: settings.type,
             status: jqXHR.status,
+            statusText: jqXHR.statusText,
             error: error
         });
     });
     
-    // Global AJAX complete handler to hide any lingering loading states
+    // Global AJAX complete handler
     $(document).ajaxComplete(function() {
+        // Restore any buttons that might be stuck in loading state
         $('.btn:disabled').each(function() {
             const $btn = $(this);
             const originalHtml = $btn.data('original-html');
-            if (originalHtml) {
+            if (originalHtml && $btn.find('.spinner-border').length) {
                 window.hideLoading($btn);
             }
         });
     });
+    
+    // Prevent double form submissions
+    $('form').on('submit', function() {
+        const $submitBtn = $(this).find('button[type="submit"]');
+        if ($submitBtn.prop('disabled')) {
+            return false;
+        }
+    });
 });
 
-console.log('✅ main.js loaded — Grand Hotel Luxury Management System');
+console.log('✅ main.js loaded — ABC hotels Luxury Management System (PHP Mode)');
+

@@ -3,8 +3,8 @@
 {% block content %}
 
 <div class="d-flex justify-content-between align-items-center mb-4 fade-in">
-    <h2 class="fw-bold"><i class="fas fa-search text-primary me-2"></i> Browse Rooms</h2>
-    <a href="/dashboard" class="btn btn-outline-primary shadow-sm fw-bold">
+    <h2 class="fw-bold mb-0"><i class="fas fa-search text-primary me-2"></i> Browse Rooms</h2>
+    <a href="/dashboard" class="btn btn-outline-primary shadow-sm fw-bold rounded-pill">
         <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
     </a>
 </div>
@@ -16,13 +16,13 @@
             <input type="text" id="searchRooms" class="form-control shadow-sm" placeholder="Search by room number or type...">
         </div>
         <div class="col-md-3">
-            <label for="priceFilterBrowse" class="fw-bold text-muted mb-1"><i class="fas fa-dollar-sign me-1"></i> Price Range</label>
+            <label for="priceFilterBrowse" class="fw-bold text-muted mb-1"><i class="fas fa-peso-sign me-1"></i> Price Range</label>
             <select id="priceFilterBrowse" class="form-select shadow-sm">
                 <option value="all">All Prices</option>
-                <option value="under100">Under $100</option>
-                <option value="100to200">$100 - $200</option>
-                <option value="200to300">$200 - $300</option>
-                <option value="over300">Over $300</option>
+                <option value="under100">Under ₱100</option>
+                <option value="100to200">₱100 - ₱200</option>
+                <option value="200to300">₱200 - ₱300</option>
+                <option value="over300">Over ₱300</option>
             </select>
         </div>
         <div class="col-md-3">
@@ -114,15 +114,15 @@ function displayBrowseRooms(rooms) {
     } else {
         rooms.forEach(function(room) {
             var img = room.image_path || '/static/uploads/rooms/default-room.jpg';
-            var price = parseFloat(room.base_price || 0).toFixed(2);
+            var price = window.formatPHP(room.base_price);
             html += `
-                <div class="col-md-6 col-lg-4">
-                    <div class="card shadow-sm h-100 border-0" style="border-radius: 16px; overflow: hidden; transition: all 0.3s ease;">
+                <div class="col-md-6 col-lg-4 fade-in">
+                    <div class="card shadow-sm h-100 border-0 room-browse-card" style="border-radius: 20px; overflow: hidden;">
                         <div style="height: 220px; overflow: hidden; position: relative;">
                             <img src="${img}" alt="Room ${escapeHtml(room.room_number)}" 
                                  style="width:100%;height:100%;object-fit:cover;transition:transform 0.5s ease;" 
                                  onerror="this.src='/static/uploads/rooms/default-room.jpg'" class="room-hover-img">
-                            <span class="badge bg-success position-absolute top-0 end-0 m-3">Available</span>
+                            <span class="badge bg-success position-absolute top-0 end-0 m-3 px-3 py-2 shadow-sm">Available</span>
                         </div>
                         <div class="card-body d-flex flex-column p-4">
                             <div class="d-flex justify-content-between align-items-start mb-2">
@@ -131,7 +131,7 @@ function displayBrowseRooms(rooms) {
                                     <small class="text-muted fw-bold">${escapeHtml(room.type_name)}</small>
                                 </div>
                             </div>
-                            <div class="my-3 p-3 rounded" style="background:#f8f9fa;">
+                            <div class="my-3 p-3 rounded-3" style="background:#f8fafc;">
                                 <div class="d-flex justify-content-between">
                                     <span class="fw-bold"><i class="fas fa-layer-group me-1 text-muted"></i> Floor ${room.floor}</span>
                                     <span class="fw-bold"><i class="fas fa-users me-1 text-muted"></i> ${room.capacity} pax</span>
@@ -139,10 +139,10 @@ function displayBrowseRooms(rooms) {
                             </div>
                             <div class="mt-auto">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <span class="fs-4 fw-bold text-success">$${price}</span>
+                                    <span class="fs-4 fw-bold text-success">${price}</span>
                                     <small class="text-muted">per night</small>
                                 </div>
-                                <button class="btn btn-primary w-100 fw-bold shadow-sm" onclick="openBrowseBooking(${room.room_id}, '${escapeHtml(room.room_number)}', '${escapeHtml(room.type_name)}', '${escapeHtml(img)}', ${price})" style="border-radius: 8px;">
+                                <button class="btn btn-primary w-100 fw-bold shadow-sm" onclick="openBrowseBooking(${room.room_id}, '${escapeHtml(room.room_number)}', '${escapeHtml(room.type_name)}', '${escapeHtml(img)}', '${escapeHtml(price)}')" style="border-radius: 10px;">
                                     <i class="fas fa-calendar-plus me-2"></i>Book Now
                                 </button>
                             </div>
@@ -156,12 +156,11 @@ function displayBrowseRooms(rooms) {
 }
 
 function openBrowseBooking(roomId, roomNumber, typeName, image, price) {
-    // Build modal HTML dynamically (same pattern as your admin modals)
     var modalHtml = `
         <div class="modal fade" id="browseBookingModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
-                    <div class="modal-header border-0" style="background: linear-gradient(135deg, #1a2744, #243356); border-radius: 16px 16px 0 0;">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                    <div class="modal-header border-0" style="background: linear-gradient(135deg, #1a2744, #243356); border-radius: 20px 20px 0 0;">
                         <h5 class="modal-title text-white fw-bold">
                             <i class="fas fa-calendar-plus me-2" style="color: #c9a84c;"></i> Book This Room
                         </h5>
@@ -172,7 +171,7 @@ function openBrowseBooking(roomId, roomNumber, typeName, image, price) {
                             <img src="${image}" style="width:120px;height:80px;object-fit:cover;border-radius:8px;" onerror="this.src='/static/uploads/rooms/default-room.jpg'">
                             <div>
                                 <h6 class="fw-bold mb-1">Room ${escapeHtml(roomNumber)} - ${escapeHtml(typeName)}</h6>
-                                <span class="badge bg-success fs-6">$${price}/night</span>
+                                <span class="badge bg-success fs-6">${price}/night</span>
                             </div>
                         </div>
                         <form id="browseBookingForm">
@@ -218,13 +217,13 @@ function openBrowseBooking(roomId, roomNumber, typeName, image, price) {
                                 <label class="fw-bold text-muted mb-1">Coupon Code</label>
                                 <input type="text" class="form-control shadow-sm" name="coupon_code" placeholder="Enter coupon code" style="text-transform: uppercase;">
                             </div>
-                            <div class="alert alert-info mt-4 border-0 shadow-sm" style="background: rgba(14, 165, 233, 0.1);">
+                            <div class="alert alert-info mt-4 border-0 shadow-sm rounded-3" style="background: rgba(14, 165, 233, 0.1);">
                                 <i class="fas fa-info-circle me-2"></i> 
                                 <strong>Booking Summary:</strong> After confirming, you will be redirected to the secure payment portal.
                             </div>
                         </form>
                     </div>
-                    <div class="modal-footer bg-light border-0" style="border-radius: 0 0 16px 16px;">
+                    <div class="modal-footer bg-light border-0" style="border-radius: 0 0 20px 20px;">
                         <button type="button" class="btn btn-secondary shadow-sm" data-bs-dismiss="modal">Cancel</button>
                         <button type="button" class="btn btn-primary shadow-sm fw-bold" onclick="submitBrowseBooking()">
                             Proceed to Payment <i class="fas fa-arrow-right ms-1"></i>
@@ -235,17 +234,14 @@ function openBrowseBooking(roomId, roomNumber, typeName, image, price) {
         </div>
     `;
     
-    // Remove existing modal if any
     $('#browseBookingModal').remove();
     $('.modal-backdrop').remove();
     $('body').removeClass('modal-open');
     $('body').css('overflow', '');
     $('body').css('padding-right', '');
     
-    // Append new modal
     $('body').append(modalHtml);
     
-    // Set dates
     var today = new Date().toISOString().split('T')[0];
     var tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
@@ -259,18 +255,15 @@ function openBrowseBooking(roomId, roomNumber, typeName, image, price) {
         if (checkIn) {
             var nextDay = new Date(checkIn);
             nextDay.setDate(nextDay.getDate() + 1);
-            var nextDayStr = nextDay.toISOString().split('T')[0];
-            $('#browseCheckOut').attr('min', nextDayStr);
-            if ($('#browseCheckOut').val() < nextDayStr) {
-                $('#browseCheckOut').val(nextDayStr);
+            $('#browseCheckOut').attr('min', nextDay.toISOString().split('T')[0]);
+            if ($('#browseCheckOut').val() < nextDay.toISOString().split('T')[0]) {
+                $('#browseCheckOut').val(nextDay.toISOString().split('T')[0]);
             }
         }
     });
     
-    // Show modal
     $('#browseBookingModal').modal('show');
     
-    // Clean up when hidden - THIS IS THE KEY PART FROM YOUR ADMIN MODALS
     $('#browseBookingModal').on('hidden.bs.modal', function() {
         $('#browseBookingModal').remove();
         $('.modal-backdrop').remove();
@@ -281,19 +274,6 @@ function openBrowseBooking(roomId, roomNumber, typeName, image, price) {
 }
 
 function submitBrowseBooking() {
-    var roomId = $('[name="room_id"]').val();
-    if (!roomId) {
-        showNotification('Please select a room', 'warning');
-        return;
-    }
-    
-    var checkIn = $('#browseCheckIn').val();
-    var checkOut = $('#browseCheckOut').val();
-    if (!checkIn || !checkOut) {
-        showNotification('Please select dates', 'warning');
-        return;
-    }
-    
     var $btn = $('#browseBookingModal .btn-primary');
     var originalText = $btn.html();
     $btn.html('<span class="spinner-border spinner-border-sm me-2"></span> Processing...').prop('disabled', true);
@@ -305,15 +285,9 @@ function submitBrowseBooking() {
         success: function(response) {
             if (response.success) {
                 showNotification('Booking created! Redirecting to payment...', 'success');
-                
-                // Hide modal
                 $('#browseBookingModal').modal('hide');
-                
-                // Redirect to payment
                 if (response.redirect) {
-                    setTimeout(function() {
-                        window.location.href = response.redirect;
-                    }, 1500);
+                    setTimeout(function() { window.location.href = response.redirect; }, 1500);
                 } else {
                     loadBrowseRooms();
                 }
@@ -324,9 +298,7 @@ function submitBrowseBooking() {
         },
         error: function(xhr) {
             var message = 'Error creating booking';
-            if (xhr.responseJSON && xhr.responseJSON.message) {
-                message = xhr.responseJSON.message;
-            }
+            if (xhr.responseJSON && xhr.responseJSON.message) message = xhr.responseJSON.message;
             showNotification(message, 'error');
             $btn.html(originalText).prop('disabled', false);
         }
@@ -351,25 +323,13 @@ function showNotification(message, type) {
     if (typeof window.showNotification === 'function') {
         window.showNotification(message, type);
     } else {
-        var alertClass = type === 'error' ? 'danger' : (type === 'success' ? 'success' : (type === 'warning' ? 'warning' : 'info'));
-        var icon = type === 'error' ? 'fa-exclamation-circle' : (type === 'success' ? 'fa-check-circle' : 'fa-info-circle');
-        var alertHtml = `
-            <div class="alert alert-${alertClass} alert-dismissible fade show border-0 shadow-lg" role="alert" 
-                 style="position: fixed; top: 20px; right: 20px; z-index: 99999; min-width: 320px; border-radius: 12px;">
-                <i class="fas ${icon} me-2"></i><strong>${message}</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        `;
-        jQuery('body').append(alertHtml);
-        setTimeout(function() {
-            jQuery('.alert').fadeOut(500, function() { jQuery(this).remove(); });
-        }, 4000);
+        alert(message);
     }
 }
 </script>
 
 <style>
-.room-hover-img:hover { transform: scale(1.05); }
-.card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.12) !important; }
+.room-browse-card:hover { transform: translateY(-8px); box-shadow: 0 20px 50px rgba(0,0,0,0.15) !important; }
+.room-hover-img:hover { transform: scale(1.08); }
 </style>
 {% endblock %}

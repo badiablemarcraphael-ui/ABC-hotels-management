@@ -3,15 +3,19 @@
 {% block content %}
 
 <div class="d-flex justify-content-between align-items-center mb-2 fade-in">
-    <h2 class="fw-bold"><i class="fas fa-bed text-primary me-2"></i> Room Management</h2>
+    <h2 class="fw-bold mb-0"><i class="fas fa-bed text-primary me-2"></i> Room Management</h2>
 </div>
 
 <ul class="nav luxury-tabs fade-in" style="animation-delay: 0.1s;">
     <li class="nav-item">
-        <a class="nav-link active" data-bs-toggle="tab" href="#rooms"><i class="fas fa-door-closed me-2"></i>Rooms</a>
+        <a class="nav-link active" data-bs-toggle="tab" href="#rooms">
+            <i class="fas fa-door-closed me-2"></i>Rooms
+        </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" data-bs-toggle="tab" href="#roomTypes"><i class="fas fa-tags me-2"></i>Room Types</a>
+        <a class="nav-link" data-bs-toggle="tab" href="#roomTypes">
+            <i class="fas fa-tags me-2"></i>Room Types
+        </a>
     </li>
 </ul>
 
@@ -23,10 +27,10 @@
             <div class="row align-items-end g-3">
                 <div class="col-md-3">
                     <label for="roomSearchInput" class="fw-bold text-muted mb-1"><i class="fas fa-search me-1"></i> Search Rooms</label>
-                    <input type="text" id="roomSearchInput" class="form-control shadow-sm" placeholder="Search by room number or type...">
+                    <input type="text" id="roomSearchInput" class="form-control shadow-sm" placeholder="Room number or type...">
                 </div>
                 <div class="col-md-2">
-                    <label for="roomStatusFilter" class="fw-bold text-muted mb-1"><i class="fas fa-filter me-1"></i> Filter by Status</label>
+                    <label for="roomStatusFilter" class="fw-bold text-muted mb-1"><i class="fas fa-filter me-1"></i> Status</label>
                     <select id="roomStatusFilter" class="form-select shadow-sm">
                         <option value="all">All Status</option>
                         <option value="available">Available</option>
@@ -36,7 +40,7 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <label for="floorFilter" class="fw-bold text-muted mb-1"><i class="fas fa-layer-group me-1"></i> Filter by Floor</label>
+                    <label for="floorFilter" class="fw-bold text-muted mb-1"><i class="fas fa-layer-group me-1"></i> Floor</label>
                     <select id="floorFilter" class="form-select shadow-sm">
                         <option value="all">All Floors</option>
                         <option value="1">Floor 1</option>
@@ -85,17 +89,17 @@
         <div class="filter-bar">
             <div class="row align-items-end g-3">
                 <div class="col-md-4">
-                    <label for="roomTypeSearchInput" class="fw-bold text-muted mb-1"><i class="fas fa-search me-1"></i> Search Room Types</label>
-                    <input type="text" id="roomTypeSearchInput" class="form-control shadow-sm" placeholder="Search by type name...">
+                    <label for="roomTypeSearchInput" class="fw-bold text-muted mb-1"><i class="fas fa-search me-1"></i> Search Types</label>
+                    <input type="text" id="roomTypeSearchInput" class="form-control shadow-sm" placeholder="Type name...">
                 </div>
                 <div class="col-md-3">
-                    <label for="priceFilter" class="fw-bold text-muted mb-1"><i class="fas fa-dollar-sign me-1"></i> Filter by Price</label>
+                    <label for="priceFilter" class="fw-bold text-muted mb-1"><i class="fas fa-peso-sign me-1"></i> Price Range</label>
                     <select id="priceFilter" class="form-select shadow-sm">
                         <option value="all">All Prices</option>
-                        <option value="under100">Under $100</option>
-                        <option value="100to200">$100 - $200</option>
-                        <option value="200to300">$200 - $300</option>
-                        <option value="over300">Over $300</option>
+                        <option value="under100">Under ₱100</option>
+                        <option value="100to200">₱100 - ₱200</option>
+                        <option value="200to300">₱200 - ₱300</option>
+                        <option value="over300">Over ₱300</option>
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -123,13 +127,13 @@
             </div>
         </div>
         
-        <div class="table-responsive shadow-sm" style="border-radius: 12px;">
+        <div class="table-responsive shadow-sm" style="border-radius: 16px;">
             <table class="table table-bordered table-hover mb-0">
                 <thead style="background: linear-gradient(135deg, #1a2744 0%, #243356 100%);">
                     <tr>
                         <th class="py-3 text-white" style="border-bottom: 2px solid #c9a84c;">ID</th>
                         <th class="py-3 text-white" style="border-bottom: 2px solid #c9a84c;">Type</th>
-                        <th class="py-3 text-white" style="border-bottom: 2px solid #c9a84c;">Price</th>
+                        <th class="py-3 text-white" style="border-bottom: 2px solid #c9a84c;">Price/Night</th>
                         <th class="py-3 text-white" style="border-bottom: 2px solid #c9a84c;">Capacity</th>
                         <th class="py-3 text-white text-center" style="border-bottom: 2px solid #c9a84c;">Actions</th>
                     </tr>
@@ -180,10 +184,9 @@
 
 var allRooms = [];
 var allRoomTypes = [];
-var roomSortOrder = 0; // 0 = status order, 1 = price low-high, 2 = price high-low, 3 = room number asc, 4 = room number desc
+var roomSortOrder = 0;
 var typeSortAscending = true;
 
-// ============ ROOM SORT TOGGLE ============
 function toggleRoomSort() {
     roomSortOrder = (roomSortOrder + 1) % 5;
     const labels = ['Status Order', 'Price: Low to High', 'Price: High to Low', 'Room #: A to Z', 'Room #: Z to A'];
@@ -193,15 +196,12 @@ function toggleRoomSort() {
     filterRooms();
 }
 
-// ============ ROOM TYPE SORT TOGGLE ============
 function toggleTypeSort() {
     typeSortAscending = !typeSortAscending;
     $('#typeSortLabel').text(typeSortAscending ? 'Low to High' : 'High to Low');
     $('#typeSortBtn i').toggleClass('fa-sort-amount-down fa-sort-amount-up');
     filterRoomTypes();
 }
-
-// ============ ROOMS FUNCTIONS ============
 
 function loadRooms() {
     jQuery.ajax({
@@ -232,7 +232,7 @@ function loadRoomTypeSelect() {
                 select.empty();
                 select.append('<option value="">Select Type</option>');
                 data.forEach(function(type) {
-                    select.append(`<option value="${type.type_id}">${escapeHtml(type.type_name)} - $${parseFloat(type.base_price).toFixed(2)}</option>`);
+                    select.append(`<option value="${type.type_id}">${escapeHtml(type.type_name)} - ${window.formatPHP(type.base_price)}</option>`);
                 });
             }
         }
@@ -257,8 +257,6 @@ function filterRooms() {
         return true;
     });
     
-    // Sort based on selected order
-    // STATUS ORDER: 1. Available, 2. Booked, 3. Cleaning, 4. Maintenance
     const statusOrder = { 
         'available': 1, 
         'booked': 2, 
@@ -267,31 +265,30 @@ function filterRooms() {
     };
     
     switch(roomSortOrder) {
-        case 0: // Status order: Available → Booked → Cleaning → Maintenance
+        case 0:
             filtered.sort(function(a, b) {
                 var statusA = statusOrder[a.status] !== undefined ? statusOrder[a.status] : 99;
                 var statusB = statusOrder[b.status] !== undefined ? statusOrder[b.status] : 99;
                 if (statusA !== statusB) return statusA - statusB;
-                // If same status, sort by room number
                 return a.room_number.localeCompare(b.room_number, undefined, {numeric: true});
             });
             break;
-        case 1: // Price low to high
+        case 1:
             filtered.sort(function(a, b) {
                 return (parseFloat(a.base_price) || 0) - (parseFloat(b.base_price) || 0);
             });
             break;
-        case 2: // Price high to low
+        case 2:
             filtered.sort(function(a, b) {
                 return (parseFloat(b.base_price) || 0) - (parseFloat(a.base_price) || 0);
             });
             break;
-        case 3: // Room number A-Z (ascending)
+        case 3:
             filtered.sort(function(a, b) {
                 return a.room_number.localeCompare(b.room_number, undefined, {numeric: true});
             });
             break;
-        case 4: // Room number Z-A (descending)
+        case 4:
             filtered.sort(function(a, b) {
                 return b.room_number.localeCompare(a.room_number, undefined, {numeric: true});
             });
@@ -358,16 +355,16 @@ function displayRooms(rooms) {
             
             html += `
                 <div class="col-md-4 col-lg-3 fade-in">
-                    <div class="admin-room-card shadow-sm" style="border-top: 4px solid ${statusColorVar}; border-radius: 12px; overflow: hidden; background: white;">
+                    <div class="admin-room-card shadow-sm" style="border-top: 4px solid ${statusColorVar}; border-radius: 16px; overflow: hidden; background: white; transition: all 0.3s ease;">
                         <div class="room-image-container" style="height: 200px; overflow: hidden;">
                             <img src="${roomImage}" alt="Room ${room.room_number}" 
-                                 style="width: 100%; height: 100%; object-fit: cover;"
+                                 style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;"
                                  onerror="this.src='/static/uploads/rooms/default-room.jpg'">
                         </div>
                         <div class="card-body p-3">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <h5 class="fw-bold mb-0 text-dark">Room ${displayRoomNumber}</h5>
-                                <span class="room-status-badge ${statusClass} shadow-sm" style="font-size: 0.75rem;">${statusText}</span>
+                                <span class="room-status-badge ${statusClass} shadow-sm" style="font-size: 0.7rem; padding: 0.3rem 0.7rem; border-radius: 20px; font-weight: 600;">${statusText}</span>
                             </div>
                             
                             <p class="text-primary fw-bold mb-2" style="font-size: 0.9rem;">${displayTypeName}</p>
@@ -379,7 +376,7 @@ function displayRooms(rooms) {
                                 </div>
                                 <div class="d-flex justify-content-between">
                                     <span class="text-muted small"><i class="fas fa-tag me-1"></i>Price</span>
-                                    <strong class="text-success">$${parseFloat(room.base_price).toFixed(2)}/nt</strong>
+                                    <strong class="text-success">${window.formatPHP(room.base_price)}/nt</strong>
                                 </div>
                             </div>
                             
@@ -423,8 +420,6 @@ function resetRoomFilters() {
     filterRooms();
 }
 
-// ============ ROOM CRUD OPERATIONS ============
-
 function showAddRoomModal() {
     loadRoomTypeSelect();
     createRoomModal(null);
@@ -438,11 +433,7 @@ function editRoom(roomId) {
             createRoomModal(data);
         },
         error: function(xhr) {
-            if (typeof showNotification === 'function') {
-                showNotification('Error loading room details', 'error');
-            } else {
-                alert('Error loading room details');
-            }
+            showNotification('Error loading room details', 'error');
         }
     });
 }
@@ -464,7 +455,7 @@ function createRoomModal(roomData) {
             var typeOptions = '<option value="">-- Select Room Type --</option>';
             types.forEach(function(type) {
                 var selected = (typeId == type.type_id) ? 'selected' : '';
-                typeOptions += `<option value="${type.type_id}" ${selected}>${escapeHtml(type.type_name)} - $${parseFloat(type.base_price).toFixed(2)}/night</option>`;
+                typeOptions += `<option value="${type.type_id}" ${selected}>${escapeHtml(type.type_name)} - ${window.formatPHP(type.base_price)}/night</option>`;
             });
             
             var imageHtml = '';
@@ -472,7 +463,7 @@ function createRoomModal(roomData) {
                 imageHtml = `
                     <div id="currentImagePreview" class="mb-3">
                         <div class="position-relative d-inline-block">
-                            <img src="${imagePath}" alt="Room Image" style="width: 100px; height: 100px; object-fit: cover; border-radius: 10px; border: 2px solid var(--gold);">
+                            <img src="${imagePath}" alt="Room Image" style="width: 100px; height: 100px; object-fit: cover; border-radius: 12px; border: 2px solid #c9a84c;">
                             <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 rounded-circle" onclick="removeCurrentImageFromModal()" style="transform: translate(30%, -30%);">&times;</button>
                         </div>
                     </div>
@@ -480,10 +471,10 @@ function createRoomModal(roomData) {
             }
             
             var modalHtml = `
-                <div class="modal fade" id="roomModal" tabindex="-1" aria-hidden="true" style="z-index: 9999;">
+                <div class="modal fade grand-modal" id="roomModal" tabindex="-1" aria-hidden="true">
                     <div class="modal-dialog modal-lg modal-dialog-centered">
-                        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; background: white;">
-                            <div class="modal-header border-0" style="background: linear-gradient(135deg, #1a2744, #243356); border-radius: 16px 16px 0 0;">
+                        <div class="modal-content" style="border-radius: 20px; background: white;">
+                            <div class="modal-header" style="background: linear-gradient(135deg, #1a2744, #243356); border-radius: 20px 20px 0 0;">
                                 <h5 class="modal-title text-white fw-bold">
                                     <i class="fas fa-door-closed me-2" style="color: #c9a84c;"></i>
                                     ${isEdit ? 'Edit Room' : 'Add New Room'}
@@ -539,7 +530,7 @@ function createRoomModal(roomData) {
                                         <small class="text-muted mt-2 d-block"><i class="fas fa-info-circle me-1"></i> Accepted formats: JPG, PNG, GIF, WEBP. Max size: 5MB</small>
                                     </div>
                                 </div>
-                                <div class="modal-footer border-0" style="background: #f8f9fa; border-radius: 0 0 16px 16px;">
+                                <div class="modal-footer" style="background: #f8f9fa; border-radius: 0 0 20px 20px;">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                     <button type="submit" class="btn btn-primary">Save Room</button>
                                 </div>
@@ -669,7 +660,6 @@ function filterRoomTypes() {
         return true;
     });
     
-    // Sort by price
     filtered.sort(function(a, b) {
         var priceA = parseFloat(a.base_price) || 0;
         var priceB = parseFloat(b.base_price) || 0;
@@ -693,7 +683,6 @@ function displayRoomTypes(roomTypes) {
     } else {
         roomTypes.forEach(function(type) {
             var displayName = escapeHtml(type.type_name);
-            var price = parseFloat(type.base_price) || 0;
             
             if (searchTerm) {
                 var regex = new RegExp('(' + escapeRegex(searchTerm) + ')', 'gi');
@@ -704,7 +693,7 @@ function displayRoomTypes(roomTypes) {
                 <tr class="fade-in">
                     <td class="align-middle fw-bold text-muted">#${type.type_id}</td>
                     <td class="align-middle fw-bold text-primary">${displayName}</td>
-                    <td class="align-middle fw-bold text-success">$${price.toFixed(2)}</td>
+                    <td class="align-middle fw-bold text-success">${window.formatPHP(type.base_price)}</td>
                     <td class="align-middle"><i class="fas fa-users text-muted me-1"></i> ${type.capacity} Pax</td>
                     <td class="align-middle text-center">
                         <div class="btn-group shadow-sm">
@@ -789,43 +778,21 @@ function showNotification(message, type) {
 
 <style>
 .room-image-container img {
-    transition: transform 0.3s ease;
+    transition: transform 0.5s ease;
 }
-.room-image-container:hover img {
-    transform: scale(1.05);
-}
-.admin-room-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+.admin-room-card:hover .room-image-container img {
+    transform: scale(1.08);
 }
 .admin-room-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.02) !important;
+    transform: translateY(-6px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.12) !important;
 }
-.btn-outline-warning {
-    border-color: #ffc107;
-    color: #ffc107;
-}
-.btn-outline-warning:hover {
-    background-color: #ffc107;
-    color: #000;
-}
-.btn-outline-danger {
-    border-color: #dc3545;
-    color: #dc3545;
-}
-.btn-outline-danger:hover {
-    background-color: #dc3545;
-    color: #fff;
-}
-.room-status-badge {
-    padding: 0.3rem 0.7rem;
-    border-radius: 20px;
-    font-weight: 600;
-}
-.status-available { background: #d8f3dc; color: #2d6a4f; }
-.status-booked { background: #fce4e4; color: #8b3a3a; }
-.status-maintenance { background: #fef3cd; color: #b8860b; }
-.status-cleaning { background: #e9ecef; color: #495057; }
+.room-status-badge.status-available { background: #d8f3dc; color: #2d6a4f; }
+.room-status-badge.status-booked { background: #fce4e4; color: #8b3a3a; }
+.room-status-badge.status-maintenance { background: #fef3cd; color: #b8860b; }
+.room-status-badge.status-cleaning { background: #e9ecef; color: #495057; }
 .search-highlight { background: #fef3cd; padding: 0.1em 0.3em; border-radius: 3px; font-weight: 700; }
+.dark-mode .admin-room-card { background: #1c2135; color: #d4cec4; }
+.dark-mode .admin-room-card h5 { color: #dfc278; }
 </style>
 {% endblock %}
