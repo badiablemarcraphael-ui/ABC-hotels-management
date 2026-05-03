@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="welcome-banner fade-in">
+    <h2 class="fw-bold mb-2"><i class="fas fa-bookmark text-warning me-2"></i> My Bookings</h2>
+    <p class="mb-0 opacity-75 fs-5">View and manage all your reservations in one place.</p>
+</div>
+
+<div class="filter-bar fade-in" style="animation-delay: 0.1s;">
+    <div class="row align-items-end">
+        <div class="col-md-4 mb-2 mb-md-0">
+            <label for="statusFilter" class="fw-bold text-muted mb-1"><i class="fas fa-filter me-1"></i> Filter by Status</label>
+            <select id="statusFilter" class="form-select shadow-sm">
+                <option value="all">All Bookings</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="pending">Pending</option>
+                <option value="checked_in">Checked In</option>
+                <option value="checked_out">Checked Out</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+        </div>
+        <div class="col-md-4 mb-2 mb-md-0">
+            <label for="searchInput" class="fw-bold text-muted mb-1"><i class="fas fa-search me-1"></i> Search</label>
+            <input type="text" id="searchInput" class="form-control shadow-sm" placeholder="Search by room number...">
+        </div>
+        <div class="col-md-4">
+            <label class="fw-bold d-block mb-1">&nbsp;</label>
+            <button class="btn btn-secondary w-100 shadow-sm" onclick="resetFilters()">
+                <i class="fas fa-undo me-1"></i> Reset Filters
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="bookingsList" class="row g-4 fade-in" style="animation-delay: 0.2s;">
+    <div class="col-12 text-center py-5">
+        <i class="fas fa-spinner fa-spin fa-2x text-primary mb-3"></i>
+        <p class="text-muted fw-bold">Loading your bookings...</p>
+    </div>
+</div>
+
+<script>
+// Wait for jQuery to load
+(function() {
+    function waitForjQuery() {
+        if (typeof jQuery !== 'undefined') {
+            console.log("✅ jQuery loaded, initializing my bookings...");
+            initMyBookingsPage();
+        } else {
+            console.log("⏳ Waiting for jQuery...");
+            setTimeout(waitForjQuery, 100);
+        }
+    }
+    
+    function initMyBookingsPage() {
+        jQuery(document).ready(function($) {
+            loadMyBookings();
+            
+            // Add event listeners
+            $('#statusFilter').on('change', filterBookings);
+            $('#searchInput').on('keyup', filterBookings);
+        });
+    }
+    
+    waitForjQuery();
+})();
+
+var allBookings = [];
+
+function loadMyBookings() {
+    console.log("📋 Loading my bookings...");
+    
+    var currentEmail = '{{ session.get("email", "") }}';
+    var currentUsername = '{{ session.get("username", "") }}';
+    
+    jQuery.ajax({
+        url: '/api/bookings/list',
+        method: 'GET',
+        success: function(bookings) {
+            // Filter bookings for current user
+            allBookings = bookings.filter(function(b) {
+                if (currentEmail && b.guest_email === currentEmail) return true;
+                if (currentUsername && b.guest_name === currentUsername) return true;
+                return false;
+            });
+            
+            displayBookings(allBookings);
+        },
+        error: function() {
+            document.getElementById('bookingsList').innerHTML = `
+                <div class="col-12">
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle fa-3x text-danger mb-3"></i>
+                        <h4 class="fw-bold">Error Loading Bookings</h4>
+                        <p class="text-muted">Could not load your bookings. Please try again later.</p>
+                    </div>
+                </div>
+            `;
+        }
+    });
+}
+
+function displayBookings(bookings) {
+    var html = '';
+    
+    if (bookings.length === 0) {
+        html = `
+            <div class="col-12">
+                <div class="empty-state fade-in">
+                    <i class="fas fa-calendar-times fa-3x text-muted opacity-50 mb-3"></i>
+                    <h4 class="fw-bold text-muted">No Bookings Found</h4>
+                    <p class="text-muted">You haven't made any bookings yet or none match your filters.</p>
+                    <a href="/dashboard" class="btn btn-primary mt-3 shadow-sm">
+                        <i class="fas fa-bed me-2"></i> Book a Room
+                    </a>
+                </div>
+            </div>
+        `;
+    } else {
+        bookings.forEach(function(booking) {
+            var statusClass = '';
+            var statusText = '';
+            
+            switch(booking.status) {
+                case 'confirmed': statusClass = 'success'; statusText = 'Confirmed'; break;
+                case 'pending': statusClass = 'warning text-dark'; statusText = 'Pending'; break;
+                case 'cancelled': statusClass = 'danger'; statusText = 'Cancelled'; break;
+                case 'checked_in': statusClass = 'info text-dark'; statusText = 'Checked In'; break;
+                case 'checked_out': statusClass = 'secondary'; statusText = 'Checked Out'; break;
+                default: statusClass = 'secondary'; statusText = booking.status;
+            }
+            
+            var paymentClass = booking.payment_status === 'paid' ? 'status-paid' : 'status-pending';
+            var paymentText = booking.payment_status === 'paid' ? 'Paid' : 'Pending Payment';
+            
+            var nights = 1;
+            if (booking.check_in_date && booking.check_out_date) {
+                var checkIn = new Date(booking.check_in_date);
+                var checkOut = new Date(booking.check_out_date);
+                nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+            }
+            
+            html += `
+                <div class="col-md-6 col-lg-4 fade-in">
+                    <div class="my-booking-card shadow-sm">
+                        <div class="card-body d-flex flex-column p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h4 class="mb-0 fw-bold text-primary">Room ${booking.room_number}</h4>
+                                    <span class="text-muted fw-bold small">${booking.type_name || 'Standard'}</span>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-${statusClass} shadow-sm px-3 py-2 rounded-pill">${statusText}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="p-3 rounded mb-3 bg-light-custom" style="background: #f8fafc;">
+                                <div class="row text-center mb-2 pb-2 border-bottom" style="border-color: #cbd5e1 !important;">
+                                    <div class="col-6 border-end" style="border-color: #cbd5e1 !important;">
+                                        <small class="text-muted fw-bold d-block">Check-in</small>
+                                        <strong class="text-dark">${booking.check_in_date}</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted fw-bold d-block">Check-out</small>
+                                        <strong class="text-dark">${booking.check_out_date}</strong>
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <small class="text-muted fw-bold">Duration: </small>
+                                    <strong class="text-dark">${nights} nights</strong>
+                                </div>
+                            </div>
+                            
+                            <div class="border-top pt-3 mt-auto mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-muted fw-bold">Total Amount:</span>
+                                    <span class="fs-5 fw-bold text-success">$${parseFloat(booking.total_amount).toFixed(2)}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted fw-bold">Payment:</span>
+                                    <span class="${paymentClass} shadow-sm">${paymentText}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex gap-2 mt-2">
+                                ${booking.status === 'confirmed' && booking.payment_status === 'pending' ? `
+                                    <button class="btn btn-warning btn-sm flex-grow-1 shadow-sm fw-bold" onclick="proceedToPayment(${booking.booking_id})">
+                                        <i class="fas fa-credit-card me-1"></i> Pay Now
+                                    </button>
+                                ` : ''}
+                                ${booking.payment_status === 'paid' ? `
+                                    <button class="btn btn-outline-primary btn-sm flex-grow-1 shadow-sm fw-bold" onclick="viewTicket(${booking.booking_id})">
+                                        <i class="fas fa-ticket-alt me-1"></i> View Ticket
+                                    </button>
+                                ` : ''}
+                                ${booking.status === 'confirmed' ? `
+                                    <button class="btn btn-outline-danger btn-sm shadow-sm" onclick="cancelBooking(${booking.booking_id})" title="Cancel Booking">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    document.getElementById('bookingsList').innerHTML = html;
+}
+
+function filterBookings() {
+    var statusFilter = document.getElementById('statusFilter').value;
+    var searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    
+    var filtered = allBookings;
+    
+    if (statusFilter !== 'all') {
+        filtered = filtered.filter(function(b) { return b.status === statusFilter; });
+    }
+    
+    if (searchTerm) {
+        filtered = filtered.filter(function(b) { 
+            return b.room_number.toLowerCase().includes(searchTerm);
+        });
+    }
+    
+    displayBookings(filtered);
+}
+
+function resetFilters() {
+    document.getElementById('statusFilter').value = 'all';
+    document.getElementById('searchInput').value = '';
+    displayBookings(allBookings);
+}
+
+function proceedToPayment(bookingId) {
+    window.location.href = '/api/payments/checkout/' + bookingId;
+}
+
+function viewTicket(bookingId) {
+    window.open('/api/payments/ticket/' + bookingId, '_blank');
+}
+
+function cancelBooking(bookingId) {
+    if (confirm('Are you sure you want to cancel this booking?')) {
+        jQuery.ajax({
+            url: `/api/bookings/cancel/${bookingId}`,
+            method: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    showNotification('Booking cancelled successfully', 'success');
+                    loadMyBookings();
+                } else {
+                    showNotification(response.message || 'Cancellation failed', 'error');
+                }
+            }
+        });
+    }
+}
+
+function showNotification(message, type) {
+    var alertClass = '';
+    var icon = '';
+    
+    if (type === 'error') { alertClass = 'danger'; icon = '<i class="fas fa-exclamation-circle me-2"></i> '; } 
+    else if (type === 'success') { alertClass = 'success'; icon = '<i class="fas fa-check-circle me-2"></i> '; } 
+    else if (type === 'warning') { alertClass = 'warning'; icon = '<i class="fas fa-exclamation-triangle me-2"></i> '; } 
+    else { alertClass = 'info'; icon = '<i class="fas fa-info-circle me-2"></i> '; }
+    
+    var alertHtml = '<div class="alert alert-' + alertClass + ' alert-dismissible fade show border-0 shadow-sm" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">' +
+        icon + '<strong>' + message + '</strong>' +
+        '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+        '</div>';
+    
+    jQuery('body').append(alertHtml);
+    
+    setTimeout(function() {
+        jQuery('.alert').fadeOut(500, function() { jQuery(this).remove(); });
+    }, 4000);
+}
+</script>
+{% endblock %}

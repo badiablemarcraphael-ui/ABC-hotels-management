@@ -1,0 +1,410 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="welcome-banner fade-in">
+    <h2 class="fw-bold mb-2"><i class="fas fa-hand-sparkles text-warning me-2"></i> Welcome back, {{ session.get('username') }}!</h2>
+    <p class="mb-0 opacity-75 fs-5">Ready for your next stay? Browse our premium rooms below.</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-8">
+        <div class="card dashboard-card">
+            <div class="card-header border-0 pb-0 bg-transparent mt-3 ms-2">
+                <h4 class="mb-0 fw-bold"><i class="fas fa-bed text-primary me-2"></i> Available Rooms</h4>
+            </div>
+            <div class="card-body pt-3">
+                <div class="row g-3" id="availableRooms">
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-spinner fa-spin fa-2x text-primary mb-3"></i>
+                        <p class="text-muted fw-bold">Searching for available rooms...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card dashboard-card">
+            <div class="card-header text-white" style="background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); border-radius: 14px 14px 0 0;">
+                <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-calendar-check me-2"></i> My Bookings</h5>
+            </div>
+            <div class="card-body booking-history p-3" id="myBookings">
+                <div class="text-center py-5">
+                    <i class="fas fa-spinner fa-spin fa-2x text-warning mb-3"></i>
+                    <p class="text-muted fw-bold">Loading your itinerary...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="text-center mt-4 fade-in">
+    <a href="/browse-rooms" class="btn btn-outline-primary btn-lg shadow-sm fw-bold px-5">
+        <i class="fas fa-search me-2"></i>Browse All Rooms
+    </a>
+</div>
+
+<script>
+(function() {
+    function waitForjQuery() {
+        if (typeof jQuery !== 'undefined') {
+            console.log("✅ jQuery loaded, initializing guest dashboard...");
+            initGuestDashboard();
+        } else {
+            setTimeout(waitForjQuery, 100);
+        }
+    }
+    waitForjQuery();
+})();
+
+var availableRoomsData = [];
+
+function initGuestDashboard() {
+    loadAvailableRooms();
+    loadMyBookings();
+}
+
+function loadAvailableRooms() {
+    jQuery.ajax({
+        url: '/api/rooms/available',
+        method: 'GET',
+        success: function(rooms) {
+            availableRoomsData = rooms;
+            let html = '';
+            if (rooms.length === 0) {
+                html = '<div class="col-12 py-5"><p class="text-center text-muted fw-bold"><i class="fas fa-bed fa-2x mb-3 d-block"></i>No rooms available.</p></div>';
+            } else {
+                rooms.forEach(function(room) {
+                    var roomImage = room.image_path || '/static/uploads/rooms/default-room.jpg';
+                    html += `
+                        <div class="col-md-6 mb-2 fade-in">
+                            <div class="card room-card h-100 border-0 shadow-sm" style="overflow: hidden; border-radius: 12px;">
+                                <div class="room-image-container" style="height: 180px; overflow: hidden;">
+                                    <img src="${roomImage}" alt="Room ${escapeHtml(room.room_number)}" 
+                                         style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;"
+                                         onerror="this.src='/static/uploads/rooms/default-room.jpg'">
+                                </div>
+                                <div class="card-body d-flex flex-column p-4">
+                                    <div class="d-flex justify-content-between align-items-start mb-1">
+                                        <h4 class="card-title fw-bold text-primary mb-0">Room ${escapeHtml(room.room_number)}</h4>
+                                        <div class="price-tag fw-bold text-success">$${parseFloat(room.base_price).toFixed(2)}<span class="text-muted fs-6 fw-normal">/night</span></div>
+                                    </div>
+                                    <h6 class="card-subtitle mb-3 text-muted fw-bold">${escapeHtml(room.type_name)}</h6>
+                                    <div class="p-3 rounded mb-3 mt-auto" style="background: #f8fafc;">
+                                        <div class="row text-center">
+                                            <div class="col-6 border-end"><i class="fas fa-layer-group text-muted mb-1 d-block"></i><small class="fw-bold">Floor ${room.floor}</small></div>
+                                            <div class="col-6"><i class="fas fa-users text-muted mb-1 d-block"></i><small class="fw-bold">${room.capacity} pax</small></div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-primary w-100 shadow-sm fw-bold" onclick="openBookingModal(${room.room_id})" style="border-radius: 8px;">
+                                        <i class="fas fa-calendar-plus me-2"></i> Book Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById('availableRooms').innerHTML = html;
+        },
+        error: function() {
+            document.getElementById('availableRooms').innerHTML = '<div class="col-12 py-5"><p class="text-center text-danger fw-bold">Error loading rooms.</p></div>';
+        }
+    });
+}
+
+function openBookingModal(roomId) {
+    // Find room data
+    var room = availableRoomsData.find(function(r) { return r.room_id == roomId; });
+    if (!room) return;
+    
+    var roomImage = room.image_path || '/static/uploads/rooms/default-room.jpg';
+    var roomName = 'Room ' + escapeHtml(room.room_number) + ' - ' + escapeHtml(room.type_name);
+    var roomPrice = '$' + parseFloat(room.base_price).toFixed(2);
+    
+    // Build modal dynamically (same pattern as admin modals - NO backdrop issues)
+    var modalHtml = `
+        <div class="modal fade" id="guestBookingModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+                    <div class="modal-header border-0" style="background: linear-gradient(135deg, #1a2744, #243356); border-radius: 16px 16px 0 0;">
+                        <h5 class="modal-title text-white fw-bold">
+                            <i class="fas fa-calendar-plus me-2" style="color: #c9a84c;"></i> Book a Room
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="p-3 rounded d-flex align-items-center gap-3 mb-3" style="background:#f8f9fa;border:1px solid #e9ecef;">
+                            <img src="${roomImage}" style="width:120px;height:80px;object-fit:cover;border-radius:8px;" onerror="this.src='/static/uploads/rooms/default-room.jpg'">
+                            <div>
+                                <h6 class="fw-bold mb-1">${roomName}</h6>
+                                <span class="badge bg-success fs-6">${roomPrice}/night</span>
+                            </div>
+                        </div>
+                        
+                        <form id="guestBookingForm">
+                            <input type="hidden" name="room_id" value="${roomId}">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold text-muted mb-1"><i class="fas fa-user me-1"></i> Guest Name *</label>
+                                    <input type="text" class="form-control shadow-sm" name="guest_name" value="{{ session.get('username') }}" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold text-muted mb-1"><i class="fas fa-envelope me-1"></i> Email *</label>
+                                    <input type="email" class="form-control shadow-sm" name="guest_email" value="{{ session.get('email') }}" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold text-muted mb-1"><i class="fas fa-phone me-1"></i> Phone *</label>
+                                    <input type="tel" class="form-control shadow-sm" name="guest_phone" placeholder="Enter phone number" required>
+                                </div>
+                                <div class="col-md-6 mb-3"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold text-muted mb-1"><i class="fas fa-calendar-check me-1"></i> Check-in Date *</label>
+                                    <input type="date" class="form-control shadow-sm" name="check_in" id="guestCheckIn" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold text-muted mb-1"><i class="fas fa-calendar-times me-1"></i> Check-out Date *</label>
+                                    <input type="date" class="form-control shadow-sm" name="check_out" id="guestCheckOut" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold text-muted mb-1"><i class="fas fa-user-friends me-1"></i> Adults</label>
+                                    <input type="number" class="form-control shadow-sm" name="adults" value="1" min="1">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-bold text-muted mb-1"><i class="fas fa-child me-1"></i> Children</label>
+                                    <input type="number" class="form-control shadow-sm" name="children" value="0" min="0">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="fw-bold text-muted mb-1"><i class="fas fa-ticket-alt me-1"></i> Coupon Code</label>
+                                <input type="text" class="form-control shadow-sm" name="coupon_code" placeholder="Enter coupon code" style="text-transform: uppercase;">
+                            </div>
+                            
+                            <div class="alert alert-info mt-4 border-0 shadow-sm" style="background: rgba(14, 165, 233, 0.1);">
+                                <i class="fas fa-info-circle me-2"></i> 
+                                <strong>Booking Summary:</strong> After confirming, you will be redirected to the secure payment portal.
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer bg-light border-0" style="border-radius: 0 0 16px 16px;">
+                        <button type="button" class="btn btn-secondary shadow-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary shadow-sm fw-bold" onclick="submitGuestBooking()">
+                            Proceed to Payment <i class="fas fa-arrow-right ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove existing modal and backdrop first
+    $('#guestBookingModal').remove();
+    $('.modal-backdrop').remove();
+    $('body').removeClass('modal-open');
+    $('body').css('overflow', '');
+    $('body').css('padding-right', '');
+    
+    // Append new modal
+    $('body').append(modalHtml);
+    
+    // Set dates
+    var today = new Date().toISOString().split('T')[0];
+    var tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    var tomorrowStr = tomorrow.toISOString().split('T')[0];
+    
+    $('#guestCheckIn').val(today).attr('min', today);
+    $('#guestCheckOut').val(tomorrowStr).attr('min', tomorrowStr);
+    
+    $('#guestCheckIn').on('change', function() {
+        var checkIn = this.value;
+        if (checkIn) {
+            var nextDay = new Date(checkIn);
+            nextDay.setDate(nextDay.getDate() + 1);
+            var nextDayStr = nextDay.toISOString().split('T')[0];
+            $('#guestCheckOut').attr('min', nextDayStr);
+            if ($('#guestCheckOut').val() < nextDayStr) {
+                $('#guestCheckOut').val(nextDayStr);
+            }
+        }
+    });
+    
+    // Show modal
+    $('#guestBookingModal').modal('show');
+    
+    // Clean up when hidden - THIS IS THE KEY
+    $('#guestBookingModal').on('hidden.bs.modal', function() {
+        $('#guestBookingModal').remove();
+        $('.modal-backdrop').remove();
+        $('body').removeClass('modal-open');
+        $('body').css('overflow', '');
+        $('body').css('padding-right', '');
+    });
+}
+
+function loadMyBookings() {
+    var currentEmail = '{{ session.get("email", "") }}';
+    var currentUsername = '{{ session.get("username", "") }}';
+    
+    jQuery.ajax({
+        url: '/api/bookings/list',
+        method: 'GET',
+        success: function(bookings) {
+            var myBookings = bookings.filter(function(b) {
+                return (currentEmail && b.guest_email === currentEmail) || (currentUsername && b.guest_name === currentUsername);
+            });
+            
+            if (myBookings.length === 0) {
+                document.getElementById('myBookings').innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="fas fa-calendar-times fa-3x text-muted opacity-50 mb-3"></i>
+                        <p class="text-muted fw-bold mb-1">No bookings yet.</p>
+                        <p class="small text-muted">Click "Book Now" on any available room!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            myBookings.slice(0, 5).forEach(function(b) {
+                var statusClass = b.status === 'confirmed' ? 'bg-success' : (b.status === 'cancelled' ? 'bg-danger' : (b.status === 'checked_in' ? 'bg-info text-dark' : 'bg-secondary'));
+                var paymentStatus = b.payment_status === 'paid' ? '<span class="badge bg-success">Paid</span>' : '<span class="badge bg-warning text-dark">Pending</span>';
+                
+                html += `
+                    <div class="booking-item fade-in p-3 mb-2 rounded shadow-sm" style="background: white; border: 1px solid #e9ecef;">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <strong class="text-primary">Room ${escapeHtml(b.room_number)}</strong>
+                                <div class="small text-muted">
+                                    <i class="fas fa-calendar-alt me-1"></i> ${b.check_in_date} → ${b.check_out_date}
+                                </div>
+                            </div>
+                            <span class="badge ${statusClass}">${b.status}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top">
+                            <strong class="text-success">$${parseFloat(b.total_amount || 0).toFixed(2)}</strong>
+                            ${paymentStatus}
+                        </div>
+                        ${b.status === 'confirmed' && b.payment_status === 'pending' ? `
+                            <button class="btn btn-sm btn-warning w-100 mt-2 fw-bold shadow-sm" onclick="proceedToPayment(${b.booking_id})">
+                                <i class="fas fa-credit-card me-1"></i> Complete Payment
+                            </button>
+                        ` : ''}
+                        ${b.payment_status === 'paid' ? `
+                            <button class="btn btn-sm btn-outline-info w-100 mt-2 fw-bold" onclick="viewTicket(${b.booking_id})">
+                                <i class="fas fa-ticket-alt me-1"></i> View Ticket
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            document.getElementById('myBookings').innerHTML = html;
+        },
+        error: function() {
+            document.getElementById('myBookings').innerHTML = '<div class="text-center py-4 text-danger">Error loading bookings.</div>';
+        }
+    });
+}
+
+function submitGuestBooking() {
+    var roomId = $('[name="room_id"]').val();
+    if (!roomId) {
+        showNotification('Please select a room', 'warning');
+        return;
+    }
+    
+    var checkIn = $('#guestCheckIn').val();
+    var checkOut = $('#guestCheckOut').val();
+    if (!checkIn || !checkOut) {
+        showNotification('Please select dates', 'warning');
+        return;
+    }
+    
+    var $btn = $('#guestBookingModal .btn-primary');
+    var originalText = $btn.html();
+    $btn.html('<span class="spinner-border spinner-border-sm me-2"></span> Processing...').prop('disabled', true);
+    
+    jQuery.ajax({
+        url: '/api/bookings/create',
+        method: 'POST',
+        data: $('#guestBookingForm').serialize(),
+        success: function(response) {
+            if (response.success) {
+                showNotification('Booking created! Redirecting to payment...', 'success');
+                
+                // Hide modal (cleanup happens in hidden.bs.modal event)
+                $('#guestBookingModal').modal('hide');
+                
+                // Redirect to payment
+                if (response.redirect) {
+                    setTimeout(function() {
+                        window.location.href = response.redirect;
+                    }, 1500);
+                } else {
+                    loadAvailableRooms();
+                    loadMyBookings();
+                }
+            } else {
+                showNotification(response.message || 'Error creating booking', 'error');
+                $btn.html(originalText).prop('disabled', false);
+            }
+        },
+        error: function(xhr) {
+            var message = 'Error creating booking';
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                message = xhr.responseJSON.message;
+            }
+            showNotification(message, 'error');
+            $btn.html(originalText).prop('disabled', false);
+        }
+    });
+}
+
+function proceedToPayment(bookingId) {
+    window.location.href = '/api/payments/checkout/' + bookingId;
+}
+
+function viewTicket(bookingId) {
+    window.open('/api/payments/ticket/' + bookingId, '_blank');
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function showNotification(message, type) {
+    if (typeof window.showNotification === 'function') {
+        window.showNotification(message, type);
+    } else {
+        var alertClass = type === 'error' ? 'danger' : (type === 'success' ? 'success' : (type === 'warning' ? 'warning' : 'info'));
+        var icon = type === 'error' ? 'fa-exclamation-circle' : (type === 'success' ? 'fa-check-circle' : 'fa-info-circle');
+        var alertHtml = `
+            <div class="alert alert-${alertClass} alert-dismissible fade show border-0 shadow-lg" role="alert" 
+                 style="position: fixed; top: 20px; right: 20px; z-index: 99999; min-width: 320px; border-radius: 12px;">
+                <i class="fas ${icon} me-2"></i><strong>${message}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        jQuery('body').append(alertHtml);
+        setTimeout(function() {
+            jQuery('.alert').fadeOut(500, function() { jQuery(this).remove(); });
+        }, 4000);
+    }
+}
+</script>
+
+<style>
+.room-image-container img:hover { transform: scale(1.05); }
+.card:hover { box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important; }
+</style>
+{% endblock %}

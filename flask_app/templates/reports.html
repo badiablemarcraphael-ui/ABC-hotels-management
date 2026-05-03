@@ -1,0 +1,476 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-between mb-4 fade-in">
+    <div>
+        <h2 class="mb-1 fw-bold"><i class="fas fa-chart-line text-primary me-2"></i> Hotel Analytics</h2>
+        <p class="mb-0 text-muted fw-bold">Real-time business insights and reports</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-4 fade-in" style="animation-delay: 0.1s;">
+    <div class="col-md-3">
+        <div class="stat-card stat-revenue shadow-sm text-dark" style="cursor: pointer;" onclick="scrollToChart('trendsChart')">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-dollar-sign me-2"></i> Total Revenue</h5>
+            <h2 id="totalRevenueCard" class="display-5 fw-bold mb-1">$0</h2>
+            <small class="fw-bold"><span id="revenueTrend" class="px-2 py-1 rounded bg-white bg-opacity-25 me-1">+0%</span> vs last period</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-bookings shadow-sm" style="cursor: pointer;" onclick="scrollToChart('trendsChart')">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-ticket-alt me-2"></i> Total Bookings</h5>
+            <h2 id="totalBookingsCard" class="display-5 fw-bold mb-1">0</h2>
+            <small class="fw-bold"><span id="bookingTrend" class="px-2 py-1 rounded bg-white bg-opacity-25 me-1">+0%</span> vs last period</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-guests shadow-sm" style="cursor: pointer;" onclick="scrollToChart('occupancyChart')">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-users me-2"></i> Active Guests</h5>
+            <h2 id="activeGuestsCard" class="display-5 fw-bold mb-1">0</h2>
+            <small class="fw-bold opacity-75">Currently checked in</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-rooms shadow-sm" style="cursor: pointer;" onclick="scrollToChart('occupancyChart')">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-percent me-2"></i> Occupancy Rate</h5>
+            <h2 id="occupancyRateCard" class="display-5 fw-bold mb-1">0%</h2>
+            <small class="fw-bold opacity-75">Current period</small>
+        </div>
+    </div>
+</div>
+
+<div class="filter-bar fade-in" style="animation-delay: 0.2s;">
+    <div class="row align-items-end g-3">
+        <div class="col-md-4">
+            <label for="startDateInput" class="fw-bold text-muted mb-1"><i class="fas fa-calendar-alt me-1"></i> Start Date</label>
+            <input type="date" id="startDateInput" class="form-control shadow-sm">
+        </div>
+        <div class="col-md-4">
+            <label for="endDateInput" class="fw-bold text-muted mb-1"><i class="fas fa-calendar-alt me-1"></i> End Date</label>
+            <input type="date" id="endDateInput" class="form-control shadow-sm">
+        </div>
+        <div class="col-md-4 d-flex gap-2">
+            <button class="btn btn-primary shadow-sm flex-grow-1 fw-bold" id="applyFilterBtn">
+                <i class="fas fa-filter me-1"></i> Apply
+            </button>
+            <button class="btn btn-secondary shadow-sm fw-bold" id="resetFilterBtn" title="Reset Filters">
+                <i class="fas fa-undo"></i>
+            </button>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-12">
+            <small id="dateRangeDisplay" class="text-muted fw-bold border-start border-3 border-primary ps-2">Showing all data</small>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card mb-4 fade-in" style="animation-delay: 0.3s;">
+    <div class="dashboard-card-header">
+        <h5 class="mb-0 fw-bold"><i class="fas fa-chart-line text-primary me-2"></i> Monthly Booking & Revenue Trends</h5>
+    </div>
+    <div class="dashboard-card-body">
+        <canvas id="trendsChart" style="min-height: 350px;"></canvas>
+        <div id="trendsNoData" class="text-center py-5" style="display: none;">
+            <i class="fas fa-chart-bar fa-3x text-muted opacity-50 mb-3"></i>
+            <h5 class="text-muted fw-bold">No data available for this period</h5>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4 fade-in" style="animation-delay: 0.4s;">
+    <div class="col-lg-6">
+        <div class="dashboard-card h-100">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-trophy text-warning me-2"></i> Top Rooms by Revenue</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <canvas id="revenueChart" style="min-height: 300px;"></canvas>
+                <div id="revenueNoData" class="text-center py-5" style="display: none;">
+                    <i class="fas fa-chart-pie fa-3x text-muted opacity-50 mb-3"></i>
+                    <h5 class="text-muted fw-bold">No revenue data</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6">
+        <div class="dashboard-card h-100">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-percent text-info me-2"></i> Occupancy Rate Trend</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <canvas id="occupancyChart" style="min-height: 300px;"></canvas>
+                <div id="occupancyNoData" class="text-center py-5" style="display: none;">
+                    <i class="fas fa-bed fa-3x text-muted opacity-50 mb-3"></i>
+                    <h5 class="text-muted fw-bold">No occupancy data</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card mb-5 fade-in" style="animation-delay: 0.5s;">
+    <div class="dashboard-card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold"><i class="fas fa-table text-primary me-2"></i> Detailed Monthly Report</h5>
+        <button class="btn btn-success btn-sm shadow-sm fw-bold px-3" id="exportBtn">
+            <i class="fas fa-download me-1"></i> Export CSV
+        </button>
+    </div>
+    <div class="dashboard-card-body p-0">
+        <div class="table-responsive">
+            <table class="table report-table mb-0">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-3">Month</th>
+                        <th class="py-3 text-center">Bookings</th>
+                        <th class="py-3 text-end">Revenue</th>
+                        <th class="py-3 text-center">Avg Stay</th>
+                        <th class="px-4 py-3 text-end">Growth</th>
+                    </tr>
+                </thead>
+                <tbody id="reportTableBody">
+                    <tr><td colspan="5" class="text-center py-5"><i class="fas fa-spinner fa-spin text-primary me-2"></i> Loading data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+// Configure Chart.js globally for modern aesthetics
+Chart.defaults.color = '#64748b'; 
+Chart.defaults.scale.grid.color = 'rgba(100, 116, 139, 0.1)'; 
+Chart.defaults.font.family = "'Segoe UI', sans-serif";
+
+let charts = {};
+let allRooms = [];
+
+function scrollToChart(chartId) {
+    document.getElementById(chartId).scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+(function() {
+    function waitForjQuery() {
+        if (typeof jQuery !== 'undefined') {
+            initReports();
+        } else {
+            setTimeout(waitForjQuery, 100);
+        }
+    }
+    
+    function initReports() {
+        jQuery(document).ready(function($) {
+            var endDate = new Date();
+            var startDate = new Date();
+            startDate.setFullYear(startDate.getFullYear() - 1);
+            
+            $('#startDateInput').val(startDate.toISOString().split('T')[0]);
+            $('#endDateInput').val(endDate.toISOString().split('T')[0]);
+            
+            $('#applyFilterBtn').on('click', function() {
+                const btn = $(this);
+                const originalHtml = btn.html();
+                btn.html('<i class="fas fa-spinner fa-spin"></i>');
+                loadAllData();
+                setTimeout(() => btn.html(originalHtml), 500);
+            });
+            
+            $('#resetFilterBtn').on('click', function() {
+                var end = new Date();
+                var start = new Date();
+                start.setFullYear(start.getFullYear() - 1);
+                $('#startDateInput').val(start.toISOString().split('T')[0]);
+                $('#endDateInput').val(end.toISOString().split('T')[0]);
+                loadAllData();
+            });
+            
+            $('#exportBtn').on('click', exportToCSV);
+            
+            loadAllData();
+        });
+    }
+    
+    waitForjQuery();
+})();
+
+function loadAllData() {
+    var startDate = $('#startDateInput').val();
+    var endDate = $('#endDateInput').val();
+    var urlParams = (startDate && endDate) ? '?start_date=' + startDate + '&end_date=' + endDate : '';
+    
+    $('#dateRangeDisplay').html('<i class="fas fa-info-circle me-1"></i> Showing data from <strong>' + startDate + '</strong> to <strong>' + endDate + '</strong>');
+    
+    // Load rooms for occupancy calculation
+    $.ajax({ url: '/api/rooms/list', method: 'GET', success: function(r) { allRooms = r; } });
+    
+    // Load monthly trends
+    $.ajax({
+        url: '/api/reports/monthly-trends' + urlParams,
+        success: function(data) {
+            if(data.length) {
+                $('#trendsNoData').hide();
+                $('#trendsChart').show();
+                loadTrendsChart(data);
+                loadReportTable(data);
+                updateStats(data);
+            } else {
+                $('#trendsNoData').show();
+                $('#trendsChart').hide();
+                $('#reportTableBody').html('<tr><td colspan="5" class="text-center py-4 text-muted fw-bold">No data found for this period.</td></tr>');
+            }
+        },
+        error: function() { 
+            $('#trendsNoData').show(); 
+            $('#trendsChart').hide();
+        }
+    });
+    
+    // Load revenue per room
+    $.ajax({
+        url: '/api/reports/revenue-by-room' + urlParams,
+        success: function(data) {
+            if(data.length) {
+                $('#revenueNoData').hide();
+                $('#revenueChart').show();
+                loadRevenueChart(data);
+            } else {
+                $('#revenueNoData').show();
+                $('#revenueChart').hide();
+            }
+        },
+        error: function() { 
+            $('#revenueNoData').show(); 
+            $('#revenueChart').hide();
+        }
+    });
+    
+    // Load occupancy data
+    loadOccupancyData(urlParams);
+}
+
+function updateStats(data) {
+    var totalRevenue = data.reduce((s, d) => s + (d.revenue || 0), 0);
+    var totalBookings = data.reduce((s, d) => s + (d.total_bookings || 0), 0);
+    $('#totalRevenueCard').html('$' + totalRevenue.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0}));
+    $('#totalBookingsCard').html(totalBookings.toLocaleString());
+    
+    if(data.length >= 2) {
+        var curr = data[data.length-1], prev = data[data.length-2];
+        if (prev.revenue > 0) {
+            var revGrowth = ((curr.revenue - prev.revenue) / prev.revenue * 100).toFixed(1);
+            $('#revenueTrend').html(revGrowth > 0 ? '↑ ' + revGrowth + '%' : '↓ ' + Math.abs(revGrowth) + '%');
+        }
+        if (prev.total_bookings > 0) {
+            var bookGrowth = ((curr.total_bookings - prev.total_bookings) / prev.total_bookings * 100).toFixed(1);
+            $('#bookingTrend').html(bookGrowth > 0 ? '↑ ' + bookGrowth + '%' : '↓ ' + Math.abs(bookGrowth) + '%');
+        }
+    }
+    
+    $.ajax({
+        url: '/api/bookings/list',
+        success: function(b) {
+            var active = b.filter(bk => bk.status === 'checked_in').length;
+            $('#activeGuestsCard').html(active);
+            
+            var occRate = allRooms.length ? ((active / allRooms.length) * 100).toFixed(1) : 0;
+            $('#occupancyRateCard').html(occRate + '%');
+        }
+    });
+}
+
+function loadTrendsChart(data) {
+    var ctx = document.getElementById('trendsChart').getContext('2d');
+    if (charts.trendsChart) charts.trendsChart.destroy();
+    
+    charts.trendsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.map(d => d.month),
+            datasets: [
+                { 
+                    label: 'Bookings', 
+                    data: data.map(d => d.total_bookings), 
+                    borderColor: '#10b981', // Success
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#10b981',
+                    fill: true, 
+                    tension: 0.4, 
+                    yAxisID: 'y' 
+                },
+                { 
+                    label: 'Revenue ($)', 
+                    data: data.map(d => d.revenue), 
+                    borderColor: '#6366f1', // Primary
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#6366f1',
+                    fill: true, 
+                    tension: 0.4, 
+                    yAxisID: 'y1' 
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { 
+                legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } },
+                tooltip: { 
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    padding: 12,
+                    callbacks: { label: (ctx) => ctx.dataset.label === 'Revenue ($)' ? '$' + ctx.raw.toLocaleString() : ctx.raw + ' bookings' } 
+                } 
+            },
+            scales: { 
+                y: { beginAtZero: true, border: {display: false}, title: { display: true, text: 'Bookings' } }, 
+                y1: { position: 'right', beginAtZero: true, border: {display: false}, grid: {display: false}, title: { display: true, text: 'Revenue ($)' }, ticks: { callback: v => '$' + v.toLocaleString() } },
+                x: { border: {display: false}, grid: {display: false} }
+            }
+        }
+    });
+}
+
+function loadRevenueChart(data) {
+    var ctx = document.getElementById('revenueChart').getContext('2d');
+    if (charts.revenueChart) charts.revenueChart.destroy();
+    
+    var top5 = data.slice(0, 5);
+    charts.revenueChart = new Chart(ctx, {
+        type: 'bar',
+        data: { 
+            labels: top5.map(r => 'Room ' + r.room_number), 
+            datasets: [{ 
+                label: 'Revenue ($)', 
+                data: top5.map(r => r.total_revenue), 
+                backgroundColor: 'rgba(245, 158, 11, 0.85)', // Warning/Gold
+                borderRadius: 6,
+                borderWidth: 0
+            }] 
+        },
+        options: { 
+            responsive: true, 
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { 
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    padding: 12,
+                    callbacks: { label: (ctx) => '$' + ctx.raw.toLocaleString() } 
+                }
+            },
+            scales: { 
+                y: { beginAtZero: true, border: {display: false}, ticks: { callback: v => '$' + v.toLocaleString() } },
+                x: { border: {display: false}, grid: {display: false} }
+            } 
+        }
+    });
+}
+
+function loadOccupancyData(urlParams) {
+    var ctx = document.getElementById('occupancyChart').getContext('2d');
+    if (charts.occupancyChart) charts.occupancyChart.destroy();
+    
+    $.ajax({
+        url: '/api/reports/occupancy-trend' + urlParams,
+        success: function(data) {
+            if(!data.length) { 
+                $('#occupancyNoData').show(); 
+                $('#occupancyChart').hide();
+                return; 
+            }
+            $('#occupancyNoData').hide();
+            $('#occupancyChart').show();
+            
+            var totalRooms = allRooms.length || 10;
+            charts.occupancyChart = new Chart(ctx, {
+                type: 'line',
+                data: { 
+                    labels: data.map(d => d.month), 
+                    datasets: [{ 
+                        label: 'Occupancy Rate (%)', 
+                        data: data.map(d => (d.total_bookings / totalRooms * 100).toFixed(1)), 
+                        borderColor: '#0ea5e9', // Info
+                        backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                        borderWidth: 3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#0ea5e9',
+                        fill: true, 
+                        tension: 0.4 
+                    }] 
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', padding: 12 }
+                    },
+                    scales: { 
+                        y: { beginAtZero: true, max: 100, border: {display: false}, ticks: { callback: v => v + '%' } },
+                        x: { border: {display: false}, grid: {display: false} }
+                    } 
+                }
+            });
+        },
+        error: function() { 
+            $('#occupancyNoData').show(); 
+            $('#occupancyChart').hide();
+        }
+    });
+}
+
+function loadReportTable(data) {
+    var html = '';
+    for (var i = 0; i < data.length; i++) {
+        var item = data[i];
+        var growth = i > 0 && data[i-1].total_bookings > 0 ? ((item.total_bookings - data[i-1].total_bookings) / data[i-1].total_bookings * 100).toFixed(1) : 0;
+        
+        var growthHtml = '';
+        if (growth > 0) growthHtml = `<span class="badge bg-success bg-opacity-25 text-success shadow-none"><i class="fas fa-arrow-up me-1"></i>${Math.abs(growth)}%</span>`;
+        else if (growth < 0) growthHtml = `<span class="badge bg-danger bg-opacity-25 text-danger shadow-none"><i class="fas fa-arrow-down me-1"></i>${Math.abs(growth)}%</span>`;
+        else growthHtml = `<span class="badge bg-secondary bg-opacity-25 text-secondary shadow-none"><i class="fas fa-minus me-1"></i>0%</span>`;
+        
+        html += `
+            <tr>
+                <td class="px-4 fw-bold text-dark align-middle">${item.month}</td>
+                <td class="text-center align-middle">${item.total_bookings || 0}</td>
+                <td class="text-end fw-bold text-success align-middle">$${(item.revenue || 0).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                <td class="text-center align-middle">${item.avg_stay ? item.avg_stay.toFixed(1) : '-'} nights</td>
+                <td class="px-4 text-end align-middle">${growthHtml}</td>
+            </tr>
+        `;
+    }
+    $('#reportTableBody').html(html || '<tr><td colspan="5" class="text-center py-4 text-muted fw-bold">No data available</td></tr>');
+}
+
+function exportToCSV() {
+    var csv = 'Month,Bookings,Revenue,Average Stay,Growth\n';
+    $('#reportTableBody tr').each(function() {
+        var cells = $(this).find('td');
+        if (cells.length === 5) {
+            let month = cells.eq(0).text().trim();
+            let bookings = cells.eq(1).text().trim();
+            let revenue = cells.eq(2).text().replace('$', '').replace(/,/g, '').trim();
+            let stay = cells.eq(3).text().replace(' nights', '').trim();
+            let growth = cells.eq(4).text().trim();
+            csv += `${month},${bookings},${revenue},${stay},${growth}\n`;
+        }
+    });
+    var blob = new Blob([csv], { type: 'text/csv' }), url = URL.createObjectURL(blob);
+    var a = document.createElement('a'); 
+    a.href = url; 
+    a.download = 'hotel_analytics_report.csv'; 
+    a.click(); 
+    URL.revokeObjectURL(url);
+}
+</script>
+{% endblock %}

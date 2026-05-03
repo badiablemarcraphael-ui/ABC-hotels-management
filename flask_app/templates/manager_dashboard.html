@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-between mb-4 fade-in">
+    <div>
+        <h2 class="mb-1"><i class="fas fa-chart-line text-primary me-2"></i> Manager Dashboard</h2>
+        <p class="mb-0 text-muted fw-bold">Welcome, {{ session.get('username') }}! Here is your business analytics overview.</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-4 fade-in" style="animation-delay: 0.1s;">
+    <div class="col-md-3">
+        <div class="stat-card stat-revenue shadow-sm text-dark">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-dollar-sign me-2"></i> Total Revenue</h5>
+            <h2 id="totalRevenue" class="display-5 fw-bold mb-0">$0</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-bookings shadow-sm">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-ticket-alt me-2"></i> Total Bookings</h5>
+            <h2 id="totalBookings" class="display-5 fw-bold mb-0">0</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-rooms shadow-sm">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-percent me-2"></i> Avg Occupancy</h5>
+            <h2 id="avgOccupancy" class="display-5 fw-bold mb-0">0%</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-guests shadow-sm">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-users me-2"></i> Active Guests</h5>
+            <h2 id="activeGuests" class="display-5 fw-bold mb-0">0</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 fade-in" style="animation-delay: 0.2s;">
+    <div class="col-md-6">
+        <div class="dashboard-card">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-chart-area text-primary me-2"></i> Revenue Trend</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <canvas id="revenueChart" style="min-height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="dashboard-card">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-trophy text-warning me-2"></i> Top Performing Rooms</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <canvas id="roomChart" style="min-height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Configure Chart.js globally for modern aesthetics
+Chart.defaults.color = '#64748b'; // Soft slate gray text
+Chart.defaults.scale.grid.color = 'rgba(100, 116, 139, 0.1)'; // Very subtle grid lines
+Chart.defaults.font.family = "'Segoe UI', sans-serif";
+
+(function() {
+    function waitForjQuery() {
+        if (typeof jQuery !== 'undefined') {
+            console.log("✅ jQuery loaded, initializing manager dashboard...");
+            loadManagerData();
+        } else {
+            console.log("⏳ Waiting for jQuery to load...");
+            setTimeout(waitForjQuery, 100);
+        }
+    }
+    waitForjQuery();
+})();
+
+let charts = {};
+
+function loadManagerData() {
+    // Load bookings for stats
+    jQuery.ajax({
+        url: '/api/bookings/list',
+        method: 'GET',
+        success: function(bookings) {
+            const totalRevenue = bookings.reduce((sum, b) => sum + parseFloat(b.total_amount || 0), 0);
+            
+            // Format currency nicely
+            document.getElementById('totalRevenue').innerHTML = '$' + totalRevenue.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+            document.getElementById('totalBookings').innerHTML = bookings.length;
+            
+            const active = bookings.filter(b => b.status === 'checked_in').length;
+            document.getElementById('activeGuests').innerHTML = active;
+        }
+    });
+    
+    // Load occupancy placeholder (If you have an endpoint for this, hook it up here)
+    // For now, doing a basic calculation to prevent it from sitting at 0%
+    jQuery.ajax({
+        url: '/api/rooms/list',
+        method: 'GET',
+        success: function(rooms) {
+            if(rooms.length > 0) {
+                const occupied = rooms.filter(r => r.status === 'occupied').length;
+                const rate = ((occupied / rooms.length) * 100).toFixed(1);
+                document.getElementById('avgOccupancy').innerHTML = rate + '%';
+            }
+        }
+    });
+    
+    // Load monthly trends
+    jQuery.ajax({
+        url: '/api/analytics/monthly-trends',
+        method: 'GET',
+        success: function(data) {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            
+            if (charts.revenueChart) charts.revenueChart.destroy();
+            
+            charts.revenueChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.month),
+                    datasets: [{
+                        label: 'Revenue ($)',
+                        data: data.map(d => d.revenue),
+                        borderColor: '#6366f1', // Luxury Primary
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#6366f1',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        tension: 0.4, // Smooth curves
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    return '$' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, border: { display: false } },
+                        x: { border: { display: false }, grid: { display: false } }
+                    }
+                }
+            });
+        }
+    });
+    
+    // Load room performance
+    jQuery.ajax({
+        url: '/api/analytics/revenue-per-room',
+        method: 'GET',
+        success: function(data) {
+            const ctx = document.getElementById('roomChart').getContext('2d');
+            
+            if (charts.roomChart) charts.roomChart.destroy();
+            
+            charts.roomChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.slice(0, 5).map(d => `Room ${d.room_number}`),
+                    datasets: [{
+                        label: 'Revenue ($)',
+                        data: data.slice(0, 5).map(d => d.total_revenue),
+                        backgroundColor: 'rgba(16, 185, 129, 0.85)', // Luxury Success
+                        borderRadius: 6, // Rounded bars
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    return '$' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, border: { display: false } },
+                        x: { border: { display: false }, grid: { display: false } }
+                    }
+                }
+            });
+        }
+    });
+}
+</script>
+{% endblock %}

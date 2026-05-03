@@ -1,0 +1,552 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="d-flex align-items-center mb-4">
+    <h2 class="mb-0"><i class="fas fa-chart-pie text-primary me-2"></i> Hotel Dashboard</h2>
+</div>
+
+<div class="row mt-2 g-4 fade-in">
+    <div class="col-md-3">
+        <div class="stat-card stat-bookings shadow-sm">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-bed me-2"></i> Occupancy Rate</h5>
+            <h2 id="occupancy-rate" class="display-5 fw-bold mb-0">0%</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-revenue shadow-sm text-dark">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-hand-holding-dollar me-2"></i> Today's Revenue</h5>
+            <h2 id="today-revenue" class="display-5 fw-bold mb-0">$0</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-rooms shadow-sm">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-calendar-check me-2"></i> Active Bookings</h5>
+            <h2 id="active-bookings" class="display-5 fw-bold mb-0">0</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-guests shadow-sm">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-door-open me-2"></i> Available Rooms</h5>
+            <h2 id="available-rooms" class="display-5 fw-bold mb-0">0</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4 g-4 fade-in" style="animation-delay: 0.1s;">
+    <div class="col-md-6">
+        <div class="dashboard-card">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-chart-area text-primary me-2"></i> Occupancy Trends</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <canvas id="occupancyChart" style="min-height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="dashboard-card">
+            <div class="dashboard-card-header">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-chart-bar text-primary me-2"></i> Revenue per Room</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <canvas id="revenueChart" style="min-height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4 g-4 mb-5 fade-in" style="animation-delay: 0.2s;">
+    
+    <div class="col-md-4">
+        <div class="dashboard-card">
+            <div class="dashboard-card-header" style="background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%); color: white; border-radius: 14px 14px 0 0;">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-bolt me-2"></i> Quick Statistics</h5>
+            </div>
+            <div class="dashboard-card-body text-center">
+                <div class="row g-4">
+                    <div class="col-6">
+                        <div class="p-3 rounded-3" style="background: rgba(99,102,241,0.05); border: 1px solid rgba(99,102,241,0.1);">
+                            <h3 id="totalBookings" class="fw-bold text-primary mb-1">0</h3>
+                            <div class="quick-stat-label">Total Bookings</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded-3" style="background: rgba(16,185,129,0.05); border: 1px solid rgba(16,185,129,0.1);">
+                            <h3 id="totalRevenue" class="fw-bold text-success mb-1">$0</h3>
+                            <div class="quick-stat-label">Total Revenue</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded-3" style="background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.1);">
+                            <h3 id="activeGuests" class="fw-bold text-warning mb-1">0</h3>
+                            <div class="quick-stat-label">Active Guests</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded-3" style="background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.1);">
+                            <h3 id="availableRoomsCount" class="fw-bold text-danger mb-1">0</h3>
+                            <div class="quick-stat-label">Avail. Rooms</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="dashboard-card">
+            <div class="dashboard-card-header" style="background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%); color: black; border-radius: 14px 14px 0 0;">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-star me-2"></i> Guest Reviews Overview</h5>
+            </div>
+            <div class="dashboard-card-body">
+                <div class="row align-items-center">
+                    
+                    <div class="col-md-3 text-center">
+                        <h2 id="avgRatingDisplay" class="display-3 fw-bold text-warning mb-0" style="text-shadow: 0 2px 5px rgba(245,158,11,0.2);">0</h2>
+                        <div id="avgStarsDisplay" class="mb-2 fs-5"></div>
+                        <p class="text-muted fw-bold">from <span id="totalReviewsDisplay">0</span> reviews</p>
+                    </div>
+                    
+                    <div class="col-md-5 border-start border-end px-4">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="me-2 fw-bold text-muted" style="width: 30px;">5 ★</span>
+                            <div class="review-progress-bg flex-grow-1" style="height: 8px;">
+                                <div id="fiveStarsBar" class="review-progress-bar bg-warning" style="width: 0%; height: 100%;"></div>
+                            </div>
+                            <span id="fiveStarsCount" class="ms-2 fw-bold text-muted" style="width: 20px; text-align: right;">0</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="me-2 fw-bold text-muted" style="width: 30px;">4 ★</span>
+                            <div class="review-progress-bg flex-grow-1" style="height: 8px;">
+                                <div id="fourStarsBar" class="review-progress-bar bg-warning" style="width: 0%; height: 100%;"></div>
+                            </div>
+                            <span id="fourStarsCount" class="ms-2 fw-bold text-muted" style="width: 20px; text-align: right;">0</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="me-2 fw-bold text-muted" style="width: 30px;">3 ★</span>
+                            <div class="review-progress-bg flex-grow-1" style="height: 8px;">
+                                <div id="threeStarsBar" class="review-progress-bar bg-warning" style="width: 0%; height: 100%;"></div>
+                            </div>
+                            <span id="threeStarsCount" class="ms-2 fw-bold text-muted" style="width: 20px; text-align: right;">0</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="me-2 fw-bold text-muted" style="width: 30px;">2 ★</span>
+                            <div class="review-progress-bg flex-grow-1" style="height: 8px;">
+                                <div id="twoStarsBar" class="review-progress-bar bg-warning" style="width: 0%; height: 100%;"></div>
+                            </div>
+                            <span id="twoStarsCount" class="ms-2 fw-bold text-muted" style="width: 20px; text-align: right;">0</span>
+                        </div>
+                        <div class="d-flex align-items-center mb-0">
+                            <span class="me-2 fw-bold text-muted" style="width: 30px;">1 ★</span>
+                            <div class="review-progress-bg flex-grow-1" style="height: 8px;">
+                                <div id="oneStarBar" class="review-progress-bar bg-warning" style="width: 0%; height: 100%;"></div>
+                            </div>
+                            <span id="oneStarCount" class="ms-2 fw-bold text-muted" style="width: 20px; text-align: right;">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4 text-center">
+                        <i class="fas fa-camera fa-2x text-primary opacity-50 mb-2"></i>
+                        <h4 id="withPhotosDisplay" class="fw-bold mb-0">0</h4>
+                        <p class="text-muted fw-bold mb-3">reviews with photos</p>
+                        <a href="/reviews" class="btn btn-outline-primary rounded-pill px-4 shadow-sm">
+                            View All <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="mt-4 pt-3 border-top">
+                    <h6 class="text-muted fw-bold mb-3 text-uppercase" style="letter-spacing: 1px; font-size: 0.8rem;">Recent Reviews</h6>
+                    <div id="recentReviewsList" class="d-flex flex-column gap-2">
+                        <div class="text-center py-3">
+                            <i class="fas fa-spinner fa-spin text-primary"></i> Loading reviews...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let charts = {};
+
+// Configure Chart.js globally for modern aesthetics (works in both dark/light mode)
+Chart.defaults.color = '#64748b'; // Soft slate gray text
+Chart.defaults.scale.grid.color = 'rgba(100, 116, 139, 0.1)'; // Very subtle grid lines
+Chart.defaults.font.family = "'Segoe UI', sans-serif";
+
+// Wait for jQuery to load
+(function() {
+    function waitForjQuery() {
+        if (typeof jQuery !== 'undefined') {
+            console.log("✅ jQuery loaded, initializing dashboard...");
+            initDashboard();
+        } else {
+            console.log("⏳ Waiting for jQuery to load...");
+            setTimeout(waitForjQuery, 100);
+        }
+    }
+    
+    function initDashboard() {
+        jQuery(document).ready(function($) {
+            console.log("📊 Loading dashboard data...");
+            loadMetrics();
+            loadOccupancyData();
+            loadRevenueData();
+            loadQuickStats();
+            loadReviewStats();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(function() {
+                console.log("🔄 Refreshing dashboard data...");
+                loadMetrics();
+                loadOccupancyData();
+                loadRevenueData();
+                loadQuickStats();
+                loadReviewStats();
+            }, 30000);
+        });
+    }
+    
+    waitForjQuery();
+})();
+
+function loadMetrics() {
+    // Load occupancy rate
+    jQuery.ajax({
+        url: '/api/analytics/occupancy',
+        method: 'GET',
+        success: function(data) {
+            if(data && data.length > 0) {
+                let rate = (data[0].booked_rooms / data[0].total_rooms * 100).toFixed(1);
+                document.getElementById('occupancy-rate').textContent = rate + '%';
+            } else {
+                document.getElementById('occupancy-rate').textContent = '0%';
+            }
+        },
+        error: function() {
+            document.getElementById('occupancy-rate').textContent = '0%';
+        }
+    });
+    
+    // Load today's revenue
+    jQuery.ajax({
+    url: '/api/analytics/revenue-per-room',
+        method: 'GET',
+        success: function(data) {
+            let todayRevenue = 0;
+            const today = new Date().toISOString().split('T')[0];
+            if(data && data.length > 0) {
+                const todayData = data.filter(d => d.month === today.substring(0, 7));
+                if(todayData.length > 0) {
+                    todayRevenue = todayData[0].total_revenue || 0;
+                }
+            }
+            document.getElementById('today-revenue').textContent = '$' + todayRevenue.toFixed(2);
+        },
+        error: function() {
+            document.getElementById('today-revenue').textContent = '$0';
+        }
+    });
+    
+    // Load active bookings count
+    jQuery.ajax({
+        url: '/api/bookings/list',
+        method: 'GET',
+        success: function(bookings) {
+            if(bookings && bookings.length > 0) {
+                const activeCount = bookings.filter(b => 
+                    b.status === 'confirmed' || b.status === 'checked_in'
+                ).length;
+                document.getElementById('active-bookings').textContent = activeCount;
+            } else {
+                document.getElementById('active-bookings').textContent = '0';
+            }
+        },
+        error: function() {
+            document.getElementById('active-bookings').textContent = '0';
+        }
+    });
+    
+    // Load available rooms
+    jQuery.ajax({
+        url: '/api/rooms/list',
+        method: 'GET',
+        success: function(rooms) {
+            if(rooms && rooms.length > 0) {
+                const availableCount = rooms.filter(r => r.status === 'available').length;
+                document.getElementById('available-rooms').textContent = availableCount;
+            } else {
+                document.getElementById('available-rooms').textContent = '0';
+            }
+        },
+        error: function() {
+            document.getElementById('available-rooms').textContent = '0';
+        }
+    });
+}
+
+function loadOccupancyData() {
+    jQuery.ajax({
+        url: '/api/analytics/monthly-trends',
+        method: 'GET',
+        success: function(data) {
+            const ctx = document.getElementById('occupancyChart').getContext('2d');
+            
+            if (charts.occupancyChart) {
+                charts.occupancyChart.destroy();
+            }
+            
+            charts.occupancyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.month),
+                    datasets: [{
+                        label: 'Total Bookings',
+                        data: data.map(d => d.total_bookings),
+                        borderColor: '#6366f1', // Luxury Primary
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#6366f1',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        tension: 0.4, // Smooth curves
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            padding: 12,
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 14 }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, border: { display: false } },
+                        x: { border: { display: false }, grid: { display: false } }
+                    }
+                }
+            });
+        },
+        error: function() {
+            console.error('Failed to load occupancy data');
+        }
+    });
+}
+
+function loadRevenueData() {
+    jQuery.ajax({
+        url: '/api/analytics/revenue-per-room',
+        method: 'GET',
+        success: function(data) {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            
+            if (charts.revenueChart) {
+                charts.revenueChart.destroy();
+            }
+            
+            const topRooms = data.slice(0, 5);
+            charts.revenueChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: topRooms.map(d => `Room ${d.room_number}`),
+                    datasets: [{
+                        label: 'Revenue ($)',
+                        data: topRooms.map(d => d.total_revenue || 0),
+                        backgroundColor: 'rgba(16, 185, 129, 0.85)', // Luxury Success
+                        borderRadius: 6, // Rounded bars
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) label += ': ';
+                                    if (context.parsed.y !== null) {
+                                        label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, border: { display: false } },
+                        x: { border: { display: false }, grid: { display: false } }
+                    }
+                }
+            });
+        },
+        error: function() {
+            console.error('Failed to load revenue data');
+        }
+    });
+}
+
+function loadQuickStats() {
+    // Get total bookings and revenue
+    jQuery.ajax({
+        url: '/api/bookings/list',
+        method: 'GET',
+        success: function(bookings) {
+            if(bookings && bookings.length > 0) {
+                document.getElementById('totalBookings').textContent = bookings.length;
+                
+                const totalRevenue = bookings.reduce((sum, b) => sum + parseFloat(b.total_amount || 0), 0);
+                document.getElementById('totalRevenue').textContent = '$' + totalRevenue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                
+                const activeGuests = bookings.filter(b => b.status === 'checked_in').length;
+                document.getElementById('activeGuests').textContent = activeGuests;
+            } else {
+                document.getElementById('totalBookings').textContent = '0';
+                document.getElementById('totalRevenue').textContent = '$0.00';
+                document.getElementById('activeGuests').textContent = '0';
+            }
+        },
+        error: function() {
+            document.getElementById('totalBookings').textContent = '0';
+            document.getElementById('totalRevenue').textContent = '$0.00';
+            document.getElementById('activeGuests').textContent = '0';
+        }
+    });
+    
+    // Get available rooms
+    jQuery.ajax({
+        url: '/api/rooms/list',
+        method: 'GET',
+        success: function(rooms) {
+            if(rooms && rooms.length > 0) {
+                const available = rooms.filter(r => r.status === 'available').length;
+                document.getElementById('availableRoomsCount').textContent = available;
+            } else {
+                document.getElementById('availableRoomsCount').textContent = '0';
+            }
+        },
+        error: function() {
+            document.getElementById('availableRoomsCount').textContent = '0';
+        }
+    });
+}
+
+function loadReviewStats() {
+    console.log("📊 Loading review statistics...");
+    
+    jQuery.ajax({
+        url: '/api/comments/dashboard-stats',
+        method: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            console.log("✅ Review stats loaded:", data);
+            
+            if (data && data.total_reviews > 0) {
+                $('#avgRatingDisplay').text(data.avg_rating);
+                
+                // Generate star HTML
+                let avgRating = data.avg_rating;
+                let fullStars = Math.floor(avgRating);
+                let hasHalfStar = (avgRating - fullStars) >= 0.5;
+                let starsHtml = '';
+                
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= fullStars) {
+                        starsHtml += '<i class="fas fa-star text-warning me-1"></i>';
+                    } else if (i === fullStars + 1 && hasHalfStar) {
+                        starsHtml += '<i class="fas fa-star-half-alt text-warning me-1"></i>';
+                    } else {
+                        starsHtml += '<i class="far fa-star text-warning me-1"></i>';
+                    }
+                }
+                $('#avgStarsDisplay').html(starsHtml);
+                
+                // Update counts
+                $('#totalReviewsDisplay').text(data.total_reviews);
+                $('#fiveStarsCount').text(data.five_stars);
+                $('#fourStarsCount').text(data.four_stars);
+                $('#threeStarsCount').text(data.three_stars);
+                $('#twoStarsCount').text(data.two_stars);
+                $('#oneStarCount').text(data.one_star);
+                $('#withPhotosDisplay').text(data.with_photos);
+                
+                // Update progress bars
+                const total = data.total_reviews;
+                $('#fiveStarsBar').css('width', (data.five_stars / total * 100) + '%');
+                $('#fourStarsBar').css('width', (data.four_stars / total * 100) + '%');
+                $('#threeStarsBar').css('width', (data.three_stars / total * 100) + '%');
+                $('#twoStarsBar').css('width', (data.two_stars / total * 100) + '%');
+                $('#oneStarBar').css('width', (data.one_star / total * 100) + '%');
+                
+                // Display recent reviews
+                let recentHtml = '';
+                if (data.recent_reviews && data.recent_reviews.length > 0) {
+                    data.recent_reviews.forEach(function(review) {
+                        let reviewStars = '';
+                        for (let i = 1; i <= 5; i++) {
+                            if (i <= review.rating) {
+                                reviewStars += '<i class="fas fa-star text-warning" style="font-size: 0.75rem;"></i>';
+                            } else {
+                                reviewStars += '<i class="far fa-star text-warning" style="font-size: 0.75rem;"></i>';
+                            }
+                        }
+                        
+                        recentHtml += `
+                            <div class="review-list-item p-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong class="text-dark d-block">${escapeHtml(review.guest_name || 'Guest')}</strong>
+                                        <div class="mb-1">${reviewStars}</div>
+                                        <p class="mb-0 text-muted" style="font-size: 0.85rem;">${escapeHtml(review.comment ? review.comment.substring(0, 100) : '')}${review.comment && review.comment.length > 100 ? '...' : ''}</p>
+                                    </div>
+                                    <small class="text-muted fw-bold" style="font-size: 0.7rem;">${formatDate(review.created_at)}</small>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    recentHtml = '<div class="text-center text-muted py-3">No recent reviews</div>';
+                }
+                $('#recentReviewsList').html(recentHtml);
+            } else {
+                $('#recentReviewsList').html('<div class="text-center text-muted py-3">No reviews yet</div>');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Error loading review stats:", error);
+            $('#recentReviewsList').html('<div class="text-center text-danger py-3">Error loading reviews</div>');
+        }
+    });
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,470 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="d-flex align-items-center justify-content-between mb-4 fade-in">
+    <div>
+        <h2 class="mb-0 fw-bold"><i class="fas fa-star text-warning me-2"></i> Guest Reviews Management</h2>
+        <p class="text-muted mt-1 mb-0">Moderate and manage guest reviews</p>
+    </div>
+    <div>
+        <span class="badge bg-warning text-dark fs-6 py-2 px-3 shadow-sm" id="pendingBadge">
+            <i class="fas fa-clock me-1"></i> Loading...
+        </span>
+    </div>
+</div>
+
+<div class="row g-4 mb-4 fade-in" style="animation-delay: 0.1s;">
+    <div class="col-md-3">
+        <div class="stat-card stat-revenue text-dark shadow-sm">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-star-half-alt me-2"></i> Average Rating</h5>
+            <h2 id="avgRating" class="display-5 fw-bold mb-1">0</h2>
+            <div id="avgStars" class="fs-6"></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-bookings shadow-sm">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-comment-alt me-2"></i> Total Reviews</h5>
+            <h2 id="totalReviews" class="display-5 fw-bold mb-0">0</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-rooms shadow-sm">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-camera me-2"></i> With Photos</h5>
+            <h2 id="withPhotos" class="display-5 fw-bold mb-0">0</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-guests shadow-sm">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-award me-2"></i> 5-Star Reviews</h5>
+            <h2 id="fiveStars" class="display-5 fw-bold mb-0">0</h2>
+        </div>
+    </div>
+</div>
+
+<div class="filter-bar fade-in" style="animation-delay: 0.2s;">
+    <div class="row align-items-end g-3">
+        <div class="col-md-3">
+            <label for="statusFilter" class="fw-bold text-muted mb-1"><i class="fas fa-filter me-1"></i> Status Filter</label>
+            <select id="statusFilter" class="form-select shadow-sm fw-bold">
+                <option value="all">All Reviews</option>
+                <option value="pending">Unpublished (Pending)</option>
+                <option value="approved">Published</option>
+                <option value="rejected">Archived</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="ratingFilterSelect" class="fw-bold text-muted mb-1"><i class="fas fa-star me-1"></i> Rating</label>
+            <select id="ratingFilterSelect" class="form-select shadow-sm fw-bold">
+                <option value="all">All Ratings</option>
+                <option value="5">5 Stars ★★★★★</option>
+                <option value="4">4 Stars ★★★★☆</option>
+                <option value="3">3 Stars ★★★☆☆</option>
+                <option value="2">2 Stars ★★☆☆☆</option>
+                <option value="1">1 Star ★☆☆☆☆</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="photoFilterSelect" class="fw-bold text-muted mb-1"><i class="fas fa-image me-1"></i> Photo Filter</label>
+            <select id="photoFilterSelect" class="form-select shadow-sm fw-bold">
+                <option value="all">All Reviews</option>
+                <option value="with">With Photos Only</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="fw-bold d-block mb-1">&nbsp;</label>
+            <button class="btn btn-primary w-100 shadow-sm fw-bold" onclick="applyFilters()">
+                <i class="fas fa-search me-1"></i> Apply Filters
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="reviewsList" class="space-y-4 fade-in" style="animation-delay: 0.3s;">
+    <div class="col-12 text-center py-5">
+        <i class="fas fa-spinner fa-spin fa-2x text-primary mb-3"></i>
+        <p class="text-muted fw-bold">Loading reviews...</p>
+    </div>
+</div>
+
+<div id="pagination" class="pagination-container justify-content-center border-0 shadow-none bg-transparent mt-4"></div>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content image-modal-content">
+            <div class="modal-body text-center p-0 position-relative">
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" style="z-index: 10;"></button>
+                <img id="modalFullImage" class="modal-image-full" src="" alt="Review photo">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let allReviews = [];
+let currentPage = 1;
+let itemsPerPage = 10;
+let filteredReviews = [];
+
+(function() {
+    function waitForjQuery() {
+        if (typeof jQuery !== 'undefined') {
+            console.log("✅ jQuery loaded, initializing admin reviews page...");
+            loadReviews();
+            $('#statusFilter, #ratingFilterSelect, #photoFilterSelect').on('change', function() {
+                currentPage = 1;
+                applyFilters();
+            });
+        } else {
+            setTimeout(waitForjQuery, 100);
+        }
+    }
+    waitForjQuery();
+})();
+
+function loadReviews() {
+    console.log("📋 Loading all reviews for admin...");
+    
+    $.ajax({
+        url: '/api/comments/list',
+        method: 'GET',
+        success: function(data) {
+            console.log("✅ Reviews loaded:", data.length);
+            allReviews = data;
+            updateStats();
+            updatePendingBadge();
+            applyFilters();
+        },
+        error: function(xhr, status, error) {
+            console.error("Error loading reviews:", error);
+            $('#reviewsList').html('<div class="col-12 text-center py-5"><i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i><h5 class="fw-bold">Error loading reviews.</h5></div>');
+        }
+    });
+}
+
+function updatePendingBadge() {
+    const pendingCount = allReviews.filter(r => r.status === 'pending').length;
+    if (pendingCount > 0) {
+        $('#pendingBadge').html(`<i class="fas fa-clock me-1"></i> ${pendingCount} Unpublished`);
+        $('#pendingBadge').addClass('animate-pulse');
+    } else {
+        $('#pendingBadge').html(`<i class="fas fa-check-circle me-1"></i> All Published`);
+        $('#pendingBadge').removeClass('animate-pulse');
+        $('#pendingBadge').removeClass('bg-warning text-dark').addClass('bg-success text-white');
+    }
+}
+
+function applyFilters() {
+    const statusFilter = $('#statusFilter').val();
+    const ratingFilter = $('#ratingFilterSelect').val();
+    const photoFilter = $('#photoFilterSelect').val();
+    
+    filteredReviews = [...allReviews];
+    
+    // Sort newest first by default
+    filteredReviews.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    
+    if (statusFilter !== 'all') {
+        filteredReviews = filteredReviews.filter(r => r.status === statusFilter);
+    }
+    
+    if (ratingFilter !== 'all') {
+        filteredReviews = filteredReviews.filter(r => r.rating == ratingFilter);
+    }
+    
+    if (photoFilter === 'with') {
+        filteredReviews = filteredReviews.filter(r => r.image_path && r.image_path !== '' && r.image_path !== null);
+    }
+    
+    currentPage = 1;
+    displayReviewsWithPagination();
+}
+
+function displayReviewsWithPagination() {
+    const totalPages = Math.ceil(filteredReviews.length / itemsPerPage);
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const pageReviews = filteredReviews.slice(start, end);
+    
+    renderReviewCards(pageReviews);
+    renderPagination(totalPages);
+}
+
+function renderReviewCards(reviews) {
+    let html = '';
+    
+    if (reviews.length === 0) {
+        html = '<div class="col-12 text-center py-5"><i class="fas fa-comment-slash fa-3x text-muted opacity-50 mb-3"></i><h4 class="text-muted fw-bold">No reviews found</h4><p class="text-muted">Try adjusting your filters.</p></div>';
+    } else {
+        reviews.forEach(function(review) {
+            let starsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= review.rating) {
+                    starsHtml += '<i class="fas fa-star text-warning"></i>';
+                } else {
+                    starsHtml += '<i class="far fa-star text-warning opacity-50"></i>';
+                }
+            }
+            
+            let statusBadge = '';
+            let statusColor = '';
+            let actionButtons = '';
+            
+            if (review.status === 'pending') {
+                statusBadge = '<span class="badge bg-warning text-dark px-3 py-2"><i class="fas fa-hourglass-half me-1"></i> Unpublished - Awaiting Review</span>';
+                statusColor = 'border-warning';
+                actionButtons = `
+                    <button class="btn btn-success btn-sm w-100 mb-2" onclick="moderateComment(${review.comment_id}, 'approved')">
+                        <i class="fas fa-check-circle me-1"></i> Publish
+                    </button>
+                    <button class="btn btn-secondary btn-sm w-100" onclick="moderateComment(${review.comment_id}, 'rejected')">
+                        <i class="fas fa-archive me-1"></i> Archive
+                    </button>
+                `;
+            } else if (review.status === 'approved') {
+                statusBadge = '<span class="badge bg-success px-3 py-2"><i class="fas fa-globe me-1"></i> Published - Visible to Guests</span>';
+                statusColor = 'border-success';
+                actionButtons = `
+                    <button class="btn btn-warning btn-sm w-100 mb-2" onclick="moderateComment(${review.comment_id}, 'rejected')">
+                        <i class="fas fa-eye-slash me-1"></i> Unpublish
+                    </button>
+                `;
+            } else if (review.status === 'rejected') {
+                statusBadge = '<span class="badge bg-secondary px-3 py-2"><i class="fas fa-archive me-1"></i> Archived - Hidden</span>';
+                statusColor = 'border-secondary';
+                actionButtons = `
+                    <button class="btn btn-success btn-sm w-100 mb-2" onclick="moderateComment(${review.comment_id}, 'approved')">
+                        <i class="fas fa-globe me-1"></i> Republish
+                    </button>
+                `;
+            }
+            
+            let reviewDate = review.created_at ? formatDate(review.created_at) : 'Recent';
+            let hasImage = review.image_path && review.image_path !== '' && review.image_path !== null;
+            let imageUrl = hasImage ? review.image_path : '';
+            
+            html += `
+                <div class="review-card-custom mb-4 fade-in border-start-4 ${statusColor}" style="border-left: 4px solid;">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                                <div>
+                                    <h5 class="fw-bold text-primary mb-1">${escapeHtml(review.guest_name || 'Anonymous Guest')}</h5>
+                                    <div class="rating-stars">${starsHtml}</div>
+                                </div>
+                                <small class="text-muted fw-bold bg-light px-3 py-1 rounded-pill shadow-sm">${reviewDate}</small>
+                            </div>
+                            
+                            <p class="text-dark mb-3" style="font-size: 1rem; line-height: 1.6;">"${escapeHtml(review.comment || '')}"</p>
+                            
+                            ${hasImage ? `
+                                <img src="${imageUrl}" class="public-review-image" onclick="showFullImage('${imageUrl}')" onerror="this.style.display='none'" alt="Review photo" style="max-width: 200px; max-height: 150px; border-radius: 8px; cursor: pointer;">
+                            ` : ''}
+                        </div>
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                            <div class="d-flex flex-column gap-2">
+                                <div class="mb-2">${statusBadge}</div>
+                                ${actionButtons}
+                                <button class="btn btn-outline-danger btn-sm w-100" onclick="deleteComment(${review.comment_id})">
+                                    <i class="fas fa-trash me-1"></i> Delete Permanently
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    $('#reviewsList').html(html);
+}
+
+function moderateComment(commentId, status) {
+    let actionText = '';
+    if (status === 'approved') {
+        actionText = 'publish';
+    } else if (status === 'rejected') {
+        actionText = 'archive';
+    }
+    
+    if(confirm(`Are you sure you want to ${actionText} this review?`)) {
+        $.ajax({
+            url: `/api/comments/moderate/${commentId}`,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ status: status }),
+            success: function(response) {
+                if(response.success) {
+                    let message = '';
+                    if (status === 'approved') message = 'Review published successfully!';
+                    else if (status === 'rejected') message = 'Review archived successfully!';
+                    showNotification(message, 'success');
+                    loadReviews();
+                } else {
+                    showNotification(response.message || 'Error updating review', 'error');
+                }
+            },
+            error: function() {
+                showNotification('Error updating review', 'error');
+            }
+        });
+    }
+}
+
+function deleteComment(commentId) {
+    if(confirm('⚠️ PERMANENT DELETE: This action cannot be undone. Are you sure you want to permanently delete this review?')) {
+        $.ajax({
+            url: `/api/comments/delete/${commentId}`,
+            method: 'DELETE',
+            success: function(response) {
+                if(response.success) {
+                    showNotification('Review permanently deleted!', 'success');
+                    loadReviews();
+                } else {
+                    showNotification(response.message || 'Error deleting review', 'error');
+                }
+            },
+            error: function() {
+                showNotification('Error deleting review', 'error');
+            }
+        });
+    }
+}
+
+function renderPagination(totalPages) {
+    if (totalPages <= 1) {
+        $('#pagination').html('');
+        return;
+    }
+    
+    let html = '<div class="pagination-buttons d-flex gap-2 flex-wrap justify-content-center">';
+    
+    html += `<button class="page-btn fw-bold" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left me-1"></i> Prev</button>`;
+    
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, currentPage + 2);
+    
+    if (startPage > 1) {
+        html += `<button class="page-btn fw-bold" onclick="changePage(1)">1</button>`;
+        if (startPage > 2) html += `<span class="align-self-end pb-1 text-muted fw-bold px-1">...</span>`;
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<button class="page-btn fw-bold ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+    }
+    
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) html += `<span class="align-self-end pb-1 text-muted fw-bold px-1">...</span>`;
+        html += `<button class="page-btn fw-bold" onclick="changePage(${totalPages})">${totalPages}</button>`;
+    }
+    
+    html += `<button class="page-btn fw-bold" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}>Next <i class="fas fa-chevron-right ms-1"></i></button>`;
+    html += '</div>';
+    
+    $('#pagination').html(html);
+}
+
+function changePage(page) {
+    if (page < 1) return;
+    const totalPages = Math.ceil(filteredReviews.length / itemsPerPage);
+    if (page > totalPages) return;
+    currentPage = page;
+    displayReviewsWithPagination();
+    $('html, body').animate({ scrollTop: 0 }, 300);
+}
+
+function updateStats() {
+    const approvedReviews = allReviews.filter(r => r.status === 'approved');
+    const total = approvedReviews.length;
+    const avg = total > 0 ? (approvedReviews.reduce((sum, r) => sum + r.rating, 0) / total).toFixed(1) : 0;
+    const withPhotos = approvedReviews.filter(r => r.image_path && r.image_path !== '' && r.image_path !== null).length;
+    const fiveStars = approvedReviews.filter(r => r.rating === 5).length;
+    
+    $('#avgRating').text(avg);
+    $('#totalReviews').text(total);
+    $('#withPhotos').text(withPhotos);
+    $('#fiveStars').text(fiveStars);
+    
+    let starsHtml = '';
+    let roundedAvg = Math.round(avg);
+    for (let i = 1; i <= 5; i++) {
+        if (i <= roundedAvg) {
+            starsHtml += '<i class="fas fa-star text-warning"></i>';
+        } else {
+            starsHtml += '<i class="far fa-star text-warning opacity-50"></i>';
+        }
+    }
+    $('#avgStars').html(starsHtml);
+}
+
+function showFullImage(imagePath) {
+    $('#modalFullImage').attr('src', imagePath);
+    $('#imageModal').modal('show');
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function showNotification(message, type) {
+    var alertClass = '';
+    var icon = '';
+    
+    if (type === 'error') { alertClass = 'danger'; icon = '<i class="fas fa-exclamation-circle me-2"></i> '; } 
+    else if (type === 'success') { alertClass = 'success'; icon = '<i class="fas fa-check-circle me-2"></i> '; } 
+    else if (type === 'warning') { alertClass = 'warning'; icon = '<i class="fas fa-exclamation-triangle me-2"></i> '; } 
+    else { alertClass = 'info'; icon = '<i class="fas fa-info-circle me-2"></i> '; }
+    
+    var alertHtml = '<div class="alert alert-' + alertClass + ' alert-dismissible fade show border-0 shadow-sm" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">' +
+        icon + '<strong>' + message + '</strong>' +
+        '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+        '</div>';
+    
+    jQuery('body').append(alertHtml);
+    
+    setTimeout(function() {
+        jQuery('.alert').fadeOut(500, function() { jQuery(this).remove(); });
+    }, 4000);
+}
+</script>
+
+<style>
+.animate-pulse {
+    animation: pulse 2s infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+.space-y-4 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 1.5rem;
+}
+.review-card-custom {
+    transition: all 0.3s ease;
+}
+.review-card-custom:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+}
+.public-review-image {
+    transition: transform 0.3s ease;
+}
+.public-review-image:hover {
+    transform: scale(1.02);
+}
+</style>
+{% endblock %}

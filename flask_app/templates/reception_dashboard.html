@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="d-flex align-items-center mb-4 fade-in">
+    <h2 class="mb-0 fw-bold"><i class="fas fa-concierge-bell text-primary me-2"></i> Receptionist Dashboard</h2>
+    <span class="ms-3 text-muted fw-bold border-start ps-3">Manage today's guests</span>
+</div>
+
+<div class="row g-4 mb-4 fade-in" style="animation-delay: 0.1s;">
+    <div class="col-md-3">
+        <div class="stat-card stat-bookings shadow-sm">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-sign-in-alt me-2"></i> Today's Arrivals</h5>
+            <h2 id="todayArrivals" class="display-5 fw-bold mb-0">0</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-revenue text-dark shadow-sm">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-sign-out-alt me-2"></i> Today's Departures</h5>
+            <h2 id="todayDepartures" class="display-5 fw-bold mb-0">0</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-rooms shadow-sm">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-bed me-2"></i> Occupied Rooms</h5>
+            <h2 id="occupiedRooms" class="display-5 fw-bold mb-0">0</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card stat-guests shadow-sm">
+            <h5 class="mb-2 fw-bold opacity-75"><i class="fas fa-door-open me-2"></i> Available Rooms</h5>
+            <h2 id="availableRooms" class="display-5 fw-bold mb-0">0</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4 fade-in" style="animation-delay: 0.2s;">
+    <div class="col-md-6">
+        <div class="dashboard-card">
+            <div class="dashboard-card-header text-white" style="background: linear-gradient(135deg, var(--success) 0%, #059669 100%);">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-sign-in-alt me-2"></i> Today's Arrivals (Check-in)</h5>
+            </div>
+            <div class="dashboard-card-body" id="arrivalsList">
+                <div class="text-center py-5">
+                    <i class="fas fa-spinner fa-spin fa-2x text-success mb-3"></i>
+                    <p class="text-muted fw-bold">Loading arrivals...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="dashboard-card">
+            <div class="dashboard-card-header text-dark" style="background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-sign-out-alt me-2"></i> Today's Departures (Check-out)</h5>
+            </div>
+            <div class="dashboard-card-body" id="departuresList">
+                <div class="text-center py-5">
+                    <i class="fas fa-spinner fa-spin fa-2x text-warning mb-3"></i>
+                    <p class="text-muted fw-bold">Loading departures...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card fade-in" style="animation-delay: 0.3s;">
+    <div class="dashboard-card-header" style="background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%); color: white;">
+        <h5 class="mb-0 fw-bold"><i class="fas fa-list me-2"></i> All Active Bookings</h5>
+    </div>
+    <div class="dashboard-card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="py-3 px-4 text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Guest</th>
+                        <th class="py-3 text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Room</th>
+                        <th class="py-3 text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Check-in</th>
+                        <th class="py-3 text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Check-out</th>
+                        <th class="py-3 text-muted fw-bold text-uppercase" style="font-size: 0.85rem;">Status</th>
+                        <th class="py-3 px-4 text-muted fw-bold text-uppercase text-center" style="font-size: 0.85rem;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="allBookings">
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <i class="fas fa-spinner fa-spin text-primary me-2"></i> Loading bookings...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    function waitForjQuery() {
+        if (typeof jQuery !== 'undefined') {
+            console.log("✅ jQuery loaded, initializing reception dashboard...");
+            loadReceptionData();
+        } else {
+            console.log("⏳ Waiting for jQuery...");
+            setTimeout(waitForjQuery, 100);
+        }
+    }
+    waitForjQuery();
+})();
+
+function loadReceptionData() {
+    const today = new Date().toISOString().split('T')[0];
+    console.log("Today's date:", today);
+    
+    // Load bookings
+    jQuery.ajax({
+        url: '/api/bookings/list',
+        method: 'GET',
+        success: function(bookings) {
+            console.log("✅ Bookings loaded:", bookings.length);
+            
+            const arrivals = bookings.filter(b => b.check_in_date === today && b.status === 'confirmed');
+            const departures = bookings.filter(b => b.check_out_date === today && b.status === 'checked_in');
+            
+            document.getElementById('todayArrivals').innerHTML = arrivals.length;
+            document.getElementById('todayDepartures').innerHTML = departures.length;
+            
+            // Arrivals list
+            let arrivalsHtml = '';
+            if (arrivals.length === 0) {
+                arrivalsHtml = '<div class="text-center py-4"><i class="fas fa-check-circle fa-2x text-muted opacity-50 mb-2"></i><p class="text-muted fw-bold mb-0">No arrivals today</p></div>';
+            } else {
+                arrivals.forEach(b => {
+                    arrivalsHtml += `
+                        <div class="reception-guest-item shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="text-primary d-block mb-1">${escapeHtml(b.guest_name)}</strong>
+                                    <span class="badge bg-light text-dark border"><i class="fas fa-door-closed me-1"></i> Room ${b.room_number}</span>
+                                </div>
+                                <button class="btn btn-success shadow-sm fw-bold px-3" onclick="checkInGuest(${b.booking_id})">
+                                    <i class="fas fa-sign-in-alt me-1"></i> Check In
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById('arrivalsList').innerHTML = arrivalsHtml;
+            
+            // Departures list
+            let departuresHtml = '';
+            if (departures.length === 0) {
+                departuresHtml = '<div class="text-center py-4"><i class="fas fa-check-circle fa-2x text-muted opacity-50 mb-2"></i><p class="text-muted fw-bold mb-0">No departures today</p></div>';
+            } else {
+                departures.forEach(b => {
+                    departuresHtml += `
+                        <div class="reception-guest-item shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong class="text-warning d-block mb-1" style="color: #d97706 !important;">${escapeHtml(b.guest_name)}</strong>
+                                    <span class="badge bg-light text-dark border"><i class="fas fa-door-open me-1"></i> Room ${b.room_number}</span>
+                                </div>
+                                <button class="btn btn-warning shadow-sm fw-bold px-3" onclick="checkOutGuest(${b.booking_id})">
+                                    <i class="fas fa-sign-out-alt me-1"></i> Check Out
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById('departuresList').innerHTML = departuresHtml;
+            
+            // All active bookings
+            let allHtml = '';
+            const activeBookings = bookings.filter(b => b.status !== 'checked_out' && b.status !== 'cancelled');
+            if (activeBookings.length === 0) {
+                allHtml = '<tr><td colspan="6" class="text-center py-4 text-muted fw-bold">No active bookings found.</td></tr>';
+            } else {
+                activeBookings.forEach(b => {
+                    let statusClass = b.status === 'confirmed' ? 'success' : 'info text-dark';
+                    let statusText = b.status === 'checked_in' ? 'Checked In' : 'Confirmed';
+                    
+                    allHtml += `<tr>
+                        <td class="px-4 align-middle fw-bold">${escapeHtml(b.guest_name)}</td>
+                        <td class="align-middle fw-bold text-primary">${b.room_number}</td>
+                        <td class="align-middle text-muted">${b.check_in_date}</td>
+                        <td class="align-middle text-muted">${b.check_out_date}</td>
+                        <td class="align-middle"><span class="badge bg-${statusClass} shadow-sm px-3 py-2 rounded-pill">${statusText}</span></td>
+                        <td class="px-4 align-middle text-center">
+                            <div class="btn-group shadow-sm">
+                                ${b.status === 'confirmed' ? `<button class="btn btn-sm btn-success fw-bold px-3" onclick="checkInGuest(${b.booking_id})" title="Check In"><i class="fas fa-sign-in-alt"></i></button>` : ''}
+                                ${b.status === 'checked_in' ? `<button class="btn btn-sm btn-warning text-dark fw-bold px-3" onclick="checkOutGuest(${b.booking_id})" title="Check Out"><i class="fas fa-sign-out-alt"></i></button>` : ''}
+                                <button class="btn btn-sm btn-outline-primary fw-bold px-3" onclick="viewReceipt(${b.booking_id})" title="View Receipt"><i class="fas fa-receipt"></i></button>
+                            </div>
+                         </td>
+                    </tr>`;
+                });
+            }
+            document.getElementById('allBookings').innerHTML = allHtml;
+        },
+        error: function() {
+            document.getElementById('arrivalsList').innerHTML = '<div class="text-center py-4"><i class="fas fa-exclamation-triangle text-danger fa-2x mb-2"></i><p class="text-danger fw-bold">Error loading data</p></div>';
+        }
+    });
+    
+    // Load rooms
+    jQuery.ajax({
+        url: '/api/rooms/list',
+        method: 'GET',
+        success: function(rooms) {
+            const occupied = rooms.filter(r => r.status === 'booked' || r.status === 'occupied').length;
+            const available = rooms.filter(r => r.status === 'available').length;
+            document.getElementById('occupiedRooms').innerHTML = occupied;
+            document.getElementById('availableRooms').innerHTML = available;
+        }
+    });
+}
+
+function checkInGuest(bookingId) {
+    if(confirm('Are you sure you want to check in this guest?')) {
+        jQuery.ajax({
+            url: `/api/bookings/check-in/${bookingId}`,
+            method: 'POST',
+            success: function(response) {
+                if(response.success) {
+                    showNotification('Guest checked in successfully!', 'success');
+                    loadReceptionData();
+                } else {
+                    showNotification(response.message || 'Error checking in guest', 'error');
+                }
+            }
+        });
+    }
+}
+
+function checkOutGuest(bookingId) {
+    if(confirm('Are you sure you want to check out this guest?')) {
+        jQuery.ajax({
+            url: `/api/bookings/check-out/${bookingId}`,
+            method: 'POST',
+            success: function(response) {
+                if(response.success) {
+                    showNotification('Guest checked out successfully!', 'success');
+                    loadReceptionData();
+                } else {
+                    showNotification(response.message || 'Error checking out guest', 'error');
+                }
+            }
+        });
+    }
+}
+
+function viewReceipt(bookingId) {
+    window.open(`/receipt/${bookingId}`, '_blank');
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function showNotification(message, type) {
+    var alertClass = '';
+    var icon = '';
+    
+    if (type === 'error') { alertClass = 'danger'; icon = '<i class="fas fa-exclamation-circle me-2"></i> '; } 
+    else if (type === 'success') { alertClass = 'success'; icon = '<i class="fas fa-check-circle me-2"></i> '; } 
+    else if (type === 'warning') { alertClass = 'warning'; icon = '<i class="fas fa-exclamation-triangle me-2"></i> '; } 
+    else { alertClass = 'info'; icon = '<i class="fas fa-info-circle me-2"></i> '; }
+    
+    var alertHtml = '<div class="alert alert-' + alertClass + ' alert-dismissible fade show border-0 shadow-sm" role="alert" style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">' +
+        icon + '<strong>' + message + '</strong>' +
+        '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+        '</div>';
+    
+    jQuery('body').append(alertHtml);
+    
+    setTimeout(function() {
+        jQuery('.alert').fadeOut(500, function() { jQuery(this).remove(); });
+    }, 4000);
+}
+</script>
+{% endblock %}
