@@ -113,7 +113,6 @@ def paymongo_success():
     print(f"Session ID from URL: {session_id}")
     
     if not booking_id:
-        # Try to get from session
         pending = session.get('pending_payment', {})
         booking_id = pending.get('booking_id')
         print(f"Booking ID from session: {booking_id}")
@@ -127,8 +126,6 @@ def paymongo_success():
     session.pop('pending_payment', None)
     
     print(f"✅ Redirecting to payment success page for booking {booking_id}")
-    
-    # Redirect to payment success page with modal
     return redirect(url_for('payment.payment_success_modal_page', booking_id=booking_id))
 
 
@@ -145,7 +142,6 @@ def paymongo_failed():
     print(f"Booking ID: {booking_id}")
     print(f"Error: {error_message}")
     
-    # Check if it's an expired session error
     if "expired" in str(error_message).lower():
         error_message = "The payment session has expired. Please create a new booking and try again."
     
@@ -227,11 +223,11 @@ def process_payment_success_json(booking_id):
         cursor.close()
         conn.close()
         
-        # Send email
+        # Send email (non-critical)
         try:
-    email_service.send_payment_receipt # Already wrapped(booking, transaction_id, 'GCash via PayMongo')
-except Exception as email_err:
-    print(f"⚠️ Email error (non-critical): {email_err}")
+            email_service.send_payment_receipt(booking, transaction_id, 'GCash via PayMongo')
+        except Exception as email_err:
+            print(f"⚠️ Email skipped (non-critical): {email_err}")
         
         return jsonify({
             'success': True,
@@ -283,7 +279,6 @@ def process_counter_payment():
         nights = (datetime.strptime(str(booking['check_out_date']), '%Y-%m-%d') - 
                  datetime.strptime(str(booking['check_in_date']), '%Y-%m-%d')).days
         
-        # Get discount amount and coupon code
         discount_amount = float(booking.get('discount_amount', 0)) if booking.get('discount_amount') else 0
         coupon_code = booking.get('coupon_code', '')
         
@@ -303,18 +298,16 @@ def process_counter_payment():
             'coupon_code': coupon_code
         }
         
-        print(f"📊 Counter PDF Data - Discount: ${discount_amount}, Coupon: {coupon_code}")
-        
         pdf_path = generate_booking_ticket(booking_data, ticket_number)
         
         cursor.close()
         conn.close()
         
+        # Send email (non-critical)
         try:
-            email_service.send_booking_confirmation(booking,
-except Exception as e:
-            print(f'?? Email skipped: {e}')
-             'Pay at Counter', ticket_number)
+            email_service.send_booking_confirmation(booking, 'Pay at Counter', ticket_number)
+        except Exception as email_err:
+            print(f"⚠️ Email skipped (non-critical): {email_err}")
         
         return send_file(
             pdf_path,
@@ -414,15 +407,13 @@ def view_ticket(booking_id):
             except:
                 pass
         return f"Error loading ticket: {str(e)}", 500
-    
-    
+
+
 @payment_bp.route('/process-counter-payment-json', methods=['POST'])
 def process_counter_payment_json():
     """Process pay at counter and return JSON with receipt data + send email"""
     try:
         booking_id = request.form.get('booking_id')
-        
-        print(f"Processing counter payment for booking ID: {booking_id}")
         
         if not booking_id:
             return jsonify({'success': False, 'message': 'Booking ID is required'})
@@ -445,9 +436,7 @@ def process_counter_payment_json():
             conn.close()
             return jsonify({'success': False, 'message': 'Booking not found'})
         
-        print(f"Found booking: {booking['guest_name']} - Room {booking['room_number']}")
-        
-        # Update booking status to confirmed (keeps payment_status as pending)
+        # Update booking status to confirmed
         cursor.execute("""
             UPDATE bookings 
             SET status = 'confirmed'
@@ -461,14 +450,11 @@ def process_counter_payment_json():
         check_out = datetime.strptime(str(booking['check_out_date']), '%Y-%m-%d')
         nights = (check_out - check_in).days
         
-        # Get discount amount and coupon code
         discount_amount = float(booking.get('discount_amount', 0)) if booking.get('discount_amount') else 0
         coupon_code = booking.get('coupon_code', '')
         
-        # Generate ticket number
         ticket_number = f"HTL{datetime.now().strftime('%Y%m%d%H%M%S')}{booking_id}"
         
-        # Prepare receipt data
         booking_data = {
             'booking_id': booking['booking_id'],
             'guest_name': booking['guest_name'],
@@ -490,18 +476,11 @@ def process_counter_payment_json():
         cursor.close()
         conn.close()
         
-        # 🔔 SEND EMAIL for counter payment (same as GCash but with counter payment note)
+        # Send email (non-critical)
         try:
-            try:
-            email_service.send_booking_confirmation(booking,
-except Exception as e:
-            print(f'?? Email skipped: {e}')
-             'Pay at Counter', ticket_number)
-            print(f"✅ Counter payment confirmation email sent to {booking['guest_email']}")
+            email_service.send_booking_confirmation(booking, 'Pay at Counter', ticket_number)
         except Exception as email_err:
-            print(f"⚠️ Email sending failed but booking is confirmed: {email_err}")
-        
-        print(f"Receipt data prepared: {booking_data}")
+            print(f"⚠️ Email skipped (non-critical): {email_err}")
         
         return jsonify({
             'success': True,
@@ -514,4 +493,3 @@ except Exception as e:
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)})
-
