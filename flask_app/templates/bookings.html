@@ -1,0 +1,593 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4 fade-in">
+    <h2 class="fw-bold"><i class="fas fa-calendar-check text-primary me-2"></i> Manage Bookings</h2>
+    <button class="btn btn-primary shadow-sm fw-bold" onclick="ModalManager.showBookingModal()">
+        <i class="fas fa-plus me-1"></i> New Booking
+    </button>
+</div>
+
+<div class="filter-bar fade-in" style="animation-delay: 0.1s;">
+    <div class="row align-items-end g-3">
+        <div class="col-md-3">
+            <label for="searchInput" class="fw-bold text-muted mb-1"><i class="fas fa-search me-1"></i> Search Bookings</label>
+            <input type="text" id="searchInput" class="form-control shadow-sm" placeholder="Search by guest name, email, or phone...">
+        </div>
+        <div class="col-md-2">
+            <label for="statusFilter" class="fw-bold text-muted mb-1"><i class="fas fa-filter me-1"></i> Filter by Status</label>
+            <select id="statusFilter" class="form-select shadow-sm">
+                <option value="">All Status</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="pending">Pending</option>
+                <option value="checked_in">Checked In</option>
+                <option value="checked_out">Checked Out</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="paymentFilter" class="fw-bold text-muted mb-1"><i class="fas fa-credit-card me-1"></i> Payment</label>
+            <select id="paymentFilter" class="form-select shadow-sm">
+                <option value="">All Payments</option>
+                <option value="paid">Paid</option>
+                <option value="pending">Pending (Counter)</option>
+                <option value="refunded">Refunded</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="entriesSelect" class="fw-bold text-muted mb-1"><i class="fas fa-list me-1"></i> Show Entries</label>
+            <select id="entriesSelect" class="form-select shadow-sm">
+                <option value="5">5 entries</option>
+                <option value="10" selected>10 entries</option>
+                <option value="25">25 entries</option>
+                <option value="50">50 entries</option>
+                <option value="100">100 entries</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="fw-bold d-block mb-1">&nbsp;</label>
+            <button class="btn btn-secondary w-100 fw-bold shadow-sm" onclick="resetFilters()">
+                <i class="fas fa-undo me-1"></i> Reset
+            </button>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <small class="text-muted fw-bold border-start border-3 border-primary ps-2" id="bookingResultCount">Loading bookings...</small>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive shadow-sm fade-in" style="border-radius: 12px; animation-delay: 0.2s;">
+    <table class="table table-bordered table-hover mb-0">
+        <thead style="background: linear-gradient(135deg, #1a2744 0%, #243356 100%);">
+            <tr>
+                <th class="py-3 text-white" style="border-bottom: 2px solid #c9a84c;">ID</th>
+                <th class="py-3 text-white" style="border-bottom: 2px solid #c9a84c;">Guest Name</th>
+                <th class="py-3 text-white" style="border-bottom: 2px solid #c9a84c;">Room</th>
+                <th class="py-3 text-white" style="border-bottom: 2px solid #c9a84c;">Check In</th>
+                <th class="py-3 text-white" style="border-bottom: 2px solid #c9a84c;">Check Out</th>
+                <th class="py-3 text-white" style="border-bottom: 2px solid #c9a84c;">Total</th>
+                <th class="py-3 text-white" style="border-bottom: 2px solid #c9a84c;">Payment</th>
+                <th class="py-3 text-white" style="border-bottom: 2px solid #c9a84c;">Status</th>
+                <th class="py-3 text-white text-center" style="border-bottom: 2px solid #c9a84c;">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="bookingsTable">
+            <tr>
+                <td colspan="9" class="text-center py-5">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="text-muted fw-bold">Loading bookings...</p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="pagination-container fade-in" style="animation-delay: 0.3s;">
+    <div class="page-info">
+        Showing <span id="startEntry" class="fw-bold">0</span> to <span id="endEntry" class="fw-bold">0</span> of <span id="totalEntries" class="fw-bold text-primary">0</span> entries
+    </div>
+    <div class="pagination-buttons">
+        <button class="page-btn" id="prevPageBtn" onclick="prevPage()" disabled><i class="fas fa-chevron-left"></i> Prev</button>
+        <span id="pageNumbers" class="d-flex gap-2"></span>
+        <button class="page-btn" id="nextPageBtn" onclick="nextPage()">Next <i class="fas fa-chevron-right"></i></button>
+    </div>
+</div>
+
+<script>
+(function() {
+    function waitForjQuery() {
+        if (typeof jQuery !== 'undefined') {
+            console.log("✅ jQuery loaded, initializing bookings page...");
+            initBookingsPage();
+        } else {
+            setTimeout(waitForjQuery, 50);
+        }
+    }
+    
+    function initBookingsPage() {
+        jQuery(document).ready(function($) {
+            loadBookings();
+            
+            $('#searchInput').on('keyup', function() {
+                currentPage = 1;
+                filterBookings();
+            });
+            
+            $('#statusFilter').on('change', function() {
+                currentPage = 1;
+                filterBookings();
+            });
+            
+            $('#paymentFilter').on('change', function() {
+                currentPage = 1;
+                filterBookings();
+            });
+            
+            $('#entriesSelect').on('change', function() {
+                entriesPerPage = parseInt($(this).val());
+                currentPage = 1;
+                filterBookings();
+            });
+        });
+    }
+    
+    waitForjQuery();
+})();
+
+let allBookings = [];
+let filteredBookings = [];
+let currentPage = 1;
+let entriesPerPage = 10;
+
+function loadBookings() {
+    console.log("📋 Loading bookings from database...");
+    jQuery.ajax({
+        url: '/api/bookings/list',
+        method: 'GET',
+        success: function(data) {
+            console.log("✅ Bookings loaded:", data.length);
+            allBookings = data;
+            filterBookings();
+        },
+        error: function(xhr, status, error) {
+            console.error('Error loading bookings:', error);
+            showNotification('Failed to load bookings', 'error');
+            document.getElementById('bookingsTable').innerHTML = `
+                <tr><td colspan="9" class="text-center text-danger py-4 fw-bold">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Error loading bookings
+                </td></tr>
+            `;
+        }
+    });
+}
+
+function filterBookings() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const statusFilter = document.getElementById('statusFilter').value;
+    const paymentFilter = document.getElementById('paymentFilter').value;
+    
+    filteredBookings = allBookings.filter(function(booking) {
+        if (statusFilter && booking.status !== statusFilter) return false;
+        if (paymentFilter && booking.payment_status !== paymentFilter) return false;
+        
+        if (searchTerm) {
+            return booking.guest_name.toLowerCase().includes(searchTerm) ||
+                   (booking.guest_email && booking.guest_email.toLowerCase().includes(searchTerm)) ||
+                   (booking.guest_phone && booking.guest_phone.includes(searchTerm)) ||
+                   (booking.room_number && booking.room_number.toLowerCase().includes(searchTerm));
+        }
+        return true;
+    });
+    
+    // Sort: newest bookings first
+    filteredBookings.sort(function(a, b) {
+        return new Date(b.created_at) - new Date(a.created_at);
+    });
+    
+    currentPage = 1;
+    displayPagination();
+    displayBookings();
+}
+
+function displayPagination() {
+    const totalEntries = filteredBookings.length;
+    const totalPages = Math.ceil(totalEntries / entriesPerPage);
+    const startEntry = totalEntries === 0 ? 0 : (currentPage - 1) * entriesPerPage + 1;
+    const endEntry = Math.min(currentPage * entriesPerPage, totalEntries);
+    
+    document.getElementById('startEntry').innerText = startEntry;
+    document.getElementById('endEntry').innerText = endEntry;
+    document.getElementById('totalEntries').innerText = totalEntries;
+    
+    document.getElementById('prevPageBtn').disabled = currentPage === 1;
+    document.getElementById('nextPageBtn').disabled = currentPage === totalPages || totalPages === 0;
+    
+    let pageHtml = '';
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, currentPage + 2);
+    
+    if (startPage > 1) {
+        pageHtml += `<button class="page-btn" onclick="goToPage(1)">1</button>`;
+        if (startPage > 2) pageHtml += `<span class="page-dots align-self-end text-muted pb-1">...</span>`;
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const activeClass = i === currentPage ? 'active' : '';
+        pageHtml += `<button class="page-btn ${activeClass}" onclick="goToPage(${i})">${i}</button>`;
+    }
+    
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) pageHtml += `<span class="page-dots align-self-end text-muted pb-1">...</span>`;
+        pageHtml += `<button class="page-btn" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+    }
+    
+    document.getElementById('pageNumbers').innerHTML = pageHtml || '<span class="text-muted">No entries</span>';
+    
+    var resultText = filteredBookings.length === allBookings.length ? 
+        'Showing all ' + filteredBookings.length + ' bookings' : 
+        'Showing ' + filteredBookings.length + ' of ' + allBookings.length + ' bookings';
+    document.getElementById('bookingResultCount').textContent = resultText;
+}
+
+function displayBookings() {
+    let html = '';
+    const startIndex = (currentPage - 1) * entriesPerPage;
+    const endIndex = startIndex + entriesPerPage;
+    const pageBookings = filteredBookings.slice(startIndex, endIndex);
+    
+    if (pageBookings.length === 0) {
+        html = '<tr><td colspan="9" class="text-center text-muted py-5 fw-bold"><i class="fas fa-search fa-2x mb-3 d-block opacity-50"></i>No bookings found</td></tr>';
+    } else {
+        pageBookings.forEach(function(booking) {
+            let statusClass = '';
+            let statusText = '';
+            
+            switch(booking.status) {
+                case 'confirmed': 
+                    statusClass = 'bg-success'; 
+                    statusText = 'Confirmed';
+                    break;
+                case 'pending': 
+                    statusClass = 'bg-warning text-dark'; 
+                    statusText = 'Pending';
+                    break;
+                case 'cancelled': 
+                    statusClass = 'bg-danger'; 
+                    statusText = 'Cancelled';
+                    break;
+                case 'checked_in': 
+                    statusClass = 'bg-info text-dark'; 
+                    statusText = 'Checked In';
+                    break;
+                case 'checked_out': 
+                    statusClass = 'bg-secondary'; 
+                    statusText = 'Checked Out';
+                    break;
+                default: 
+                    statusClass = 'bg-secondary';
+                    statusText = booking.status || 'Unknown';
+            }
+            
+            // Payment status display
+            let paymentBadge = '';
+            let paymentStatus = booking.payment_status || 'pending';
+            
+            switch(paymentStatus) {
+                case 'paid':
+                    paymentBadge = '<span class="badge bg-success px-3 py-2"><i class="fas fa-check-circle me-1"></i>Paid</span>';
+                    break;
+                case 'pending':
+                    paymentBadge = '<span class="badge bg-warning text-dark px-3 py-2"><i class="fas fa-clock me-1"></i>Pay at Counter</span>';
+                    break;
+                case 'refunded':
+                    paymentBadge = '<span class="badge bg-info text-dark px-3 py-2"><i class="fas fa-undo me-1"></i>Refunded</span>';
+                    break;
+                default:
+                    paymentBadge = '<span class="badge bg-secondary px-3 py-2">' + escapeHtml(paymentStatus) + '</span>';
+            }
+            
+            const isPaidOnline = booking.payment_status === 'paid';
+            const isPendingPayment = booking.payment_status === 'pending';
+            const isConfirmed = booking.status === 'confirmed';
+            
+            // Build action buttons
+            let actionButtons = '';
+            
+            if (isConfirmed) {
+                // Check In button always available for confirmed bookings
+                actionButtons += `
+                    <button class="btn btn-sm btn-info text-white" onclick="checkIn(${booking.booking_id})" title="Check In">
+                        <i class="fas fa-sign-in-alt"></i>
+                    </button>
+                `;
+                
+                // Mark as Paid button - ONLY for counter payments (pending)
+                if (isPendingPayment) {
+                    actionButtons += `
+                        <button class="btn btn-sm btn-success" onclick="markAsPaid(${booking.booking_id})" title="Mark as Paid at Counter">
+                            <i class="fas fa-cash-register"></i>
+                        </button>
+                    `;
+                }
+                
+                // Cancel button: ONLY if pending payment (counter)
+                if (isPendingPayment) {
+                    actionButtons += `
+                        <button class="btn btn-sm btn-danger" onclick="cancelBooking(${booking.booking_id})" title="Cancel">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                }
+                
+                // If paid online, show lock icon
+                if (isPaidOnline) {
+                    actionButtons += `
+                        <button class="btn btn-sm btn-outline-secondary" disabled title="Cannot cancel paid bookings">
+                            <i class="fas fa-lock"></i>
+                        </button>
+                    `;
+                }
+            }
+            
+            if (booking.status === 'checked_in') {
+                actionButtons += `
+                    <button class="btn btn-sm btn-warning text-dark" onclick="checkOut(${booking.booking_id})" title="Check Out">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                `;
+            }
+            
+            // Receipt and Review buttons
+            actionButtons += `
+                <button class="btn btn-sm btn-outline-success" onclick="viewReceipt(${booking.booking_id})" title="Receipt">
+                    <i class="fas fa-receipt"></i>
+                </button>
+                
+            `;
+            
+            html += `
+                <tr data-status="${booking.status}" class="fade-in">
+                    <td class="align-middle fw-bold text-muted">#${booking.booking_id}</td>
+                    <td class="align-middle">
+                        <strong class="fw-bold text-primary">${escapeHtml(booking.guest_name)}</strong><br>
+                        <small class="text-muted">${escapeHtml(booking.guest_email || 'No email')}</small>
+                    </td>
+                    <td class="align-middle">
+                        <span class="fw-bold">${escapeHtml(booking.room_number || 'N/A')}</span>
+                        <br><small class="text-muted">${escapeHtml(booking.type_name || 'Standard')}</small>
+                    </td>
+                    <td class="align-middle small fw-bold">${formatDate(booking.check_in_date)}</td>
+                    <td class="align-middle small fw-bold">${formatDate(booking.check_out_date)}</td>
+                    <td class="align-middle fw-bold text-success">$${parseFloat(booking.total_amount || 0).toFixed(2)}</td>
+                    <td class="align-middle">${paymentBadge}</td>
+                    <td class="align-middle"><span class="badge ${statusClass} px-3 py-2 shadow-sm">${statusText}</span></td>
+                    <td class="align-middle text-center">
+                        <div class="btn-group shadow-sm" role="group">
+                            ${actionButtons}
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+    
+    document.getElementById('bookingsTable').innerHTML = html;
+}
+
+// ============ NEW: Mark as Paid Function ============
+function markAsPaid(bookingId) {
+    if(confirm('💰 Mark this booking as paid at the counter?\n\nThis confirms that the guest has paid in person.')) {
+        var $btn = $(event.target).closest('button');
+        var originalHtml = $btn.html();
+        $btn.html('<i class="fas fa-spinner fa-spin"></i>').prop('disabled', true);
+        
+        jQuery.ajax({
+            url: `/api/bookings/mark-paid/${bookingId}`,
+            method: 'POST',
+            success: function(response) {
+                if(response.success) {
+                    showNotification('Payment marked as paid! 💰', 'success');
+                    loadBookings();
+                } else {
+                    showNotification(response.message || 'Failed to mark as paid', 'error');
+                    $btn.html(originalHtml).prop('disabled', false);
+                }
+            },
+            error: function() {
+                showNotification('Error marking payment', 'error');
+                $btn.html(originalHtml).prop('disabled', false);
+            }
+        });
+    }
+}
+
+function goToPage(page) {
+    currentPage = page;
+    displayPagination();
+    displayBookings();
+}
+
+function prevPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        displayPagination();
+        displayBookings();
+    }
+}
+
+function nextPage() {
+    const totalPages = Math.ceil(filteredBookings.length / entriesPerPage);
+    if (currentPage < totalPages) {
+        currentPage++;
+        displayPagination();
+        displayBookings();
+    }
+}
+
+function resetFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('statusFilter').value = '';
+    document.getElementById('paymentFilter').value = '';
+    document.getElementById('entriesSelect').value = '10';
+    entriesPerPage = 10;
+    filterBookings();
+    showNotification('Filters reset', 'info');
+}
+
+function checkIn(bookingId) {
+    if(confirm('Confirm check-in for this guest?')) {
+        jQuery.ajax({
+            url: `/api/bookings/check-in/${bookingId}`,
+            method: 'POST',
+            success: function(response) {
+                if(response.success) {
+                    showNotification('Guest checked in successfully!', 'success');
+                    loadBookings();
+                } else {
+                    showNotification(response.message || 'Check-in failed', 'error');
+                }
+            },
+            error: function() {
+                showNotification('Error during check-in', 'error');
+            }
+        });
+    }
+}
+
+function checkOut(bookingId) {
+    if(confirm('Confirm check-out for this guest?')) {
+        jQuery.ajax({
+            url: `/api/bookings/check-out/${bookingId}`,
+            method: 'POST',
+            success: function(response) {
+                if(response.success) {
+                    showNotification('Guest checked out successfully!', 'success');
+                    loadBookings();
+                } else {
+                    showNotification(response.message || 'Check-out failed', 'error');
+                }
+            },
+            error: function() {
+                showNotification('Error during check-out', 'error');
+            }
+        });
+    }
+}
+
+function cancelBooking(bookingId) {
+    if(confirm('⚠️ Are you sure you want to cancel this booking?\nThis action cannot be undone.')) {
+        jQuery.ajax({
+            url: `/api/bookings/cancel/${bookingId}`,
+            method: 'POST',
+            success: function(response) {
+                if(response.success) {
+                    showNotification('Booking cancelled successfully!', 'warning');
+                    loadBookings();
+                } else {
+                    showNotification(response.message || 'Cancellation failed', 'error');
+                }
+            },
+            error: function() {
+                showNotification('Error cancelling booking', 'error');
+            }
+        });
+    }
+}
+
+function viewReceipt(bookingId) {
+    window.open(`/receipt/${bookingId}`, '_blank');
+}
+
+function addReview(bookingId) {
+    if (typeof ModalManager !== 'undefined' && ModalManager.showCommentModal) {
+        ModalManager.showCommentModal(bookingId);
+    } else {
+        alert('Please refresh the page and try again.');
+    }
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function showNotification(message, type) {
+    if (typeof window.showNotification === 'function') {
+        window.showNotification(message, type);
+    } else {
+        alert(message);
+    }
+}
+</script>
+
+<style>
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+    padding: 1rem 1.5rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.page-info {
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+.pagination-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+.page-btn {
+    padding: 0.4rem 0.9rem;
+    border: 1px solid #dee2e6;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    color: #374151;
+}
+.page-btn:hover:not(:disabled) {
+    background: #f8f9fa;
+    border-color: #c9a84c;
+    color: #1a2744;
+}
+.page-btn.active {
+    background: linear-gradient(135deg, #1a2744, #243356);
+    color: white;
+    border-color: #1a2744;
+}
+.page-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.page-dots {
+    color: #9ca3af;
+    font-weight: 700;
+}
+</style>
+{% endblock %}

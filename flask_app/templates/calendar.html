@@ -1,0 +1,484 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="mb-0"><i class="fas fa-calendar-alt text-primary me-2"></i> Booking Calendar</h2>
+        <small class="text-muted fw-bold">Shows check-in, check-out, and currently staying only</small>
+    </div>
+    <button class="nav-btn" onclick="location.reload()">
+        <i class="fas fa-sync-alt me-1"></i> Refresh
+    </button>
+</div>
+
+<div class="stats-container">
+    <div class="stat-card stat-bookings calendar-stat" onclick="goToToday()">
+        <h3 id="totalBookingsCard">0</h3>
+        <p class="fw-bold mb-1">Total Active Bookings</p>
+        <small>Excluding cancelled</small>
+    </div>
+    <div class="stat-card stat-rooms calendar-stat" onclick="setStatusFilter('checkin')">
+        <h3 id="checkedInCard">0</h3>
+        <p class="fw-bold mb-1"> Currently Staying</p>
+        <small>Checked in today</small>
+    </div>
+    <div class="stat-card stat-revenue calendar-stat" onclick="setStatusFilter('checkin')">
+        <h3 id="todayCheckinsCard" class="text-dark">0</h3>
+        <p class="fw-bold mb-1 text-dark"> Today's Check-ins</p>
+        <small class="text-dark">Arrivals</small>
+    </div>
+    <div class="stat-card stat-guests calendar-stat" onclick="setStatusFilter('checkout')">
+        <h3 id="todayCheckoutsCard">0</h3>
+        <p class="fw-bold mb-1"> Today's Check-outs</p>
+        <small>Departures</small>
+    </div>
+</div>
+
+<div class="filter-bar">
+    <span class="fw-bold"><i class="fas fa-filter text-muted me-1"></i> Filter:</span>
+    <button class="filter-btn active" onclick="setStatusFilter('all')">All</button>
+    
+    <button class="filter-btn" onclick="setStatusFilter('checkin')">📥 Check-ins</button>
+    
+    <button class="filter-btn" onclick="setStatusFilter('checkout')">📤 Check-outs</button>
+
+    <span id="filterStatus" class="ms-auto text-muted fw-bold">Showing: All</span>
+</div>
+
+<div class="calendar-wrapper">
+    <div class="calendar-nav-bar">
+        
+        <h3 class="month-year" id="monthYearDisplay">Loading...</h3>
+        <div class="d-flex gap-2">
+            <button class="nav-btn" onclick="changeMonth(-1)">
+            <i class="fas fa-chevron-left me-1"></i> Previous
+        </button>
+            <button class="nav-btn" onclick="changeMonth(1)">
+                  Next   <i class="fas fa-chevron-right ms-1"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="weekdays-row">
+        <div class="weekday-cell weekend">Sun</div>
+        <div class="weekday-cell">Mon</div>
+        <div class="weekday-cell">Tue</div>
+        <div class="weekday-cell">Wed</div>
+        <div class="weekday-cell">Thu</div>
+        <div class="weekday-cell">Fri</div>
+        <div class="weekday-cell weekend">Sat</div>
+    </div>
+
+    <div id="calendarGrid" class="calendar-grid">
+        <div class="text-center py-5" style="grid-column: span 7;">
+            <i class="fas fa-spinner fa-spin fa-2x text-primary mb-3"></i>
+            <p class="text-muted fw-bold">Loading calendar data...</p>
+        </div>
+    </div>
+
+    <div class="legend-container shadow-sm">
+        <div></div>
+        <div class="legend-item"><span class="legend-dot checkin"></span> Check-in Day</div>
+        <div class="legend-item"><span class="legend-dot checkout"></span> Check-out Day</div>
+        <div></div>
+    </div>
+</div>
+
+<div id="bookingModal" class="modal-overlay" onclick="closeModalOnClick(event)">
+    <div class="modal-content-custom" onclick="event.stopPropagation()">
+        <div class="modal-header-custom d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 fw-bold"><i class="fas fa-receipt me-2"></i> Booking Details</h4>
+            <button class="btn-close" style="filter: invert(1);" onclick="closeModal()"></button>
+        </div>
+        <div class="modal-body p-4" id="modalBody">Loading...</div>
+    </div>
+</div>
+
+<script>
+// Global variables
+let currentDate = new Date();
+let allBookings = [];
+let allRooms = [];
+let allRoomTypes = [];
+let currentYear = currentDate.getFullYear();
+let currentMonth = currentDate.getMonth();
+let todayStr = new Date().toISOString().split('T')[0];
+let currentStatusFilter = 'all';
+
+const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                    'July', 'August', 'September', 'October', 'November', 'December'];
+
+// Statuses to EXCLUDE from calendar
+const EXCLUDED_STATUSES = ['cancelled', 'checked_out'];
+
+// Initialize
+(function() {
+    function waitForjQuery() {
+        if (typeof jQuery !== 'undefined') {
+            console.log("✅ jQuery loaded, initializing calendar...");
+            initCalendar();
+        } else {
+            console.log("⏳ Waiting for jQuery...");
+            setTimeout(waitForjQuery, 100);
+        }
+    }
+    
+    function initCalendar() {
+        jQuery(document).ready(function($) {
+            loadAllData();
+        });
+    }
+    
+    waitForjQuery();
+})();
+
+function setStatusFilter(status) {
+    currentStatusFilter = status;
+    $('.filter-btn').removeClass('active');
+    $(event.target).addClass('active');
+    
+    let filterText = '';
+    switch(status) {
+        case 'checked_in': filterText = 'Currently Staying'; break;
+        case 'checkin': filterText = 'Check-ins'; break;
+        case 'checkout': filterText = 'Check-outs'; break;
+        case 'confirmed': filterText = 'Future Bookings'; break;
+        default: filterText = 'All Bookings';
+    }
+    $('#filterStatus').text(`Showing: ${filterText}`);
+    renderCalendar();
+}
+
+function loadAllData() {
+    console.log("📊 Loading calendar data from database...");
+    
+    const year = currentYear;
+    const month = String(currentMonth + 1).padStart(2, '0');
+    
+    jQuery.ajax({
+        url: `/api/calendar/bookings-for-calendar?year=${year}&month=${month}`,
+        method: 'GET',
+        success: function(response) {
+            if (response.success) {
+                allBookings = response.bookings;
+                console.log(`✅ Loaded ${allBookings.length} active bookings for ${monthNames[currentMonth]} ${currentYear}`);
+                loadRoomsAndRender();
+            } else {
+                console.error("API returned error:", response.error);
+                showError("Failed to load calendar data");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("❌ Error loading bookings:", error);
+            showError("Could not connect to the database");
+        }
+    });
+}
+
+function loadRoomsAndRender() {
+    jQuery.ajax({
+        url: '/api/rooms/list',
+        method: 'GET',
+        success: function(rooms) {
+            allRooms = rooms;
+            jQuery.ajax({
+                url: '/api/rooms/types/list',
+                method: 'GET',
+                success: function(roomTypes) {
+                    allRoomTypes = roomTypes;
+                    renderCalendar();
+                    updateStats();
+                    loadTodayActivity(); 
+                },
+                error: function() {
+                    renderCalendar();
+                    updateStats();
+                }
+            });
+        },
+        error: function() {
+            renderCalendar();
+            updateStats();
+        }
+    });
+}
+
+function loadTodayActivity() {
+    jQuery.ajax({
+        url: '/api/calendar/today-activity',
+        method: 'GET',
+        success: function(response) {
+            if (response.success) {
+                document.getElementById('checkedInCard').innerHTML = response.stats.currently_staying_count;
+                document.getElementById('todayCheckinsCard').innerHTML = response.stats.checkins_count;
+                document.getElementById('todayCheckoutsCard').innerHTML = response.stats.checkouts_count;
+            }
+        },
+        error: function(err) {
+            console.log("Could not load today's activity:", err);
+        }
+    });
+}
+
+function updateStats() {
+    document.getElementById('totalBookingsCard').innerHTML = allBookings.length;
+}
+
+function showError(message) {
+    document.getElementById('calendarGrid').innerHTML = `
+        <div class="text-center py-5" style="grid-column: span 7;">
+            <i class="fas fa-exclamation-triangle fa-3x mb-3" style="color: var(--danger);"></i>
+            <h4 class="fw-bold">Error Loading Data</h4>
+            <p class="text-muted">${message}</p>
+            <button class="btn btn-primary mt-2" onclick="location.reload()">
+                <i class="fas fa-sync-alt"></i> Retry
+            </button>
+        </div>
+    `;
+}
+
+function getRoomNumber(roomId) {
+    const room = allRooms.find(r => r.room_id === roomId);
+    return room ? room.room_number : `#${roomId}`;
+}
+
+function getRoomTypeName(roomId) {
+    const room = allRooms.find(r => r.room_id === roomId);
+    if (room && room.type_id) {
+        const roomType = allRoomTypes.find(rt => rt.type_id === room.type_id);
+        return roomType ? roomType.type_name : 'Standard';
+    }
+    return 'Standard';
+}
+
+function getBookingDisplayType(booking, dateStr) {
+    if (booking.check_in_date === dateStr) return 'checkin';
+    if (booking.check_out_date === dateStr) return 'checkout';
+    if (dateStr === todayStr && booking.check_in_date <= dateStr && booking.check_out_date > dateStr && booking.status === 'checked_in') {
+        return 'checked_in';
+    }
+    if (booking.check_in_date === dateStr && booking.status === 'confirmed') return 'confirmed';
+    return null;
+}
+
+function shouldShowBooking(booking, displayType) {
+    if (currentStatusFilter === 'all') return true;
+    return currentStatusFilter === displayType;
+}
+
+function renderCalendar() {
+    document.getElementById('monthYearDisplay').innerHTML = `${monthNames[currentMonth]} ${currentYear}`;
+    
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    const startDay = firstDay.getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate();
+    
+    let html = '';
+    let dayCounter = 1;
+    let nextMonthCounter = 1;
+    
+    for (let i = 0; i < 42; i++) {
+        let dayNumber;
+        let isCurrentMonth = true;
+        let isToday = false;
+        let dateStr;
+        let displayYear = currentYear;
+        let displayMonth = currentMonth;
+        
+        if (i < startDay) {
+            dayNumber = prevMonthDays - (startDay - i) + 1;
+            isCurrentMonth = false;
+            displayMonth = currentMonth - 1;
+            if (displayMonth < 0) { displayMonth = 11; displayYear = currentYear - 1; }
+            dateStr = `${displayYear}-${String(displayMonth + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
+        } else if (dayCounter <= daysInMonth) {
+            dayNumber = dayCounter;
+            dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
+            dayCounter++;
+            isCurrentMonth = true;
+            
+            const today = new Date();
+            if (currentYear === today.getFullYear() && currentMonth === today.getMonth() && dayNumber === today.getDate()) {
+                isToday = true;
+            }
+        } else {
+            dayNumber = nextMonthCounter;
+            nextMonthCounter++;
+            isCurrentMonth = false;
+            displayMonth = currentMonth + 1;
+            if (displayMonth > 11) { displayMonth = 0; displayYear = currentYear + 1; }
+            dateStr = `${displayYear}-${String(displayMonth + 1).padStart(2, '0')}-${String(dayNumber).padStart(2, '0')}`;
+        }
+        
+        let bookingsForDate = [];
+        allBookings.forEach(booking => {
+            const displayType = getBookingDisplayType(booking, dateStr);
+            if (displayType && shouldShowBooking(booking, displayType)) {
+                bookingsForDate.push({ ...booking, displayType: displayType });
+            }
+        });
+        
+        let cellClass = 'calendar-day-cell';
+        if (!isCurrentMonth) cellClass += ' other-month';
+        if (isToday) cellClass += ' today-cell';
+        
+        html += `<div class="${cellClass}">`;
+        html += `<div class="day-number shadow-sm">${dayNumber}</div>`;
+        
+        bookingsForDate.slice(0, 4).forEach(booking => {
+            let icon = '';
+            let typeClass = '';
+            
+            switch(booking.displayType) {
+                case 'checked_in': icon = '🟢'; typeClass = 'checked-in'; break;
+                case 'checkin': icon = '📥'; typeClass = 'checkin'; break;
+                case 'checkout': icon = '📤'; typeClass = 'checkout'; break;
+                case 'confirmed': icon = '📅'; typeClass = 'confirmed'; break;
+                default: icon = '🛏️'; typeClass = 'checked-in';
+            }
+            
+            html += `
+                <div class="booking-card-mini shadow-sm ${typeClass}" onclick="showBooking(${booking.booking_id})">
+                    <div class="guest-name">${icon} ${escapeHtml(booking.guest_name)}</div>
+                    <div class="room-number">Room ${getRoomNumber(booking.room_id)}</div>
+                </div>
+            `;
+        });
+        
+        html += `</div>`;
+    }
+    
+    document.getElementById('calendarGrid').innerHTML = html;
+    
+    if (allBookings.length === 0) {
+        document.getElementById('calendarGrid').innerHTML = `
+            <div class="text-center py-5" style="grid-column: span 7;">
+                <i class="fas fa-calendar-plus fa-3x mb-3 text-muted"></i>
+                <h4 class="fw-bold text-muted">No Active Bookings</h4>
+                <button class="btn btn-primary mt-2 shadow-sm" onclick="window.location.href='/bookings'">
+                    <i class="fas fa-plus me-1"></i> Create Booking
+                </button>
+            </div>
+        `;
+    }
+}
+
+function showBooking(bookingId) {
+    const booking = allBookings.find(b => b.booking_id === bookingId);
+    if (!booking) return;
+    
+    const room = allRooms.find(r => r.room_id === booking.room_id);
+    const nights = Math.max(1, Math.ceil((new Date(booking.check_out_date) - new Date(booking.check_in_date)) / (1000 * 60 * 60 * 24)));
+    const totalAmount = parseFloat(booking.total_amount) || 0;
+    const vat = totalAmount * 0.07;
+    const service = totalAmount * 0.05;
+    const grandTotal = totalAmount + vat + service;
+    
+    const isCurrentlyStaying = booking.check_in_date <= todayStr && 
+                               booking.check_out_date >= todayStr && 
+                               booking.status === 'checked_in';
+    
+    let statusBadge = '';
+    let statusColor = '';
+    if (isCurrentlyStaying) {
+        statusColor = 'var(--success)';
+        statusBadge = '🟢 CURRENTLY STAYING';
+    } else if (booking.status === 'checked_in') {
+        statusColor = 'var(--success)';
+        statusBadge = '✅ Checked In';
+    } else if (booking.status === 'confirmed') {
+        statusColor = 'var(--warning)';
+        statusBadge = '📅 Confirmed';
+    } else {
+        statusColor = '#64748b';
+        statusBadge = '⏳ ' + (booking.status || 'Pending');
+    }
+    
+    const modalHtml = `
+        <div class="text-center mb-4">
+            <span class="shadow-sm" style="background:${statusColor}; padding:8px 20px; border-radius:30px; color:white; font-weight:600; font-size:0.9rem;">
+                ${statusBadge}
+            </span>
+        </div>
+        
+        <div class="row g-3 mb-4">
+            <div class="col-6">
+                <div class="p-3 rounded-3 h-100" style="background: rgba(100,116,139,0.1);">
+                    <strong class="d-block mb-1"><i class="fas fa-user text-primary"></i> Guest</strong>
+                    <span class="fw-bold">${escapeHtml(booking.guest_name)}</span><br>
+                    <small class="text-muted">${booking.guest_email || 'No email'}</small><br>
+                    <small class="text-muted">${booking.guest_phone || 'No phone'}</small>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="p-3 rounded-3 h-100" style="background: rgba(100,116,139,0.1);">
+                    <strong class="d-block mb-1"><i class="fas fa-bed text-primary"></i> Room</strong>
+                    <span class="fs-5 fw-bold text-primary">${room ? room.room_number : booking.room_id}</span><br>
+                    <small class="fw-bold">${getRoomTypeName(booking.room_id)}</small><br>
+                    <small class="text-muted">${booking.adults || 1} Adults, ${booking.children || 0} Children</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-3 rounded-3 mb-4 shadow-sm" style="background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2);">
+            <div class="d-flex justify-content-between text-center align-items-center">
+                <div><small class="text-muted fw-bold">CHECK-IN</small><br><strong class="fs-6">${booking.check_in_date}</strong></div>
+                <div class="text-primary"><i class="fas fa-arrow-right"></i></div>
+                <div><small class="text-muted fw-bold">CHECK-OUT</small><br><strong class="fs-6">${booking.check_out_date}</strong></div>
+                <div class="border-start ps-3"><small class="text-muted fw-bold">NIGHTS</small><br><strong class="fs-6 text-primary">${nights}</strong></div>
+            </div>
+        </div>
+        
+        <div class="p-3 rounded-3 shadow-sm" style="background: rgba(100,116,139,0.05);">
+            <strong class="d-block mb-2"><i class="fas fa-money-bill-wave text-success"></i> Payment Summary</strong>
+            <div class="d-flex justify-content-between mb-1"><span class="text-muted">Room Charge:</span> <span class="fw-bold">$${totalAmount.toFixed(2)}</span></div>
+            <div class="d-flex justify-content-between mb-1"><span class="text-muted">VAT (7%):</span> <span class="fw-bold">$${vat.toFixed(2)}</span></div>
+            <div class="d-flex justify-content-between mb-2"><span class="text-muted">Service (5%):</span> <span class="fw-bold">$${service.toFixed(2)}</span></div>
+            <hr class="my-2 opacity-25">
+            <div class="d-flex justify-content-between fs-5"><strong class="text-dark">TOTAL:</strong> <strong class="text-success">$${grandTotal.toFixed(2)}</strong></div>
+        </div>
+        
+        <div class="d-flex gap-2 mt-4">
+            <button class="btn btn-primary w-100 shadow-sm" onclick="window.open('/receipt/${booking.booking_id}', '_blank')"><i class="fas fa-print me-1"></i> Print Receipt</button>
+            <button class="btn btn-secondary w-100 shadow-sm" onclick="closeModal()">Close</button>
+        </div>
+    `;
+    
+    document.getElementById('modalBody').innerHTML = modalHtml;
+    document.getElementById('bookingModal').style.display = 'flex';
+}
+
+function changeMonth(delta) {
+    currentMonth += delta;
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    else if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+    renderCalendar();
+}
+
+function goToToday() {
+    const today = new Date();
+    currentYear = today.getFullYear();
+    currentMonth = today.getMonth();
+    renderCalendar();
+}
+
+function closeModal() {
+    document.getElementById('bookingModal').style.display = 'none';
+}
+
+function closeModalOnClick(event) {
+    if (event.target === document.getElementById('bookingModal')) {
+        closeModal();
+    }
+}
+
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>
+{% endblock %}

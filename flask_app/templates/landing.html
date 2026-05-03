@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Grand Hotel & Resort — Award-winning luxury hospitality. Experience world-class accommodations, fine dining, and exceptional service.">
+    <meta name="keywords" content="luxury hotel, resort, grand hotel, luxury accommodation, fine dining, spa, business hotel">
+    <meta name="author" content="Grand Hotel Management">
+    <meta name="theme-color" content="#0a0f1a">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Grand Hotel & Resort | Luxury Redefined">
+    <meta property="og:description" content="Experience world-class luxury hospitality at Grand Hotel & Resort.">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Grand Hotel & Resort">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Grand Hotel & Resort | Luxury Redefined">
+    <meta name="twitter:description" content="Experience world-class luxury hospitality at Grand Hotel & Resort.">
+    
+    <title>Grand Hotel & Resort | Luxury Hospitality & Fine Accommodation</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏨</text></svg>">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏨</text></svg>">
+    
+    <!-- Preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://unpkg.com">
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gold-400: #dfc278;
+            --gold-500: #c9a84c;
+            --gold-600: #a88838;
+            --gold-700: #8a6e2e;
+            --navy-950: #0a0f1a;
+            --navy-900: #0f1629;
+            --navy-800: #1a2744;
+            --navy-700: #243356;
+            --surface-white: #ffffff;
+            --surface-cream: #faf8f4;
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a68;
+            --text-muted: #8b8a95;
+            --font-display: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+            --font-heading: 'Montserrat', 'Inter', sans-serif;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --transition-fast: 200ms cubic-bezier(0.4,0,0.2,1);
+            --transition-base: 400ms cubic-bezier(0.4,0,0.2,1);
+            --transition-slow: 600ms cubic-bezier(0.4,0,0.2,1);
+            --transition-spring: 600ms cubic-bezier(0.34,1.56,0.64,1);
+            --radius-sm: 8px; --radius-md: 12px; --radius-lg: 20px; --radius-xl: 24px; --radius-2xl: 32px; --radius-full: 9999px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06); --shadow-md: 0 4px 20px rgba(0,0,0,0.06); --shadow-lg: 0 10px 40px rgba(0,0,0,0.08); --shadow-xl: 0 20px 60px rgba(0,0,0,0.12); --shadow-2xl: 0 30px 80px rgba(0,0,0,0.16);
+            --shadow-gold: 0 4px 20px rgba(201,168,76,0.15); --shadow-gold-lg: 0 10px 40px rgba(201,168,76,0.25);
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{scroll-behavior:smooth;scroll-padding-top:80px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+        body{font-family:var(--font-body);font-size:16px;line-height:1.7;color:var(--text-primary);background:var(--surface-cream);overflow-x:hidden}
+        body.loading{overflow:hidden}
+        
+        /* Skip */
+        .skip-link{position:absolute;top:-100px;left:1rem;background:var(--gold-500);color:var(--navy-950);padding:.5rem 1rem;border-radius:var(--radius-sm);font-weight:700;z-index:99999;transition:top var(--transition-fast);text-decoration:none}
+        .skip-link:focus{top:1rem}
+        
+        /* ===== PRELOADER ===== */
+        .preloader{position:fixed;inset:0;z-index:99999;background:var(--navy-950);display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity .7s ease,visibility .7s ease}
+        .preloader.hidden{opacity:0;visibility:hidden;pointer-events:none}
+        .preloader-logo{font-family:var(--font-display);font-size:2.8rem;font-weight:700;color:var(--gold-500);letter-spacing:4px;margin-bottom:1.5rem;opacity:0;transform:translateY(20px);animation:pfade .7s ease forwards}
+        .preloader-ring{width:60px;height:60px;border-radius:50%;border:2px solid rgba(201,168,76,.12);border-top-color:var(--gold-500);border-right-color:var(--gold-400);animation:spin .8s linear infinite}
+        .preloader-text{font-size:.65rem;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-top:1.5rem;opacity:0;animation:pfade .7s ease .3s forwards}
+        @keyframes pfade{to{opacity:1;transform:translateY(0)}}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        
+        /* ===== CURSOR ===== */
+       
+        
+        /* ===== NAVBAR ===== */
+        .navbar-main{position:fixed;top:0;left:0;right:0;z-index:1000;padding:1.25rem 0;transition:all var(--transition-base)}
+        .navbar-main.scrolled{background:rgba(15,22,41,.97);backdrop-filter:blur(24px)saturate(180%);-webkit-backdrop-filter:blur(24px)saturate(180%);padding:.75rem 0;box-shadow:0 4px 40px rgba(0,0,0,.4);border-bottom:1px solid rgba(201,168,76,.06)}
+        .navbar-brand{font-family:var(--font-display);font-size:1.5rem;font-weight:700;color:var(--gold-500)!important;letter-spacing:2px;text-decoration:none;display:flex;align-items:center;gap:.6rem;transition:color var(--transition-fast)}
+        .navbar-brand:hover{color:var(--gold-400)!important}
+        .navbar-brand-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--gold-500),var(--gold-600));border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--navy-900);font-size:1rem;transition:all var(--transition-spring)}
+        .navbar-brand:hover .navbar-brand-icon{transform:scale(1.1)rotate(-3deg)}
+        .nav-link-main{color:rgba(255,255,255,.78)!important;font-family:var(--font-heading);font-size:.72rem;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;padding:.5rem 0!important;margin:0 .75rem;position:relative;transition:color var(--transition-fast)}
+        .nav-link-main::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1.5px;background:var(--gold-500);transition:width var(--transition-base)}
+        .nav-link-main:hover{color:var(--gold-500)!important}
+        .nav-link-main:hover::after{width:100%}
+        .btn-nav-outline{background:transparent;border:1.5px solid var(--gold-500);color:var(--gold-500);padding:.55rem 1.4rem;border-radius:var(--radius-full);font-family:var(--font-heading);font-size:.7rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;transition:all var(--transition-base);text-decoration:none;display:inline-flex;align-items:center;gap:.4rem}
+        .btn-nav-outline:hover{background:var(--gold-500);color:var(--navy-950);box-shadow:var(--shadow-gold)}
+        .btn-nav-solid{background:var(--gold-500);border:1.5px solid var(--gold-500);color:var(--navy-950);padding:.55rem 1.4rem;border-radius:var(--radius-full);font-family:var(--font-heading);font-size:.7rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;transition:all var(--transition-base);text-decoration:none;display:inline-flex;align-items:center;gap:.4rem}
+        .btn-nav-solid:hover{background:var(--gold-400);border-color:var(--gold-400);color:var(--navy-950);transform:translateY(-2px);box-shadow:var(--shadow-gold-lg)}
+        .navbar-toggler{border:1px solid rgba(255,255,255,.2);padding:.5rem .75rem;border-radius:var(--radius-sm);color:white}
+        @media(max-width:991px){.navbar-collapse{background:rgba(15,22,41,.98);backdrop-filter:blur(20px);padding:1.5rem;border-radius:var(--radius-lg);margin-top:1rem;border:1px solid rgba(201,168,76,.1)}.nav-link-main{margin:.5rem 0;padding:.75rem 0!important}}
+        
+        /* ===== HERO ===== */
+        .hero-section{position:relative;min-height:100vh;display:flex;align-items:center;background:linear-gradient(160deg,var(--navy-950)0%,var(--navy-900)30%,var(--navy-800)60%,#1e2f52 100%);overflow:hidden}
+        .hero-particles{position:absolute;inset:0;pointer-events:none}
+        .hero-particle{position:absolute;width:2px;height:2px;background:var(--gold-500);border-radius:50%;animation:particleFloat linear infinite;opacity:0}
+        @keyframes particleFloat{0%{transform:translateY(100vh)scale(0);opacity:0}10%{opacity:.8}90%{opacity:.2}100%{transform:translateY(-100px)scale(1.5);opacity:0}}
+        .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(201,168,76,.025)1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.025)1px,transparent 1px);background-size:60px 60px}
+        .hero-glow{position:absolute;border-radius:50%;filter:blur(140px);opacity:.1;pointer-events:none}
+        .hero-glow-1{width:600px;height:600px;top:-200px;right:-150px;background:var(--gold-500);animation:glowFloat 10s ease-in-out infinite}
+        .hero-glow-2{width:450px;height:450px;bottom:-120px;left:-80px;background:var(--navy-700);animation:glowFloat 10s ease-in-out 5s infinite}
+        @keyframes glowFloat{0%,100%{transform:translate(0,0)scale(1)}33%{transform:translate(40px,-30px)scale(1.12)}66%{transform:translate(-25px,25px)scale(.88)}}
+        .hero-content-wrapper{position:relative;z-index:2;padding:4rem 0}
+        .hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);color:var(--gold-400);padding:.45rem 1.2rem;border-radius:var(--radius-full);font-family:var(--font-heading);font-size:.68rem;font-weight:600;letter-spacing:3px;text-transform:uppercase;margin-bottom:2rem;animation:heroFadeUp .8s ease forwards}
+        .hero-badge-dot{width:7px;height:7px;background:var(--gold-500);border-radius:50%;animation:pulse 2s ease-in-out infinite}
+        @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.65)}}
+        .hero-title{font-family:var(--font-display);font-size:clamp(3rem,7vw,6.5rem);font-weight:800;color:#fff;line-height:1.05;margin-bottom:1.5rem;animation:heroFadeUp .8s ease .15s forwards;opacity:0}
+        .hero-title-accent{display:block;color:var(--gold-500);font-style:italic;font-weight:500;background:linear-gradient(135deg,var(--gold-400),var(--gold-500),var(--gold-600));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .hero-description{font-size:1.05rem;color:rgba(255,255,255,.6);max-width:520px;line-height:1.8;margin-bottom:2.5rem;animation:heroFadeUp .8s ease .3s forwards;opacity:0}
+        .hero-actions{display:flex;gap:1rem;flex-wrap:wrap;animation:heroFadeUp .8s ease .45s forwards;opacity:0}
+        .btn-hero{padding:.9rem 2rem;border-radius:var(--radius-full);font-family:var(--font-heading);font-size:.75rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;transition:all var(--transition-base);position:relative;overflow:hidden}
+        .btn-hero::after{content:'';position:absolute;top:50%;left:50%;width:0;height:0;border-radius:50%;background:rgba(255,255,255,.2);transform:translate(-50%,-50%);transition:width .6s ease,height .6s ease}
+        .btn-hero:active::after{width:300px;height:300px}
+        .btn-hero-primary{background:linear-gradient(135deg,var(--gold-500),var(--gold-600));color:var(--navy-950);border:none;box-shadow:var(--shadow-gold)}
+        .btn-hero-primary:hover{transform:translateY(-3px);box-shadow:var(--shadow-gold-lg);filter:brightness(1.1)}
+        .btn-hero-outline{background:transparent;border:1.5px solid rgba(255,255,255,.2);color:#fff}
+        .btn-hero-outline:hover{border-color:#fff;background:rgba(255,255,255,.04);transform:translateY(-3px)}
+        .hero-stats-row{display:flex;gap:3rem;margin-top:4rem;padding-top:2rem;border-top:1px solid rgba(255,255,255,.06);animation:heroFadeUp .8s ease .6s forwards;opacity:0}
+        .hero-stat-number{font-family:var(--font-display);font-size:2.8rem;font-weight:700;color:var(--gold-500);line-height:1;margin-bottom:.2rem}
+        .hero-stat-label{font-family:var(--font-heading);font-size:.65rem;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase}
+        .hero-scroll{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;cursor:pointer;z-index:2;color:var(--gold-500);opacity:0;animation:heroFadeUp .8s ease 1s forwards}
+        .hero-scroll-text{font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.35)}
+        .hero-scroll-icon{animation:scrollBounce 2s ease-in-out infinite}
+        @keyframes scrollBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(10px)}}
+        @keyframes heroFadeUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+        
+        /* ===== SECTIONS ===== */
+        .section{padding:6rem 0}
+        .section-alt{background:var(--surface-white)}
+        .section-header{text-align:center;margin-bottom:4rem}
+        .section-label{font-family:var(--font-heading);font-size:.6rem;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gold-600);margin-bottom:.75rem}
+        .section-title{font-family:var(--font-display);font-size:clamp(2rem,4vw,3.5rem);font-weight:700;color:var(--navy-900);margin-bottom:1rem}
+        .section-divider{width:50px;height:2px;background:var(--gold-500);margin:1.5rem auto}
+        .section-description{color:var(--text-secondary);max-width:550px;margin:0 auto;line-height:1.7}
+        
+        /* ===== FEATURES ===== */
+        .features-strip{background:var(--navy-900);padding:4rem 0;position:relative}
+        .features-strip::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold-500),transparent);opacity:.4}
+        .feature-card{text-align:center;padding:2rem;border-radius:var(--radius-xl);transition:all var(--transition-slow);position:relative;overflow:hidden}
+        .feature-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at center,rgba(201,168,76,.06)0%,transparent 70%);opacity:0;transition:opacity var(--transition-slow)}
+        .feature-card:hover::before{opacity:1}
+        .feature-card:hover{transform:translateY(-8px)}
+        .feature-icon{width:70px;height:70px;margin:0 auto 1.5rem;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.15);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:var(--gold-500);transition:all var(--transition-spring)}
+        .feature-card:hover .feature-icon{background:rgba(201,168,76,.15);transform:scale(1.1)rotate(5deg);box-shadow:var(--shadow-gold);border-color:var(--gold-500)}
+        .feature-title{font-family:var(--font-display);font-size:1.1rem;font-weight:600;color:#fff;margin-bottom:.4rem}
+        .feature-text{font-size:.82rem;color:rgba(255,255,255,.5);line-height:1.6}
+        
+        /* ===== PARALLAX STRIP ===== */
+        .parallax-strip{position:relative;padding:5rem 0;background:url('/static/uploads/rooms/default-room.jpg')center/cover fixed;overflow:hidden}
+        .parallax-strip::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--navy-950)0%,rgba(15,22,41,.85)50%,var(--navy-800)100%)}
+        .parallax-content{position:relative;z-index:1;text-align:center}
+        .parallax-number{font-family:var(--font-display);font-size:4rem;font-weight:700;color:var(--gold-500);line-height:1}
+        .parallax-label{font-size:.75rem;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.6);margin-top:.5rem}
+        
+        /* ===== ROOM CARDS ===== */
+        .room-card{background:var(--surface-white);border-radius:var(--radius-xl);overflow:hidden;box-shadow:var(--shadow-md);transition:all var(--transition-slow);height:100%;border:1px solid rgba(0,0,0,.04);position:relative}
+        .room-card:hover{transform:translateY(-10px);box-shadow:var(--shadow-2xl)}
+        .room-card-img-wrap{position:relative;height:280px;overflow:hidden;background:linear-gradient(135deg,#f5f0e8,#e8e0d5)}
+        .room-card-img{width:100%;height:100%;object-fit:cover;transition:transform .8s ease,filter .8s ease}
+        .room-card:hover .room-card-img{transform:scale(1.06);filter:brightness(1.05)}
+        .room-card-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,15,26,.65)0%,transparent 50%);opacity:0;transition:opacity var(--transition-base)}
+        .room-card:hover .room-card-overlay{opacity:1}
+        .room-card-shine{position:absolute;top:0;left:-75%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transform:skewX(-25deg);transition:left .8s ease;z-index:3}
+        .room-card:hover .room-card-shine{left:125%}
+        .room-card-badge{position:absolute;top:1rem;right:1rem;background:var(--gold-500);color:var(--navy-950);padding:.35rem .85rem;border-radius:var(--radius-full);font-family:var(--font-heading);font-size:.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;z-index:2}
+        .room-card-status{position:absolute;top:1rem;left:1rem;background:rgba(255,255,255,.95);color:#2d6a4f;padding:.3rem .75rem;border-radius:var(--radius-full);font-size:.68rem;font-weight:600;z-index:2;display:flex;align-items:center;gap:.35rem}
+        .room-card-status-dot{width:7px;height:7px;background:#2d6a4f;border-radius:50%;animation:pulse 2s ease-in-out infinite}
+        .room-card-body{padding:1.75rem}
+        .room-card-meta{display:flex;gap:1rem;margin-bottom:.6rem;font-size:.75rem;color:var(--text-muted)}
+        .room-card-title{font-family:var(--font-display);font-size:1.35rem;font-weight:700;color:var(--navy-900);margin-bottom:.5rem}
+        .room-card-stars{color:#f59e0b;font-size:.78rem;margin-bottom:.75rem}
+        .room-card-footer{display:flex;align-items:flex-end;justify-content:space-between;padding-top:1.25rem;border-top:1px solid #f0f0f0}
+        .room-card-price{font-family:var(--font-display);font-size:1.9rem;font-weight:700;color:var(--navy-900);line-height:1}
+        .room-card-price-period{font-size:.7rem;color:var(--text-muted)}
+        .room-card-btn{padding:.55rem 1.2rem;border-radius:var(--radius-full);font-family:var(--font-heading);font-size:.65rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;background:var(--navy-900);color:#fff;border:none;text-decoration:none;display:inline-flex;align-items:center;gap:.35rem;transition:all var(--transition-base)}
+        .room-card-btn:hover{background:var(--gold-500);color:var(--navy-950);transform:translateX(4px)}
+        
+        /* ===== TESTIMONIALS ===== */
+        .testimonial-card{background:var(--surface-white);border-radius:var(--radius-xl);padding:2rem;box-shadow:var(--shadow-md);transition:all var(--transition-slow);height:100%;border:1px solid rgba(0,0,0,.04);position:relative}
+        .testimonial-card::before{content:'\201C';position:absolute;top:1rem;right:1.5rem;font-family:var(--font-display);font-size:5rem;color:var(--gold-400);opacity:.12;line-height:1;pointer-events:none;transition:all var(--transition-slow)}
+        .testimonial-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+        .testimonial-card:hover::before{opacity:.2;transform:scale(1.1)}
+        .testimonial-header{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}
+        .testimonial-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--gold-500),var(--gold-600));display:flex;align-items:center;justify-content:center;color:var(--navy-950);font-weight:700;font-size:1rem;flex-shrink:0;transition:all var(--transition-spring)}
+        .testimonial-card:hover .testimonial-avatar{transform:scale(1.1)rotate(-5deg)}
+        .testimonial-name{font-weight:700;color:var(--navy-900);font-size:.9rem}
+        .testimonial-date{font-size:.72rem;color:var(--text-muted)}
+        .testimonial-stars{color:#f59e0b;margin-bottom:.75rem;font-size:.8rem}
+        .testimonial-text{color:var(--text-secondary);font-style:italic;line-height:1.7;margin-bottom:1rem;position:relative;z-index:1}
+        .testimonial-room{display:inline-flex;align-items:center;gap:.3rem;background:var(--surface-cream);padding:.3rem .8rem;border-radius:var(--radius-full);font-size:.7rem;color:var(--text-secondary);font-weight:500}
+        .testimonial-img{width:100%;height:160px;object-fit:cover;border-radius:var(--radius-md);margin-top:1rem;cursor:pointer;transition:all var(--transition-base)}
+        .testimonial-img:hover{transform:scale(1.03);box-shadow:var(--shadow-md)}
+        
+        /* ===== CTA ===== */
+        .cta-section{background:linear-gradient(160deg,var(--navy-950)0%,var(--navy-800)100%);position:relative;overflow:hidden}
+        .cta-pattern{position:absolute;inset:0;background-image:radial-gradient(circle at 20% 80%,rgba(201,168,76,.05)0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(201,168,76,.03)0%,transparent 50%);pointer-events:none}
+        .cta-orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:.08}
+        .cta-orb-1{width:400px;height:400px;top:-100px;right:-100px;background:var(--gold-500);animation:glowFloat 12s ease-in-out infinite}
+        .cta-orb-2{width:300px;height:300px;bottom:-80px;left:-60px;background:var(--navy-600);animation:glowFloat 12s ease-in-out 6s infinite}
+        
+        /* ===== FOOTER ===== */
+        .footer-main{background:var(--navy-950);padding:4rem 0 1.5rem;color:rgba(255,255,255,.55);border-top:1px solid rgba(201,168,76,.06)}
+        .footer-brand{font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:var(--gold-500);margin-bottom:.75rem;letter-spacing:1px}
+        .footer-heading{font-family:var(--font-heading);font-size:.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;margin-bottom:1.25rem}
+        .footer-link{display:block;color:rgba(255,255,255,.45);text-decoration:none;font-size:.85rem;margin-bottom:.6rem;transition:all var(--transition-fast)}
+        .footer-link:hover{color:var(--gold-500);transform:translateX(5px)}
+        .footer-bottom{border-top:1px solid rgba(255,255,255,.04);margin-top:2.5rem;padding-top:1.25rem;text-align:center;font-size:.75rem;color:rgba(255,255,255,.3)}
+        .social-icon{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border:1px solid rgba(255,255,255,.12);border-radius:50%;color:rgba(255,255,255,.5);margin-right:.5rem;transition:all var(--transition-base)}
+        .social-icon:hover{background:var(--gold-500);border-color:var(--gold-500);color:var(--navy-950);transform:translateY(-3px)}
+        
+        /* ===== MODAL ===== */
+        .image-modal .modal-content{background:var(--navy-950);border:1px solid rgba(201,168,76,.1);border-radius:var(--radius-xl);overflow:hidden}
+        .image-modal .modal-body{padding:0}
+        .image-modal img{max-height:80vh;object-fit:contain}
+        
+        /* ===== RESPONSIVE ===== */
+        @media(max-width:991px){.hero-stats-row{flex-wrap:wrap;gap:2rem}.section{padding:4rem 0}}
+        @media(max-width:768px){.hero-title{font-size:2.5rem}.hero-stats-row{gap:1.5rem}.hero-stat-number{font-size:2rem}.room-card-img-wrap{height:200px}.parallax-number{font-size:2.5rem}}
+        
+        /* ===== BACK TO TOP ===== */
+        .back-to-top{position:fixed;bottom:2rem;right:2rem;width:48px;height:48px;background:var(--gold-500);color:var(--navy-950);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;z-index:99;opacity:0;visibility:hidden;transition:all var(--transition-base);box-shadow:var(--shadow-gold);border:none}
+        .back-to-top.visible{opacity:1;visibility:visible}
+        .back-to-top:hover{transform:translateY(-4px);box-shadow:var(--shadow-gold-lg)}
+        
+        .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    </style>
+</head>
+<body class="loading">
+
+    <!-- Skip Navigation -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+
+    <!-- Preloader -->
+    <div class="preloader" id="preloader">
+        <div class="preloader-logo">GRAND HOTEL</div>
+        <div class="preloader-ring"></div>
+        <div class="preloader-text">Luxury Hospitality</div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-main" id="navbarMain">
+        <div class="container">
+            <a href="/landing" class="navbar-brand">
+                <span class="navbar-brand-icon"><i class="fas fa-crown"></i></span>
+                Grand Hotel
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+                    <li class="nav-item"><a class="nav-link nav-link-main" href="#features">Amenities</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-main" href="#rooms">Rooms</a></li>
+                    <li class="nav-item"><a class="nav-link nav-link-main" href="#testimonials">Reviews</a></li>
+                    <li class="nav-item ms-lg-3 mt-2 mt-lg-0"><a href="/login" class="btn-nav-outline"><i class="fas fa-sign-in-alt"></i> Sign In</a></li>
+                    <li class="nav-item ms-lg-2 mt-2 mt-lg-0"><a href="/register" class="btn-nav-solid"><i class="fas fa-calendar-check"></i> Reserve</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+
+        <!-- Hero -->
+        <section class="hero-section" id="hero">
+            <div class="hero-grid"></div>
+            <div class="hero-particles" id="heroParticles"></div>
+            <div class="hero-glow hero-glow-1"></div>
+            <div class="hero-glow hero-glow-2"></div>   
+            <div class="container"><div class="row"><div class="col-lg-7">
+                <
+                <div class="hero-content-wrapper">
+                    
+                    <h1 class="hero-title">Where Elegance<br><span class="hero-title-accent">Meets Comfort</span></h1>
+                    <p class="hero-description">Experience unparalleled luxury at Grand Hotel &amp; Resort. From meticulously designed rooms to world‑class amenities, every moment is crafted for your ultimate comfort.</p>
+                    <div class="hero-actions">
+                        <a href="/register" class="btn-hero btn-hero-primary"><i class="fas fa-calendar-check"></i>Book Your Stay</a>
+                        <a href="#rooms" class="btn-hero btn-hero-outline"><i class="fas fa-bed"></i>Explore Rooms</a>
+                    </div>
+                    <div class="hero-stats-row">
+                        <div><div class="hero-stat-number" id="statRooms">—</div><div class="hero-stat-label">Luxury Rooms</div></div>
+                        <div><div class="hero-stat-number" id="statRating">—</div><div class="hero-stat-label">Guest Rating</div></div>
+                        <div><div class="hero-stat-number" id="statReviews">—</div><div class="hero-stat-label">Verified Reviews</div></div>
+                    </div>
+                </div>
+            </div></div></div>
+            <div class="hero-scroll" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">
+                <span class="hero-scroll-text">Discover</span>
+                <i class="fas fa-chevron-down hero-scroll-icon"></i>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="features-strip" id="features">
+            <div class="container"><div class="row g-4">
+                <div class="col-md-4" data-aos="fade-up" data-aos-duration="700">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-concierge-bell"></i></div>
+                        <h3 class="feature-title">Concierge 24/7</h3>
+                        <p class="feature-text">Personalized service around the clock to cater to your every need with a dedicated team.</p>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-duration="700" data-aos-delay="150">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-spa"></i></div>
+                        <h3 class="feature-title">Luxury Spa</h3>
+                        <p class="feature-text">World‑class treatments &amp; wellness programs designed to relax, rejuvenate, and restore.</p>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-duration="700" data-aos-delay="300">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-utensils"></i></div>
+                        <h3 class="feature-title">Fine Dining</h3>
+                        <p class="feature-text">Michelin‑starred chefs crafting unforgettable culinary journeys with seasonal menus.</p>
+                    </div>
+                </div>
+            </div></div>
+        </section>
+
+        <!-- Parallax Stats -->
+        <section class="parallax-strip" id="parallax-strip">
+            <div class="container"><div class="row g-4 parallax-content">
+                <div class="col-md-3 col-6" data-aos="zoom-in" data-aos-duration="600"><div class="parallax-number">4.8</div><div class="parallax-label">Guest Rating</div></div>
+                <div class="col-md-3 col-6" data-aos="zoom-in" data-aos-duration="600" data-aos-delay="100"><div class="parallax-number">150+</div><div class="parallax-label">Luxury Rooms</div></div>
+                <div class="col-md-3 col-6" data-aos="zoom-in" data-aos-duration="600" data-aos-delay="200"><div class="parallax-number">5★</div><div class="parallax-label">Service Quality</div></div>
+                <div class="col-md-3 col-6" data-aos="zoom-in" data-aos-duration="600" data-aos-delay="300"><div class="parallax-number">10K+</div><div class="parallax-label">Happy Guests</div></div>
+            </div></div>
+        </section>
+
+        <!-- Rooms -->
+        <section class="section section-alt" id="rooms">
+            <div class="container">
+                <div class="section-header" data-aos="fade-up"><div class="section-label">Accommodations</div><h2 class="section-title">Our Luxury Rooms</h2><div class="section-divider"></div><p class="section-description">Discover your perfect sanctuary from our curated collection of elegantly appointed rooms.</p></div>
+                <div class="row g-4" id="roomsGrid"></div>
+                <div class="text-center mt-5" data-aos="fade-up" data-aos-delay="100"><a href="/register" class="btn-hero btn-hero-primary"><i class="fas fa-calendar-check"></i>Book Your Room Now</a></div>
+            </div>
+        </section>
+
+        <!-- Testimonials -->
+        <section class="section" id="testimonials">
+            <div class="container">
+                <div class="section-header" data-aos="fade-up"><div class="section-label">Testimonials</div><h2 class="section-title">What Our Guests Say</h2><div class="section-divider"></div><p class="section-description">Read authentic experiences from guests who have stayed with us.</p></div>
+                <div class="row g-4" id="testimonialsGrid"></div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="section cta-section">
+            <div class="cta-pattern"></div><div class="cta-orb cta-orb-1"></div><div class="cta-orb cta-orb-2"></div>
+            <div class="container"><div class="cta-content" data-aos="zoom-in" data-aos-duration="900">
+                <h2 class="section-title" style="color:#fff">Ready for an Unforgettable Stay?</h2>
+                <div class="section-divider"></div>
+                
+                <a href="/register" class="btn-hero btn-hero-primary mt-3" style="font-size:.85rem;padding:1rem 2.5rem"><i class="fas fa-calendar-check"></i>Reserve Your Stay</a>
+            <P></P>
+            <p class="section-title" style="font-size: 1.25rem;color:rgba(255,255,255,.6)">Join thousands of satisfied guests. Book your luxury experience today and create memories that last a lifetime.</p>
+        </div></div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-main">
+        <div class="container"><div class="row g-4">
+            <div class="col-lg-4"><div class="footer-brand"><i class="fas fa-crown me-2"></i>Grand Hotel</div><p>Experience the pinnacle of luxury hospitality. Where every detail is crafted for your perfect stay.</p>
+                <div class="mt-3">
+                    <a href="#" class="social-icon" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-icon" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-icon" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4"><h5 class="footer-heading">Navigation</h5><a href="#hero" class="footer-link">Home</a><a href="#rooms" class="footer-link">Rooms</a><a href="#testimonials" class="footer-link">Reviews</a></div>
+            <div class="col-lg-3 col-md-4"><h5 class="footer-heading">Account</h5><a href="/login" class="footer-link">Sign In</a><a href="/register" class="footer-link">Create Account</a><a href="/register" class="footer-link">Guest Registration</a></div>
+            <div class="col-lg-3 col-md-4"><h5 class="footer-heading">Contact</h5><div class="footer-link"><i class="fas fa-map-marker-alt me-2"></i>123 Luxury Avenue</div><div class="footer-link"><i class="fas fa-phone me-2"></i>+1 (555) 123‑4567</div><div class="footer-link"><i class="fas fa-envelope me-2"></i>reservations@grandhotel.com</div></div>
+        </div><div class="footer-bottom">&copy; 2025 Grand Hotel &amp; Resort. All rights reserved. | Privacy Policy | Terms of Service</div></div>
+    </footer>
+
+    <!-- Image Preview Modal -->
+    <div class="modal fade image-modal" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content">
+            <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" style="z-index:10"></button>
+            <div class="modal-body"><img id="previewImage" src="" alt="Review Photo" class="w-100"></div>
+        </div></div>
+    </div>
+
+    <!-- Back to Top -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+        (function(){'use strict';
+
+        // ── Preloader ──
+        const preloader=document.getElementById('preloader'),body=document.body;
+        const hidePreloader=()=>{preloader.classList.add('hidden');body.classList.remove('loading')};
+        window.addEventListener('load',()=>setTimeout(hidePreloader,900));
+        setTimeout(hidePreloader,5000);
+
+        // ── AOS ──
+        AOS.init({once:true,offset:100,duration:800,easing:'ease-out-cubic'});
+
+        // ── Custom Cursor ──
+        const cursor=document.getElementById('cursor');
+        if(cursor&&window.innerWidth>991){
+            document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px'},{passive:true});
+            document.addEventListener('mouseover',e=>{const t=e.target.closest('a,button,.btn-hero,.room-card,.testimonial-card,.feature-card');cursor.classList.toggle('hover',!!t)},{passive:true});
+            document.addEventListener('mouseout',e=>{const t=e.target.closest('a,button,.btn-hero,.room-card,.testimonial-card,.feature-card');if(t)cursor.classList.remove('hover')},{passive:true});
+        }
+
+        // ── Navbar ──
+        const navbar=document.getElementById('navbarMain');
+        let scrollTicking=false;
+        window.addEventListener('scroll',()=>{if(!scrollTicking){requestAnimationFrame(()=>{navbar.classList.toggle('scrolled',window.scrollY>50);scrollTicking=false});scrollTicking=true}},{passive:true});
+
+        // ── Back to Top ──
+        const btt=document.getElementById('backToTop');
+        window.addEventListener('scroll',()=>{btt.classList.toggle('visible',window.scrollY>600)},{passive:true});
+
+        // ── Hero Particles ──
+        const pc=document.getElementById('heroParticles');
+        if(pc){const f=document.createDocumentFragment();for(let i=0;i<50;i++){const p=document.createElement('div');p.classList.add('hero-particle');p.style.left=Math.random()*100+'%';p.style.animationDuration=(Math.random()*20+12)+'s';p.style.animationDelay=(Math.random()*12)+'s';p.style.width=p.style.height=(Math.random()*3+1)+'px';f.appendChild(p)}pc.appendChild(f)}
+
+        // ── Helpers ──
+        const eh=t=>{if(!t)return'';const d=document.createElement('div');d.textContent=t;return d.innerHTML};
+        const fd=s=>{if(!s)return'';const d=new Date(s);return d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})};
+        const gs=r=>{const f=Math.floor(r||0);let h='';for(let i=1;i<=5;i++)h+=i<=f?'<i class="fas fa-star"></i>':((i===f+1&&(r||0)%1>=.5)?'<i class="fas fa-star-half-alt"></i>':'<i class="far fa-star"></i>');return h};
+        const gi=n=>{if(!n)return'G';const p=n.trim().split(' ');return(p.length>=2?p[0][0]+p[1][0]:p[0].substring(0,2)).toUpperCase()};
+
+        // ── Load Rooms ──
+        function lr(){
+            const g=document.getElementById('roomsGrid');
+            g.innerHTML='<div class="col-12 text-center py-5"><div class="spinner-border" style="color:var(--gold-500)"></div><p class="text-muted mt-3">Loading rooms…</p></div>';
+            $.ajax({url:'/api/public/top-rooms',method:'GET',timeout:15000,
+                success:function(rooms){
+                    if(!rooms?.length){g.innerHTML='<div class="col-12 text-center py-5"><i class="fas fa-bed fa-3x text-muted opacity-50 mb-3"></i><p class="text-muted">No rooms available at the moment.</p></div>';return}
+                    let h='';
+                    rooms.forEach((r,i)=>{const img=r.image_path||'/static/uploads/rooms/default-room.jpg';
+                    h+=`<div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="${i*120}"><article class="room-card">
+                        <div class="room-card-img-wrap"><img src="${img}" alt="Room ${eh(r.room_number)}" class="room-card-img" loading="lazy" onerror="this.src='/static/uploads/rooms/default-room.jpg'"><div class="room-card-shine"></div><div class="room-card-overlay"></div><span class="room-card-badge">${eh(r.type_name)}</span><span class="room-card-status"><span class="room-card-status-dot"></span>Available</span></div>
+                        <div class="room-card-body"><div class="room-card-meta"><span><i class="fas fa-layer-group"></i>Floor ${r.floor}</span><span><i class="fas fa-user"></i>${r.capacity} Guests</span></div><h3 class="room-card-title">${eh(r.type_name)} Suite</h3><div class="room-card-stars">${gs(r.avg_rating||0)}${r.review_count?`<small class="text-muted ms-1">(${r.review_count})</small>`:''}</div>
+                        <div class="room-card-footer"><div><div class="room-card-price">$${parseFloat(r.base_price).toFixed(0)}</div><div class="room-card-price-period">/ night</div></div><a href="/register" class="room-card-btn"><i class="fas fa-arrow-right"></i>Book</a></div></div></article></div>`});
+                    g.innerHTML=h;document.getElementById('statRooms').textContent=rooms.length;AOS.refresh()},
+                error:()=>{g.innerHTML='<div class="col-12 text-center py-5"><i class="fas fa-exclamation-circle fa-3x text-danger mb-3 opacity-50"></i><p class="text-danger">Failed to load rooms.</p></div>'}});
+        }
+
+        // ── Load Reviews ──
+        function lrv(){
+            const g=document.getElementById('testimonialsGrid');
+            g.innerHTML='<div class="col-12 text-center py-5"><div class="spinner-border" style="color:var(--gold-500)"></div><p class="text-muted mt-3">Loading reviews…</p></div>';
+            $.ajax({url:'/api/public/top-reviews',method:'GET',timeout:15000,
+                success:function(reviews){
+                    if(!reviews?.length){g.innerHTML='<div class="col-12 text-center py-5"><i class="fas fa-comments fa-3x text-muted opacity-50 mb-3"></i><p class="text-muted">No reviews yet — be the first to share your experience!</p></div>';return}
+                    let h='',sum=0;
+                    reviews.forEach((r,i)=>{sum+=parseFloat(r.rating);const hi=r.image_path&&r.image_path!==''&&r.image_path!==null;
+                    h+=`<div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="${i*120}"><article class="testimonial-card">
+                        <div class="testimonial-header"><div class="testimonial-avatar">${gi(r.guest_name)}</div><div><div class="testimonial-name">${eh(r.guest_name||'Anonymous Guest')}</div><div class="testimonial-date">${fd(r.created_at)}</div></div></div>
+                        <div class="testimonial-stars">${gs(r.rating)}</div><p class="testimonial-text">"${eh(r.comment||'Wonderful stay!')}"</p><span class="testimonial-room"><i class="fas fa-door-open"></i>${eh(r.type_name||'Room')} ${eh(r.room_number||'')}</span>
+                        ${hi?`<img src="${r.image_path}" class="testimonial-img" loading="lazy" onclick="window.showImagePreview('${r.image_path}')" onerror="this.style.display='none'" alt="Review photo">`:''}</article></div>`});
+                    g.innerHTML=h;document.getElementById('statReviews').textContent=reviews.length;document.getElementById('statRating').textContent=(reviews.length?(sum/reviews.length).toFixed(1)+' ★':'0');AOS.refresh()},
+                error:()=>{g.innerHTML='<div class="col-12 text-center py-5"><i class="fas fa-exclamation-circle fa-3x text-danger mb-3 opacity-50"></i><p class="text-danger">Failed to load reviews.</p></div>'}});
+        }
+
+        window.showImagePreview=function(s){document.getElementById('previewImage').src=s;new bootstrap.Modal(document.getElementById('imagePreviewModal')).show()};
+
+        lr();lrv();
+        })();
+    </script>
+</body>
+</html>

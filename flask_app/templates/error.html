@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="error-card shadow-lg" style="border-radius: 20px; overflow: hidden;">
+                <div class="p-5" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                    <i class="fas fa-exclamation-triangle fa-4x text-white mb-3"></i>
+                    <h1 class="text-white fw-bold mb-0">{{ error_code|default('404') }}</h1>
+                    <p class="text-white-50 mb-0">{{ error_title|default('Page Not Found') }}</p>
+                </div>
+                <div class="p-5 bg-white">
+                    <h3 class="text-dark mb-3">{{ error_message|default('Oops! Something went wrong.') }}</h3>
+                    <p class="text-muted mb-4">{{ error_details|default('The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.') }}</p>
+                    <div class="d-flex gap-3 justify-content-center">
+                        <a href="javascript:history.back()" class="btn btn-outline-secondary px-4">
+                            <i class="fas fa-arrow-left me-2"></i> Go Back
+                        </a>
+                        <a href="/dashboard" class="btn btn-primary px-4">
+                            <i class="fas fa-home me-2"></i> Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .error-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .error-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+    }
+</style>
+{% endblock %}
