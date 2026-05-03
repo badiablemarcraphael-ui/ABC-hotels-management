@@ -228,7 +228,10 @@ def process_payment_success_json(booking_id):
         conn.close()
         
         # Send email
-        email_service.send_payment_receipt(booking, transaction_id, 'GCash via PayMongo')
+        try:
+    email_service.send_payment_receipt # Already wrapped(booking, transaction_id, 'GCash via PayMongo')
+except Exception as email_err:
+    print(f"⚠️ Email error (non-critical): {email_err}")
         
         return jsonify({
             'success': True,
@@ -307,7 +310,11 @@ def process_counter_payment():
         cursor.close()
         conn.close()
         
-        email_service.send_booking_confirmation(booking, 'Pay at Counter', ticket_number)
+        try:
+            email_service.send_booking_confirmation(booking,
+except Exception as e:
+            print(f'?? Email skipped: {e}')
+             'Pay at Counter', ticket_number)
         
         return send_file(
             pdf_path,
@@ -485,7 +492,11 @@ def process_counter_payment_json():
         
         # 🔔 SEND EMAIL for counter payment (same as GCash but with counter payment note)
         try:
-            email_service.send_booking_confirmation(booking, 'Pay at Counter', ticket_number)
+            try:
+            email_service.send_booking_confirmation(booking,
+except Exception as e:
+            print(f'?? Email skipped: {e}')
+             'Pay at Counter', ticket_number)
             print(f"✅ Counter payment confirmation email sent to {booking['guest_email']}")
         except Exception as email_err:
             print(f"⚠️ Email sending failed but booking is confirmed: {email_err}")
@@ -503,3 +514,4 @@ def process_counter_payment_json():
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)})
+
