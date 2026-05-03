@@ -12,13 +12,14 @@ class EmailService:
         self.smtp_port = 587
         self.sender_email = os.environ.get('EMAIL_SENDER', "badiablemarcraphael@gmail.com")
         self.sender_password = os.environ.get('EMAIL_PASSWORD', "")
-        
-        # Auto-disable if no password or on Render
+    
+    # Auto-disable if no password or on Render
         if not self.sender_password:
             self.enabled = False
             print("⚠️ Email service disabled - no EMAIL_PASSWORD set")
         else:
             self.enabled = True
+        print("✅ Email service enabled")
     
     def _get_payment_status_html(self, payment_method, payment_status='pending'):
         """Get payment status badge HTML"""
