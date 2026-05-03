@@ -202,7 +202,7 @@ def process_payment_success_json(booking_id):
         cursor.execute("""
             INSERT INTO payments (booking_id, amount, payment_method, transaction_id, status)
             VALUES (%s, %s, %s, %s, 'completed')
-        """, (booking_id, total_amount * 1.12, 'gcash_paymongo', transaction_id))
+        """, (booking_id, total_amount * 1.12, 'online', transaction_id))
         
         conn.commit()
         
