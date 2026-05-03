@@ -11,6 +11,8 @@ import os
 from datetime import datetime, timedelta
 import time
 
+import sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 def create_app():
     """
@@ -144,15 +146,15 @@ def register_blueprints(app):
     """Register all API blueprint routes."""
     
     # Import blueprints
-    from routes.booking_routes import booking_bp
-    from routes.room_routes import room_bp
-    from routes.user_routes import user_bp
-    from routes.report_routes import report_bp
-    from routes.amenities_routes import amenities_bp
-    from routes.payment_routes import payment_bp
-    from routes.coupon_routes import coupon_bp
-    from routes.comment_routes import comment_bp
-    from routes.calendar_routes import calendar_bp
+    from flask_app.routes.booking_routes import booking_bp
+    from flask_app.routes.room_routes import room_bp
+    from flask_app.routes.user_routes import user_bp
+    from flask_app.routes.report_routes import report_bp
+    from flask_app.routes.amenities_routes import amenities_bp
+    from flask_app.routes.payment_routes import payment_bp
+    from flask_app.routes.coupon_routes import coupon_bp
+    from flask_app.routes.comment_routes import comment_bp
+    from flask_app.routes.calendar_routes import calendar_bp
     
     # Register with URL prefixes
     blueprints = [
@@ -174,7 +176,7 @@ def register_blueprints(app):
 def register_web_routes(app):
     """Register all web page routes and API endpoints."""
     
-    from db_config import get_db_connection
+    from flask_app.db_config import get_db_connection
     
     # ── Authentication Decorator ──
     def login_required(f):
