@@ -6,13 +6,19 @@ from datetime import datetime
 import os
 
 class EmailService:
-    def __init__(self):
-        # Configure your email settings here
+    class EmailService:
+     def __init__(self):
         self.smtp_server = "smtp.gmail.com"
         self.smtp_port = 587
         self.sender_email = os.environ.get('EMAIL_SENDER', "badiablemarcraphael@gmail.com")
         self.sender_password = os.environ.get('EMAIL_PASSWORD', "")
-        self.enabled = True
+        
+        # Auto-disable if no password or on Render
+        if not self.sender_password:
+            self.enabled = False
+            print("⚠️ Email service disabled - no EMAIL_PASSWORD set")
+        else:
+            self.enabled = True
     
     def _get_payment_status_html(self, payment_method, payment_status='pending'):
         """Get payment status badge HTML"""
@@ -47,11 +53,10 @@ class EmailService:
                 'completed'
             )
     
-    def send_booking_confirmation(self, booking, payment_method, ticket_number):
-        """Send beautiful HTML booking confirmation email"""
+    def send_payment_receipt(self, booking, transaction_id, payment_method='GCash'):
         if not self.enabled:
-            print(f"📧 Email would be sent to {booking['guest_email']}")
-            return True
+         print(f"📧 Receipt skipped (disabled) - would send to {booking.get('guest_email', 'unknown')}")
+        return True
         
         try:
             # Get payment status
