@@ -10,6 +10,8 @@ from datetime import datetime, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from flask_app.db_config import get_db_connection
+from flask_app.utils.email_service import get_email_service
+
 
 user_bp = Blueprint('user', __name__)
 
@@ -550,8 +552,7 @@ def send_otp():
         
         # Send OTP via email
         try:
-            from flask_app.utils.email_service import get_email_service
-            
+                        
             subject = "🔐 Your OTP Code - Grand Hotel Registration"
             html_body = f"""
             <div style="max-width: 500px; margin: 0 auto; font-family: Arial, sans-serif;">
@@ -638,8 +639,7 @@ def forgot_password():
         
         # Send OTP via email
         try:
-            from flask_app.utils.email_service import get_email_service
-            
+                        
             subject = "🔑 Password Reset OTP - Grand Hotel"
             html_body = f"""
             <div style="max-width: 500px; margin: 0 auto; font-family: Arial, sans-serif;">
@@ -878,3 +878,4 @@ def verify_otp():
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'message': 'Registration failed. Please try again.'})
+

@@ -9,6 +9,7 @@ import uuid
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from flask_app.db_config import get_db_connection
 from flask_app.utils.email_service import get_email_service
+
 from flask_app.utils.pdf_generator import generate_booking_ticket
 from flask_app.utils.paymongo_checkout import paymongo_checkout
 
@@ -493,3 +494,4 @@ def process_counter_payment_json():
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)})
+
