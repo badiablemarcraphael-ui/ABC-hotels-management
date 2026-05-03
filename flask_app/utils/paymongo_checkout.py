@@ -128,7 +128,7 @@ class PayMongoCheckout:
     def _store_checkout_session(self, booking_id, session_id):
         """Store checkout session ID in database"""
         try:
-            from db_config import get_db_connection
+            from flask_app.db_config import get_db_connection
             
             conn = get_db_connection()
             cursor = conn.cursor()

@@ -5,7 +5,7 @@ from decimal import Decimal
 from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from db_config import get_db_connection
+from flask_app.db_config import get_db_connection
 
 report_bp = Blueprint('report', __name__)
 

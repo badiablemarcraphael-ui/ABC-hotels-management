@@ -9,7 +9,7 @@ from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from db_config import get_db_connection
+from flask_app.db_config import get_db_connection
 
 user_bp = Blueprint('user', __name__)
 
@@ -550,7 +550,7 @@ def send_otp():
         
         # Send OTP via email
         try:
-            from utils.email_service import email_service
+            from flask_app.utils.email_service import email_service
             
             subject = "🔐 Your OTP Code - Grand Hotel Registration"
             html_body = f"""
@@ -638,7 +638,7 @@ def forgot_password():
         
         # Send OTP via email
         try:
-            from utils.email_service import email_service
+            from flask_app.utils.email_service import email_service
             
             subject = "🔑 Password Reset OTP - Grand Hotel"
             html_body = f"""

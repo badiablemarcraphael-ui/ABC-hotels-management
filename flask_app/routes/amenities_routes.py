@@ -6,7 +6,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import from local db_config (NOT from config.db_config)
-from db_config import get_db_connection
+from flask_app.db_config import get_db_connection
 
 amenities_bp = Blueprint('amenities', __name__)
 

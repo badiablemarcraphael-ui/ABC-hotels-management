@@ -5,7 +5,7 @@ from decimal import Decimal
 from datetime import datetime, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from db_config import get_db_connection
+from flask_app.db_config import get_db_connection
 
 calendar_bp = Blueprint('calendar', __name__)
 

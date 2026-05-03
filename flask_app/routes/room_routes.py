@@ -5,7 +5,7 @@ import uuid
 from werkzeug.utils import secure_filename
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from db_config import get_db_connection
+from flask_app.db_config import get_db_connection
 
 room_bp = Blueprint('room', __name__)
 

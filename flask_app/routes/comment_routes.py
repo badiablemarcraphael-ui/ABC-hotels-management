@@ -5,7 +5,7 @@ from datetime import datetime
 import uuid
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from db_config import get_db_connection
+from flask_app.db_config import get_db_connection
 
 comment_bp = Blueprint('comment', __name__)
 

@@ -7,7 +7,7 @@ import json
 import subprocess
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from db_config import get_db_connection
+from flask_app.db_config import get_db_connection
 
 booking_bp = Blueprint('booking', __name__)
 

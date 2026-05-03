@@ -7,10 +7,10 @@ import json
 import uuid
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from db_config import get_db_connection
-from utils.email_service import email_service
-from utils.pdf_generator import generate_booking_ticket
-from utils.paymongo_checkout import paymongo_checkout
+from flask_app.db_config import get_db_connection
+from flask_app.utils.email_service import email_service
+from flask_app.utils.pdf_generator import generate_booking_ticket
+from flask_app.utils.paymongo_checkout import paymongo_checkout
 
 payment_bp = Blueprint('payment', __name__)
 
