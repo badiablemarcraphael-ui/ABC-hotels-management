@@ -550,7 +550,7 @@ def send_otp():
         
         # Send OTP via email
         try:
-            from flask_app.utils.email_service import email_service
+            from flask_app.utils.email_service import get_email_service
             
             subject = "🔐 Your OTP Code - Grand Hotel Registration"
             html_body = f"""
@@ -570,14 +570,14 @@ def send_otp():
             """
             
             msg = MIMEMultipart('alternative')
-            msg['From'] = email_service.sender_email
+            msg['From'] = get_email_service().sender_email
             msg['To'] = email
             msg['Subject'] = subject
             msg.attach(MIMEText(html_body, 'html'))
             
-            server = smtplib.SMTP(email_service.smtp_server, email_service.smtp_port)
+            server = smtplib.SMTP(get_email_service().smtp_server, get_email_service().smtp_port)
             server.starttls()
-            server.login(email_service.sender_email, email_service.sender_password)
+            server.login(get_email_service().sender_email, get_email_service().sender_password)
             server.send_message(msg)
             server.quit()
             
@@ -638,7 +638,7 @@ def forgot_password():
         
         # Send OTP via email
         try:
-            from flask_app.utils.email_service import email_service
+            from flask_app.utils.email_service import get_email_service
             
             subject = "🔑 Password Reset OTP - Grand Hotel"
             html_body = f"""
@@ -659,14 +659,14 @@ def forgot_password():
             """
             
             msg = MIMEMultipart('alternative')
-            msg['From'] = email_service.sender_email
+            msg['From'] = get_email_service().sender_email
             msg['To'] = email
             msg['Subject'] = subject
             msg.attach(MIMEText(html_body, 'html'))
             
-            server = smtplib.SMTP(email_service.smtp_server, email_service.smtp_port)
+            server = smtplib.SMTP(get_email_service().smtp_server, get_email_service().smtp_port)
             server.starttls()
-            server.login(email_service.sender_email, email_service.sender_password)
+            server.login(get_email_service().sender_email, get_email_service().sender_password)
             server.send_message(msg)
             server.quit()
             

@@ -496,7 +496,17 @@ class EmailService:
             return False
 
 # Initialize email service
-email_service = EmailService()
+# Lazy initialization - only create when actually needed
+_email_service_instance = None
+
+def get_email_service():
+    global _email_service_instance
+    if _email_service_instance is None:
+        _email_service_instance = EmailService()
+    return _email_service_instance
+
+# Legacy support for existing imports
+email_service = None
 
 # Test function
 def test_email():

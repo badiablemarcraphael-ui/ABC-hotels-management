@@ -8,7 +8,7 @@ import uuid
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from flask_app.db_config import get_db_connection
-from flask_app.utils.email_service import email_service
+from flask_app.utils.email_service import get_email_service
 from flask_app.utils.pdf_generator import generate_booking_ticket
 from flask_app.utils.paymongo_checkout import paymongo_checkout
 
@@ -225,7 +225,7 @@ def process_payment_success_json(booking_id):
         
         # Send email (non-critical)
         try:
-            email_service.send_payment_receipt(booking, transaction_id, 'GCash via PayMongo')
+            get_email_service().send_payment_receipt(booking, transaction_id, 'GCash via PayMongo')
         except Exception as email_err:
             print(f"⚠️ Email skipped (non-critical): {email_err}")
         
@@ -305,7 +305,7 @@ def process_counter_payment():
         
         # Send email (non-critical)
         try:
-            email_service.send_booking_confirmation(booking, 'Pay at Counter', ticket_number)
+            get_email_service().send_booking_confirmation(booking, 'Pay at Counter', ticket_number)
         except Exception as email_err:
             print(f"⚠️ Email skipped (non-critical): {email_err}")
         
@@ -478,7 +478,7 @@ def process_counter_payment_json():
         
         # Send email (non-critical)
         try:
-            email_service.send_booking_confirmation(booking, 'Pay at Counter', ticket_number)
+            get_email_service().send_booking_confirmation(booking, 'Pay at Counter', ticket_number)
         except Exception as email_err:
             print(f"⚠️ Email skipped (non-critical): {email_err}")
         
